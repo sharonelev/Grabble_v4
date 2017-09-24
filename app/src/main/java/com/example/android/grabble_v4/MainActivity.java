@@ -15,7 +15,7 @@ import com.example.android.grabble_v4.data.LetterBag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener{
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     */
 
-        mBoardAdapter = new BoardAdapter(this, board);
+        mBoardAdapter = new BoardAdapter(this, board, this);
         mBoardRecView.setAdapter(mBoardAdapter);
 
 
@@ -96,5 +96,12 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             totalSum = totalSum + item.letter_probability;
         }
         return totalSum;
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+
+        mLetterBuild.setText(board.get(clickedItemIndex).getLetter_name());
+
     }
 }

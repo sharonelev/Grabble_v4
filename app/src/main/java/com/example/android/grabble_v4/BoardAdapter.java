@@ -3,10 +3,12 @@ package com.example.android.grabble_v4;
 import android.content.Context;
 import android.net.sip.SipAudioCall;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 
@@ -18,13 +20,21 @@ import java.util.List;
 
 
 
-public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewHolder>{
+public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewHolder> {
 
     List<SingleLetter> mBoard;
+    ListItemClickListener mOnClickListener;
 
 
-    public BoardAdapter(Context context, List<SingleLetter> list){
+
+    public interface ListItemClickListener {
+        // YOSSI explanation
+        void onListItemClick(int clickedItemIndex);
+    }
+
+    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener){
         mBoard = list;
+      mOnClickListener =listener;
     };
     @Override
     public LetterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -43,8 +53,6 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     public void onBindViewHolder(LetterViewHolder holder, int position) {
 
 
-        //     if (!mCursor.moveToPosition(position))
-        //       return; // bail if returned null
 
         if(mBoard.get(position)==null){
             return;
@@ -66,7 +74,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
 
 
-    public class LetterViewHolder extends RecyclerView.ViewHolder {
+    public class LetterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView mLetter;
         TextView mLetterValue;
@@ -76,7 +84,24 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             super(itemView);
             mLetter = (TextView) itemView.findViewById(R.id.scrabble_letter_name);
             mLetterValue = (TextView) itemView.findViewById(R.id.scrabble_letter_value);
+            itemView.setOnClickListener(this);
 
         }
+
+        @Override
+        public void onClick(View view) {
+            {
+
+                // pass letter tag to textview of main activity. remove letter from list
+                //YOSSI couldn't do toast
+                Log.i("first","letter clicked");
+                int clickedPosition = getAdapterPosition();
+                //Object letterTag = view.getTag();
+                mOnClickListener.onListItemClick(clickedPosition);
+                // Toast.makeText(this, "letter clicked", Toast.LENGTH_LONG).show;
+            }
+        }
+
+
     }
 }
