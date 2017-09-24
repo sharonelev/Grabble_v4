@@ -24,17 +24,19 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
     List<SingleLetter> mBoard;
     ListItemClickListener mOnClickListener;
+    int recyclerViewId;
 
 
 
     public interface ListItemClickListener {
         // YOSSI explanation
-        void onListItemClick(int clickedItemIndex);
+        void onListItemClick(int view_id, int clickedItemIndex);
     }
 
-    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener){
+    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id){
         mBoard = list;
       mOnClickListener =listener;
+        recyclerViewId=recycler_id;
     };
     @Override
     public LetterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -97,7 +99,9 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 Log.i("first","letter clicked");
                 int clickedPosition = getAdapterPosition();
                 //Object letterTag = view.getTag();
-                mOnClickListener.onListItemClick(clickedPosition);
+
+                mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);
+                //view.getId() - pass this if able to use same adapter for several recyclerviews
                 // Toast.makeText(this, "letter clicked", Toast.LENGTH_LONG).show;
             }
         }

@@ -19,8 +19,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
+    List<SingleLetter> builder = new ArrayList<SingleLetter>();
     private BoardAdapter mBoardAdapter;
+    private BoardAdapter mBuilderAdapter;
     RecyclerView mBoardRecView;
+    RecyclerView mBuilderRecView;
     TextView mLetterBuild;
 
     @Override
@@ -32,9 +35,12 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
         //RecycleView reference
         mBoardRecView = (RecyclerView)findViewById(R.id.scrabble_letter_list);
+        mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
         //set Layout
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
+        GridLayoutManager BuildergridLayoutManager = new GridLayoutManager(this, 4);
         mBoardRecView.setLayoutManager(gridLayoutManager);
+        mBuilderRecView.setLayoutManager(BuildergridLayoutManager);
         newGame();
     /*    String example =String.valueOf(list.get(79).getLetter()) +" value: "+ String.valueOf(list.get(5).getValue());
         mLetterBag.setText(example);
@@ -42,8 +48,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     */
 
-        mBoardAdapter = new BoardAdapter(this, board, this);
+        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
         mBoardRecView.setAdapter(mBoardAdapter);
+
+        mBuilderAdapter = new BoardAdapter(this,builder,this, R.id.word_builder_list );
+        mBuilderRecView.setAdapter(mBuilderAdapter);
 
 
     }
@@ -99,9 +108,27 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
+    public void onListItemClick(int recyler_id, int clickedItemIndex) {
 
-        mLetterBuild.setText(board.get(clickedItemIndex).getLetter_name());
+
+        //remove from board list
+        //pass to builder list
+        switch(recyler_id) {
+            case R.id.scrabble_letter_list:
+            //mLetterBuild.setText("from board to builder " + board.get(clickedItemIndex).getLetter_name()); //testing
+            builder.add(board.get(clickedItemIndex));
+            board.remove(board.get(clickedItemIndex));
+            mBoardAdapter.notifyDataSetChanged();
+            mBuilderAdapter.notifyDataSetChanged();
+                break;
+            case R.id.word_builder_list:
+            //    mLetterBuild.setText("from builder to board " + board.get(clickedItemIndex).getLetter_name()); //testing
+                board.add(builder.get(clickedItemIndex));
+                builder.remove(builder.get(clickedItemIndex));
+                mBoardAdapter.notifyDataSetChanged();
+                mBuilderAdapter.notifyDataSetChanged();
+                break;
+        }
 
     }
 }
