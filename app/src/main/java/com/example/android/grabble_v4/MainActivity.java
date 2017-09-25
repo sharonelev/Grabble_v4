@@ -6,12 +6,15 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.LetterBag;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,15 +27,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     private BoardAdapter mBuilderAdapter;
     RecyclerView mBoardRecView;
     RecyclerView mBuilderRecView;
-    TextView mLetterBuild;
+    TextView wordReview;
+    ProgressBar pBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLetterBuild = (TextView) findViewById(R.id.word_builder);
-
+        wordReview = (TextView) findViewById(R.id.success_words);
+        pBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         //RecycleView reference
         mBoardRecView = (RecyclerView)findViewById(R.id.scrabble_letter_list);
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
@@ -96,6 +100,29 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 addLetterToBoard();
                 mBoardAdapter.notifyDataSetChanged();
                 break;
+            case R.id.send_word:
+                Log.i("send word", "send word");
+                String spellCheckWord="";
+                for(int i=0; i<builder.size(); i++){
+
+                    spellCheckWord = spellCheckWord + builder.get(i).getLetter_name();
+
+                }
+                //wordReview.setText(spellCheckWord);
+                URL wordSearchURL = NetworkUtils.buildUrl(spellCheckWord);
+                new ValidateWord(wordReview, pBar).execute(wordSearchURL);
+                //add dictionary check!
+                break;
+            case R.id.clear_word:
+               int builder_size=builder.size();
+                for(int i=builder_size-1; i>=0; i--){
+                    board.add(builder.get(i));
+                    builder.remove(builder.get(i));
+
+                } mBoardAdapter.notifyDataSetChanged();
+                mBuilderAdapter.notifyDataSetChanged();
+                              break;
+
         }
     }
 
@@ -111,18 +138,15 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void onListItemClick(int recyler_id, int clickedItemIndex) {
 
 
-        //remove from board list
-        //pass to builder list
+        //convert to drag and drop!
         switch(recyler_id) {
             case R.id.scrabble_letter_list:
-            //mLetterBuild.setText("from board to builder " + board.get(clickedItemIndex).getLetter_name()); //testing
             builder.add(board.get(clickedItemIndex));
             board.remove(board.get(clickedItemIndex));
             mBoardAdapter.notifyDataSetChanged();
             mBuilderAdapter.notifyDataSetChanged();
                 break;
             case R.id.word_builder_list:
-            //    mLetterBuild.setText("from builder to board " + board.get(clickedItemIndex).getLetter_name()); //testing
                 board.add(builder.get(clickedItemIndex));
                 builder.remove(builder.get(clickedItemIndex));
                 mBoardAdapter.notifyDataSetChanged();

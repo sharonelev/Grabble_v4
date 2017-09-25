@@ -19,7 +19,7 @@ public class LetterBag {
         list.add(new SingleLetter("B",3,2));
         list.add(new SingleLetter("C",3,2));
         list.add(new SingleLetter("D",2,4));
-       /* list.add(new SingleLetter("E",1,12));
+        list.add(new SingleLetter("E",1,12));
         list.add(new SingleLetter("F",4,2));
         list.add(new SingleLetter("G",2,3));
         list.add(new SingleLetter("H",4,2));
@@ -41,7 +41,7 @@ public class LetterBag {
         list.add(new SingleLetter("X",8,1));
         list.add(new SingleLetter("Y",4,2));
         list.add(new SingleLetter("Z",10,1));
-        */
+
         return list;
     }
 }
