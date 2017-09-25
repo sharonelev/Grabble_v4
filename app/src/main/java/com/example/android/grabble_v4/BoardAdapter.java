@@ -25,18 +25,22 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     List<SingleLetter> mBoard;
     ListItemClickListener mOnClickListener;
     int recyclerViewId;
+    int myWordPosition;
+
 
 
 
     public interface ListItemClickListener {
         // YOSSI explanation
+
         void onListItemClick(int view_id, int clickedItemIndex);
     }
 
-    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id){
+    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id, int wordPosition){
         mBoard = list;
       mOnClickListener =listener;
         recyclerViewId=recycler_id;
+        myWordPosition=wordPosition;
     };
     @Override
     public LetterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

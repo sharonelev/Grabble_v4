@@ -9,6 +9,7 @@ import android.preference.Preference;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.grabble_v4.Utilities.GridSpacingItemDecoration;
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.LetterBag;
@@ -36,19 +38,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener{//, myWordsAdapter.ListWordClickListener {
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
     List<SingleLetter> builder = new ArrayList<SingleLetter>();
+    List<List<SingleLetter>> myWords =new ArrayList<>();
     private BoardAdapter mBoardAdapter;
     private BoardAdapter mBuilderAdapter;
+    private myWordsAdapter mWordsAdapter;
     RecyclerView mBoardRecView;
     RecyclerView mBuilderRecView;
+    RecyclerView mMyWordsRecView;
     TextView wordReview;
     ProgressBar pBar;
     TextView mScore;
     int playerScore;
+    int currentWordPosition;
 
 
     @Override
@@ -63,24 +69,26 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         //RecycleView reference
         mBoardRecView = (RecyclerView) findViewById(R.id.scrabble_letter_list);
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
+        mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
         //set Layout
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
-        GridLayoutManager BuildergridLayoutManager = new GridLayoutManager(this, 4);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7);
+        GridLayoutManager BuilderGridLayoutManager = new GridLayoutManager(this, 7);
+        LinearLayoutManager linearLayout = new LinearLayoutManager(this);
+        mMyWordsRecView.setLayoutManager(linearLayout);
         mBoardRecView.setLayoutManager(gridLayoutManager);
-        mBuilderRecView.setLayoutManager(BuildergridLayoutManager);
+        mBuilderRecView.setLayoutManager(BuilderGridLayoutManager);
+      /*  int spacingInPixels = getResources().getDimensionPixelSize(R.id.scrabble_letter_list);
+        mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
-    /*    String example =String.valueOf(list.get(79).getLetter()) +" value: "+ String.valueOf(list.get(5).getValue());
-        mLetterBag.setText(example);
-        Log.i("tag", "abc");
 
-    */
-
-        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
+        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list,0);
         mBoardRecView.setAdapter(mBoardAdapter);
 
-        mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list);
+        mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,0);
         mBuilderRecView.setAdapter(mBuilderAdapter);
 
+        mWordsAdapter = new myWordsAdapter(this, myWords);
+        mMyWordsRecView.setAdapter(mWordsAdapter);
 
     }
 
@@ -145,7 +153,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 //add dictionary check!
                 break;
             case R.id.clear_word:
-                clearBuilder(0); //0 = move letters back to board
+                clearBuilder();
                 break;
 
         }
@@ -171,21 +179,36 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
                 break;
-            case R.id.word_builder_list:
+            case R.id.word_builder_list: //what if it needs to be returned to myWords??
                 board.add(builder.get(clickedItemIndex));
                 builder.remove(builder.get(clickedItemIndex));
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
                 break;
+            //first implement onClickListener to myWordsAdapter.
+           case R.id.myWordsRecyclerView:
+                builder.add(board.get(clickedItemIndex));
+                myWords.get(currentWordPosition).remove(clickedItemIndex);
+                mBuilderAdapter.notifyDataSetChanged();
+                mWordsAdapter.notifyDataSetChanged();
+
         }
 
     }
+/*
+    @Override
+    public void onWordItemClick(int clickedItemIndex) {
+        Log.i("onWord",String.valueOf(clickedItemIndex));
+        currentWordPosition=clickedItemIndex;
+    }
+    */
 
     public class WordValidator extends AsyncTask<URL, Void, String>
 
     {
         String checkWord;
         int tempScore;
+
         public WordValidator(String aWord, int tempAddScore) {
             checkWord = aWord;
             tempScore = tempAddScore;
@@ -201,11 +224,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         protected String doInBackground(URL... params) {
             URL searchUrl = params[0];
             String wordValidateResults = null;
-            try {
+            //return this when API works!
+           /*   try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
+
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
+            wordValidateResults="temp";
             return wordValidateResults;
         }
 
@@ -215,45 +241,43 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
             pBar.setVisibility(View.INVISIBLE);
 
-           // int valid=1;
-         //   parseWordResult(wordValidateResults);
+            // int valid=1;
+            //   parseWordResult(wordValidateResults);
             String valid = null; //change to get the "scrabble" node , put in try catch incase no reply from server
-            try {
+            //return this when API works!
+           /* try {
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace();*/
+                //remove this when API works!
+             valid="1"; {
+                wordReview.setText(valid);
+
+                if (valid.equals("0")) {
+                    // wordReview.setText(wordValidateResults);
+                    dialogWrongWord(checkWord);
+                } else if (valid.equals("1")) {
+                    dialogCorrectWord(checkWord);
+                    List<SingleLetter> newWord = new ArrayList<>();
+                    //move letters to myWords
+                    addWordToMyWords(tempScore);
+
+                }
+
+
             }
-            wordReview.setText(valid);
-
-            if (valid.equals("0")){
-               // wordReview.setText(wordValidateResults);
-                dialogWrongWord(checkWord);
-            }
-           else if (valid.equals("1")) {
-                dialogCorrectWord(checkWord);
-                clearBuilder(1); //move letters to myWords
-
-                playerScore = playerScore +tempScore ;
-                mScore.setText(String.valueOf(playerScore));
-                // empty builder, pass to myWords. update score.
-
-            }
-
-
         }
     }
-
-    public void clearBuilder(int wordDestination){
+    public void clearBuilder(){
         int builder_size = builder.size();
+
+
         for (int i = builder_size - 1; i >= 0; i--) {
 
-            if(wordDestination==0) {
+
                 board.add(builder.get(i));
-            }
-            if(wordDestination==1){
-                //move to myWords
-            }
-            builder.remove(builder.get(i));
+
+                builder.remove(builder.get(i));
 
         }
         mBoardAdapter.notifyDataSetChanged();
@@ -267,16 +291,42 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
 
     public void dialogCorrectWord(String word) {
+
         new AlertDialog.Builder(this).setTitle("Hurray")
                 .setMessage(word + " is great! Keep it up!")
-                .setNeutralButton("Oh Yeah!", null)
+                .setNeutralButton("Oh Yeah!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                       ;
+                    }
+                })
                 .setPositiveButton("See word definition", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                         //DICTIONARY from internet... With intent - activity WordDefinition -to be continued
                     }
                 }).create().show();
+
     }
+
+    public void addWordToMyWords(  int tempScore){
+
+        List<SingleLetter> newWord = new ArrayList<>();
+
+        //move letters to myWords
+
+        for (int i = 0; i < builder.size(); i++) {
+            newWord.add(i, builder.get(i));
+        }
+        builder.clear();
+        mBuilderAdapter.notifyDataSetChanged();;
+        myWords.add(newWord);
+        mWordsAdapter.notifyDataSetChanged();
+        playerScore = playerScore + tempScore;
+        mScore.setText(String.valueOf(playerScore));
+    };
 
 
     public String parseWordResult(String xmlString) throws IOException {

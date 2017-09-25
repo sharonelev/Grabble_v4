@@ -16,21 +16,21 @@
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="75dp"
-    android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:layout_width="50dp"
+    android:layout_height="55dp"
+    android:padding="5dp"
     android:background="#D6C97B"
     >
 
     <TextView
         android:id="@+id/scrabble_letter_name"
         style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
+        android:layout_width="20dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
+        android:layout_gravity="top|left"
         android:fontFamily="monospace"
-        android:textSize="42sp"
-        tools:text="S" />
+        android:textSize="35sp"
+        tools:text="Q" />
 
 
     <TextView
@@ -40,8 +40,8 @@
         android:layout_gravity="bottom|right"
 
         android:fontFamily="monospace"
-        android:textSize="25sp"
-        tools:text="1" />
+        android:textSize="20sp"
+        tools:text="10" />
 
 
 </FrameLayout>
