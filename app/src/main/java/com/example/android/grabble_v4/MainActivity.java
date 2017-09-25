@@ -136,12 +136,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
                 }
                 //wordReview.setText(spellCheckWord);
+                if(spellCheckWord.equals("")){
+                    Toast.makeText(this,"No word",Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 URL wordSearchURL = NetworkUtils.buildUrl(spellCheckWord);
                 new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
                 //add dictionary check!
                 break;
             case R.id.clear_word:
-                clearBuilder();
+                clearBuilder(0); //0 = move letters back to board
                 break;
 
         }
@@ -211,19 +215,26 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
             pBar.setVisibility(View.INVISIBLE);
 
-            int valid=0;
+           // int valid=1;
          //   parseWordResult(wordValidateResults);
-           // int valid = parseWordResult(wordValidateResults); //change to get the "scrabble" node , put in try catch incase no reply from server
-            wordReview.setText(String.valueOf(valid));
+            String valid = null; //change to get the "scrabble" node , put in try catch incase no reply from server
+            try {
+                valid = parseWordResult(wordValidateResults);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            wordReview.setText(valid);
 
-            if (valid == 0) {
+            if (valid.equals("0")){
                // wordReview.setText(wordValidateResults);
                 dialogWrongWord(checkWord);
-            } else if (valid == 1) {
+            }
+           else if (valid.equals("1")) {
                 dialogCorrectWord(checkWord);
-                clearBuilder();
+                clearBuilder(1); //move letters to myWords
 
                 playerScore = playerScore +tempScore ;
+                mScore.setText(String.valueOf(playerScore));
                 // empty builder, pass to myWords. update score.
 
             }
@@ -232,10 +243,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         }
     }
 
-    public void clearBuilder(){
+    public void clearBuilder(int wordDestination){
         int builder_size = builder.size();
         for (int i = builder_size - 1; i >= 0; i--) {
-            board.add(builder.get(i));
+
+            if(wordDestination==0) {
+                board.add(builder.get(i));
+            }
+            if(wordDestination==1){
+                //move to myWords
+            }
             builder.remove(builder.get(i));
 
         }
@@ -253,27 +270,21 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         new AlertDialog.Builder(this).setTitle("Hurray")
                 .setMessage(word + " is great! Keep it up!")
                 .setNeutralButton("Oh Yeah!", null)
-              /*  .setPositiveButton("See word definition", new DialogInterface.OnClickListener() {
+                .setPositiveButton("See word definition", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //DICTIONARY from internet... With intent
-
+                        //DICTIONARY from internet... With intent - activity WordDefinition -to be continued
                     }
-                })
-
-              */
-                .create().show();
+                }).create().show();
     }
 
-/*
-    public int parseWordResult(String xmlString){
 
-       // File file = new File(xmlString);//YOSSI explain stream
-//        InputStream targetStream = new FileInputStream();
+    public String parseWordResult(String xmlString) throws IOException {
+
         InputStream stream = new ByteArrayInputStream(xmlString.getBytes());
         XmlPullParserFactory xmlFactoryObject = null;
         XmlPullParser myParser = null;
-        int valid=0;
+        String valid="";
         try {
             xmlFactoryObject = XmlPullParserFactory.newInstance();
         } catch (XmlPullParserException e) {
@@ -283,23 +294,22 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
            myParser = xmlFactoryObject.newPullParser();
             myParser.setInput(stream,null);
             int event = myParser.getEventType();
+
             while (event != XmlPullParser.END_DOCUMENT)  {
                 String name=myParser.getName();
                 switch (event){
-                    case XmlPullParser.START_TAG:
-                        break;
 
-                    case XmlPullParser.END_TAG:
+                    case XmlPullParser.START_TAG:
                         if(name.equals("scrabble")){
-                            valid = Integer.parseInt(myParser.getAttributeValue(null,"value"));
-                        }
-                        break;
+                            if(myParser.next() == XmlPullParser.TEXT) {
+                            valid = myParser.getText();}
+                            //(null,"value");
+
+                        }break;
+
                 }
-                try {
                     event = myParser.next();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
             }
         } catch (XmlPullParserException e) {
             e.printStackTrace();
@@ -307,5 +317,5 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 return valid;
 
     }
-*/
+
 }
