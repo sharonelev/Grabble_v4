@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener{//, myWordsAdapter.ListWordClickListener {
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener, myWordsAdapter.ListWordClickListener {
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
@@ -81,13 +81,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
 
-        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list,0);
+        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
         mBoardRecView.setAdapter(mBoardAdapter);
 
-        mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,0);
+        mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list);
         mBuilderRecView.setAdapter(mBuilderAdapter);
 
-        mWordsAdapter = new myWordsAdapter(this, myWords);
+        mWordsAdapter = new myWordsAdapter(this, myWords, this);
         mMyWordsRecView.setAdapter(mWordsAdapter);
 
     }
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 break;
             //first implement onClickListener to myWordsAdapter.
            case R.id.myWordsRecyclerView:
-                builder.add(board.get(clickedItemIndex));
+                builder.add(myWords.get(currentWordPosition).get(clickedItemIndex));
                 myWords.get(currentWordPosition).remove(clickedItemIndex);
                 mBuilderAdapter.notifyDataSetChanged();
                 mWordsAdapter.notifyDataSetChanged();
@@ -195,13 +195,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         }
 
     }
-/*
+
+
     @Override
     public void onWordItemClick(int clickedItemIndex) {
-        Log.i("onWord",String.valueOf(clickedItemIndex));
+        Log.i("onWordItemClicked",String.valueOf(clickedItemIndex));
         currentWordPosition=clickedItemIndex;
     }
-    */
+
 
     public class WordValidator extends AsyncTask<URL, Void, String>
 

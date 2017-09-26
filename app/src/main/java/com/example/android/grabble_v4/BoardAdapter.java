@@ -36,11 +36,10 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         void onListItemClick(int view_id, int clickedItemIndex);
     }
 
-    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id, int wordPosition){
+    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id){
         mBoard = list;
       mOnClickListener =listener;
         recyclerViewId=recycler_id;
-        myWordPosition=wordPosition;
     };
     @Override
     public LetterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -97,11 +96,12 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         @Override
         public void onClick(View view) {
             {
-
+                int clickedPosition = getAdapterPosition();
                 // pass letter tag to textview of main activity. remove letter from list
                 //YOSSI couldn't do toast
-                Log.i("first","letter clicked");
-                int clickedPosition = getAdapterPosition();
+                Log.i("letter clicked",String.valueOf(clickedPosition));
+    //            Log.i("Word in my Word list",String.valueOf(myWordPosition));
+
                 //Object letterTag = view.getTag();
 
                 mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);

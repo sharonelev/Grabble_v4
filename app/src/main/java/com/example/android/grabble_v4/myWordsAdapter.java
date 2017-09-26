@@ -2,12 +2,15 @@ package com.example.android.grabble_v4;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 
@@ -21,18 +24,20 @@ import java.util.List;
 public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordViewHolder> {
     Context mContext;
     List<List<SingleLetter>> myWords;
- //   ListWordClickListener mOnClickListener;
+ private   ListWordClickListener mOnClickListener;
 
- /*   public interface ListWordClickListener {
+
+
+   public interface ListWordClickListener {
         // YOSSI explanation
         void onWordItemClick(int clickedItemIndex);
         ;
-    }*/
+    }
 
-    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords){
+    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener){
         mContext=context;
         myWords=aWords;
-      //  mOnClickListener =listener;
+        mOnClickListener=listener;
     }
     @Override
     public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -59,11 +64,14 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             return;}
 
       holder.mList.addAll(myWords.get(position));
+      // holder.wordInList=position;
+    //   holder.mBoardAdapter.notifyDataSetChanged();//causes mywords to duplicate!!!
 
-        holder.eachWordRecView.setLayoutManager(holder.gridLayoutManager);
+
+       /* holder.eachWordRecView.setLayoutManager(holder.gridLayoutManager);
         holder.mBoardAdapter = new BoardAdapter(mContext, holder.mList ,holder.listener, R.id.myWordsRecyclerView, position);
         holder.eachWordRecView.setAdapter(holder.mBoardAdapter);
-
+*/
 
     }
 
@@ -77,36 +85,39 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         RecyclerView eachWordRecView;
         BoardAdapter mBoardAdapter;
         List<SingleLetter> mList = new ArrayList<>();
-       BoardAdapter.ListItemClickListener listener= new MainActivity();
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext,7);
-
+       BoardAdapter.ListItemClickListener listener;
+        GridLayoutManager gridLayoutManager;
+      //  int wordInList;
 
         public WordViewHolder(View itemView) {
 
             super(itemView);
-            itemView.setOnClickListener(this);
+
             eachWordRecView = (RecyclerView)itemView.findViewById(R.id.each_word);
 
-       /*     eachWordRecView.setLayoutManager(gridLayoutManager);
-            mBoardAdapter = new BoardAdapter(mContext, mList ,listener, R.id.myWordsRecyclerView, );
-            eachWordRecView.setAdapter(mBoardAdapter);*/
+            listener=new MainActivity();
+            gridLayoutManager= new GridLayoutManager(mContext,7);
+
+            eachWordRecView.setLayoutManager(gridLayoutManager); //this prevents onClick to work!!
+            mBoardAdapter = new BoardAdapter(mContext, mList ,listener, R.id.myWordsRecyclerView );
+            eachWordRecView.setAdapter(mBoardAdapter);
+
+            eachWordRecView.setLayoutFrozen(true);
+
+            itemView.setOnClickListener(this);
         }
 
-        @Override
-        public void onClick(View view) { //never gets here.....
-            Log.i("WordAdapter","letter in word clicked");
+    @Override
+        public void onClick(View view) {
+
+            //never gets here.....
+
+            Log.i("WordAdapter","word clicked");
             int clickedPosition = getAdapterPosition();
-            //Object letterTag = view.getTag();
-
-            //mOnClickListener.onWordItemClick(clickedPosition);
+            mOnClickListener.onWordItemClick(clickedPosition);
         }
 
-   /*     @Override
-        public void onListItemClick(int view_id, int clickedItemIndex) {
-            Log.i("WordAdapter","letter in word clicked- onListItemClick");
-            Log.i("clicked item",String.valueOf(clickedItemIndex));
-            Log.i("clicked word",String.valueOf(itemView.getId()));
-        }*/
+
     }
 
 }
