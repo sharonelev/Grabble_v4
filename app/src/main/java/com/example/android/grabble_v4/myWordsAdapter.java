@@ -25,7 +25,7 @@ import java.util.List;
 public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordViewHolder> {
     Context mContext;
     List<List<SingleLetter>> myWords;
- private   ListWordClickListener mOnClickListener;
+    ListWordClickListener mOnClickListener;
 
 
 
@@ -39,6 +39,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         mContext=context;
         myWords=aWords;
         mOnClickListener=listener;
+
     }
     @Override
     public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -64,16 +65,9 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
             return;}
 
-      holder.mList.addAll(myWords.get(position));
-       holder.wordInList=position;
-    //   holder.mBoardAdapter.notifyDataSetChanged();//causes mywords to duplicate!!!
 
-
-       /* holder.eachWordRecView.setLayoutManager(holder.gridLayoutManager);
-        holder.mBoardAdapter = new BoardAdapter(mContext, holder.mList ,holder.listener, R.id.myWordsRecyclerView, position);
-        holder.eachWordRecView.setAdapter(holder.mBoardAdapter);
-*/
-
+       holder.mList.addAll(myWords.get(position));
+//        holder.mBoardAdapter.notifyItemChanged(position); //duplicates the list! but I want it to know there was a change in the data...
     }
 
     @Override
@@ -89,7 +83,6 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
        BoardAdapter.ListItemClickListener listener;
         GridLayoutManager gridLayoutManager;
 
-        int wordInList;
 
         public WordViewHolder(View itemView) {
 
@@ -106,17 +99,23 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             //try sending word in list to the adapter and erase the onclick methods here. first erase and see if mywords still gets emptied
             eachWordRecView.setAdapter(mBoardAdapter);
 
+
      //       eachWordRecView.setLayoutFrozen(true);
             // itemView.setOnClickListener(this);
         }
 
         @Override
-        public void onListItemClick(int view_id, int clickedItemIndex) {
+        public void onListItemClick(int view_id, int clickedItemIndex) { // a letter in a word was clicked
             Log.i("click in word adapter","do u get here?");
             int position = getAdapterPosition();
             Log.i("adapter position", String.valueOf(position));
             Log.i("letter position", String.valueOf(clickedItemIndex));
             mOnClickListener.onWordItemClick(position, clickedItemIndex);
+            mList.remove(clickedItemIndex);
+            mList.add(clickedItemIndex,new SingleLetter("",0,0));
+            mBoardAdapter.notifyItemRemoved(clickedItemIndex);
+            mBoardAdapter.notifyItemInserted(clickedItemIndex);
+
         }
 /*
     @Override

@@ -1,6 +1,7 @@
 package com.example.android.grabble_v4;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.sip.SipAudioCall;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -65,8 +66,15 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         int value = mBoard.get(position).letter_value;
 
 
+
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
+        if(holder.mLetter.getText()==""){
+            holder.mLetterValue.setVisibility(View.INVISIBLE);
+            holder.itemView.setOnClickListener(null);
+            holder.itemView.setBackgroundColor(Color.RED);
+        }
+
     }
 
     @Override
@@ -100,15 +108,16 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     //            Log.i("Word in my Word list",String.valueOf(myWordPosition));
 
                 //Object letterTag = view.getTag();
-                if(recyclerViewId==R.id.myWordsRecyclerView){
+               /* if(recyclerViewId==R.id.myWordsRecyclerView){
                     Log.i("onClick board adapter","here");
+                    mLetter.setVisibility(View.INVISIBLE);
+                    mLetterValue.setVisibility(View.INVISIBLE);
+                    itemView.setOnClickListener(null);
+               }*/
 
-                    //why does mywords get emptied?
-
-
-                }
                 mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);
             }
+
         }
 
 

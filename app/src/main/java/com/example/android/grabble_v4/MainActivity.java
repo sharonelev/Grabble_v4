@@ -1,6 +1,7 @@
 package com.example.android.grabble_v4;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -33,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
     List<SingleLetter> builder = new ArrayList<SingleLetter>();
+    List<int[]> builderLetterTypes = new ArrayList<>();// 0=from board 1=from myWords
     List<List<SingleLetter>> myWords =new ArrayList<>();
     private BoardAdapter mBoardAdapter;
     private BoardAdapter mBuilderAdapter;
@@ -54,8 +57,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     ProgressBar pBar;
     TextView mScore;
     int playerScore;
-    int currentLetterPosition;
-    int currentWordPosition;
 
 
     @Override
@@ -170,8 +171,15 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     @Override
     public void onWordItemClick(int clickedWord, int clickedLetter) {
         Log.i("Clicked Letter in Word",myWords.get(clickedWord).get(clickedLetter).letter_name);
-      //  Log.i("Clicked Letter",String.valueOf(clickedWord));
-        //  currentWordPosition=clickedItemIndex;
+
+        builder.add(myWords.get(clickedWord).get(clickedLetter));
+        mBuilderAdapter.notifyDataSetChanged();
+        builderLetterTypes.add(placer(1,clickedWord,clickedLetter));
+
+       myWords.get(clickedWord).remove(clickedLetter);
+        //mWordsAdapter.notifyItemRemoved(clickedWord);
+        myWords.get(clickedWord).add(clickedLetter,new SingleLetter("",0,0));
+      //  mWordsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -182,18 +190,30 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         switch (recyler_id) {
             case R.id.scrabble_letter_list:
                 builder.add(board.get(clickedItemIndex));
-                board.remove(board.get(clickedItemIndex));
+                //board.remove(board.get(clickedItemIndex));// why not
+                board.remove(clickedItemIndex);
+
+                builderLetterTypes.add(placer(0,0,0));
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
                 break;
             case R.id.word_builder_list: //what if it needs to be returned to myWords??
-                board.add(builder.get(clickedItemIndex));
-                builder.remove(builder.get(clickedItemIndex));
-                mBoardAdapter.notifyDataSetChanged();
-                mBuilderAdapter.notifyDataSetChanged();
-                break;
+                int origin= builderLetterTypes.get(clickedItemIndex)[0];
+                switch (origin) {
+                    case 0:
+                        board.add(builder.get(clickedItemIndex));
+                        mBoardAdapter.notifyDataSetChanged();
+
+                    case 1:
+                    //turn textview back to visible and clickable
 
 
+                }  //in any case:
+                    builder.remove(clickedItemIndex);
+                    builderLetterTypes.remove(clickedItemIndex);
+
+                    mBuilderAdapter.notifyDataSetChanged();
+                    break;
         }
 
     }
@@ -223,7 +243,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         protected String doInBackground(URL... params) {
             URL searchUrl = params[0];
             String wordValidateResults = null;
-            //return this when API works!
+            //TODO return this when API works!
            /*   try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
 
@@ -256,7 +276,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     // wordReview.setText(wordValidateResults);
                     dialogWrongWord(checkWord);
                 } else if (valid.equals("1")) {
-                    dialogCorrectWord(checkWord);
+    //                dialogCorrectWord(checkWord); //TODO apply dialogue (removed for testing)
                     List<SingleLetter> newWord = new ArrayList<>();
                     //move letters to myWords
                     addWordToMyWords(tempScore);
@@ -267,7 +287,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             }
         }
     }
-    public void clearBuilder(){
+    public void clearBuilder(){ ///change to clear to mywords as well
         int builder_size = builder.size();
 
 
@@ -275,8 +295,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
 
                 board.add(builder.get(i));
-
-                builder.remove(builder.get(i));
+                builderLetterTypes.remove(i);
+                builder.remove(i);
 
         }
         mBoardAdapter.notifyDataSetChanged();
@@ -320,6 +340,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             newWord.add(i, builder.get(i));
         }
         builder.clear();
+        builderLetterTypes.clear();
         mBuilderAdapter.notifyDataSetChanged();;
         myWords.add(newWord);
         mWordsAdapter.notifyDataSetChanged();
@@ -368,4 +389,10 @@ return valid;
 
     }
 
+    public  int[] placer(int letterOrigin, int wordPlace, int letterPlace){
+       //List placer = new ArrayList();
+        int[] series={letterOrigin,wordPlace,letterPlace};//0: 0= from board 1 = from mywords, 1: word index, 2: letter index
+      //  placer.add(series);
+        return series;
+    }
 }

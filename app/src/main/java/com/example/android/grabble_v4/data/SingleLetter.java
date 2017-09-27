@@ -1,5 +1,7 @@
 package com.example.android.grabble_v4.data;
 
+import android.widget.TextView;
+
 /**
  * Created by user on 9/19/2017.
  */
@@ -16,6 +18,10 @@ public class SingleLetter {
         letter_probability=prob;
     }
 
+    public SingleLetter(String name){
+        letter_name=name;
+
+    }
     public String getLetter_name(){
         return letter_name;
     }
@@ -43,4 +49,6 @@ public class SingleLetter {
     public void reduce_letter_probability(){
         this.letter_probability=letter_probability-1;
     }
+
+
 }
