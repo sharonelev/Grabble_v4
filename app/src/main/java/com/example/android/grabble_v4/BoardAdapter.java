@@ -25,7 +25,6 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     List<SingleLetter> mBoard;
     ListItemClickListener mOnClickListener;
     int recyclerViewId;
-    int myWordPosition;
 
 
 
@@ -56,8 +55,6 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
     @Override
     public void onBindViewHolder(LetterViewHolder holder, int position) {
-
-
 
         if(mBoard.get(position)==null){
             return;
@@ -103,10 +100,14 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     //            Log.i("Word in my Word list",String.valueOf(myWordPosition));
 
                 //Object letterTag = view.getTag();
+                if(recyclerViewId==R.id.myWordsRecyclerView){
+                    Log.i("onClick board adapter","here");
 
+                    //why does mywords get emptied?
+
+
+                }
                 mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);
-                //view.getId() - pass this if able to use same adapter for several recyclerviews
-                // Toast.makeText(this, "letter clicked", Toast.LENGTH_LONG).show;
             }
         }
 

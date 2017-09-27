@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     ProgressBar pBar;
     TextView mScore;
     int playerScore;
+    int currentLetterPosition;
     int currentWordPosition;
 
 
@@ -166,6 +167,12 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         }
         return totalSum;
     }
+    @Override
+    public void onWordItemClick(int clickedWord, int clickedLetter) {
+        Log.i("Clicked Letter in Word",myWords.get(clickedWord).get(clickedLetter).letter_name);
+      //  Log.i("Clicked Letter",String.valueOf(clickedWord));
+        //  currentWordPosition=clickedItemIndex;
+    }
 
     @Override
     public void onListItemClick(int recyler_id, int clickedItemIndex) {
@@ -185,23 +192,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
                 break;
-            //first implement onClickListener to myWordsAdapter.
-           case R.id.myWordsRecyclerView:
-                builder.add(myWords.get(currentWordPosition).get(clickedItemIndex));
-                myWords.get(currentWordPosition).remove(clickedItemIndex);
-                mBuilderAdapter.notifyDataSetChanged();
-                mWordsAdapter.notifyDataSetChanged();
+
 
         }
 
     }
 
 
-    @Override
-    public void onWordItemClick(int clickedItemIndex) {
-        Log.i("onWordItemClicked",String.valueOf(clickedItemIndex));
-        currentWordPosition=clickedItemIndex;
-    }
+
 
 
     public class WordValidator extends AsyncTask<URL, Void, String>
@@ -327,6 +325,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         mWordsAdapter.notifyDataSetChanged();
         playerScore = playerScore + tempScore;
         mScore.setText(String.valueOf(playerScore));
+
     };
 
 

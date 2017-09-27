@@ -3,7 +3,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="70dp"
 
-    android:background="#FF0000">
+    android:background="#FF0000"
+    >
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="65dp"
@@ -11,5 +12,6 @@
         android:padding="5dp"
 
         ></android.support.v7.widget.RecyclerView>
+
 
 </FrameLayout>

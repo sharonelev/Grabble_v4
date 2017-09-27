@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 
+import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
    public interface ListWordClickListener {
         // YOSSI explanation
-        void onWordItemClick(int clickedItemIndex);
+        void onWordItemClick(int clickedWord, int clickedLetter);
         ;
     }
 
@@ -64,7 +65,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             return;}
 
       holder.mList.addAll(myWords.get(position));
-      // holder.wordInList=position;
+       holder.wordInList=position;
     //   holder.mBoardAdapter.notifyDataSetChanged();//causes mywords to duplicate!!!
 
 
@@ -80,14 +81,15 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         return myWords.size();
     }
 
-    public class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-            //, BoardAdapter.ListItemClickListener{
+    public class WordViewHolder extends RecyclerView.ViewHolder implements BoardAdapter.ListItemClickListener{//,View.OnClickListener{
+
         RecyclerView eachWordRecView;
         BoardAdapter mBoardAdapter;
         List<SingleLetter> mList = new ArrayList<>();
        BoardAdapter.ListItemClickListener listener;
         GridLayoutManager gridLayoutManager;
-      //  int wordInList;
+
+        int wordInList;
 
         public WordViewHolder(View itemView) {
 
@@ -95,28 +97,38 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
             eachWordRecView = (RecyclerView)itemView.findViewById(R.id.each_word);
 
-            listener=new MainActivity();
+      //      listener= new MainActivity();
             gridLayoutManager= new GridLayoutManager(mContext,7);
 
             eachWordRecView.setLayoutManager(gridLayoutManager); //this prevents onClick to work!!
-            mBoardAdapter = new BoardAdapter(mContext, mList ,listener, R.id.myWordsRecyclerView );
+            mBoardAdapter = new BoardAdapter(mContext, mList ,this, R.id.myWordsRecyclerView );
+
+            //try sending word in list to the adapter and erase the onclick methods here. first erase and see if mywords still gets emptied
             eachWordRecView.setAdapter(mBoardAdapter);
 
-            eachWordRecView.setLayoutFrozen(true);
-
-            itemView.setOnClickListener(this);
+     //       eachWordRecView.setLayoutFrozen(true);
+            // itemView.setOnClickListener(this);
         }
 
+        @Override
+        public void onListItemClick(int view_id, int clickedItemIndex) {
+            Log.i("click in word adapter","do u get here?");
+            int position = getAdapterPosition();
+            Log.i("adapter position", String.valueOf(position));
+            Log.i("letter position", String.valueOf(clickedItemIndex));
+            mOnClickListener.onWordItemClick(position, clickedItemIndex);
+        }
+/*
     @Override
         public void onClick(View view) {
-
-            //never gets here.....
 
             Log.i("WordAdapter","word clicked");
             int clickedPosition = getAdapterPosition();
             mOnClickListener.onWordItemClick(clickedPosition);
-        }
 
+
+        }
+*/
 
     }
 
