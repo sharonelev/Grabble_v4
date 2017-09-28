@@ -38,6 +38,7 @@ import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener, myWordsAdapter.ListWordClickListener {
@@ -310,21 +311,43 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             }
         }
     }
-    public void clearBuilder(){ ///change to clear to mywords as well
+    public void clearBuilder() { ///change to clear to mywords as well
         int builder_size = builder.size();
 
 
         for (int i = builder_size - 1; i >= 0; i--) {
 
 
-                board.add(builder.get(i));
-                builderLetterTypes.remove(i);
-                builder.remove(i);
+            int origin = builderLetterTypes.get(i)[0];
+            int wordIndex = builderLetterTypes.get(i)[1];
+            int letterIndex = builderLetterTypes.get(i)[2];
+            switch (origin) {
+                case 0: //board
+                    board.remove(letterIndex);//remove place holder
+                    board.add(letterIndex, builder.get(i));
+                   //mBoardAdapter.notifyDataSetChanged();
+                    break;
+                case 1: //myWords(wordplace.letterplace)
+                    if (wordIndex < 0) {
+                        Log.i("case word index=-1", "shouldn't get here");
+                        break;
+                    } //per caution. shouldn't get here
+                    myWords.get(wordIndex).remove(letterIndex); //remove space holder
+                    myWords.get(wordIndex).add(letterIndex, builder.get(i));
+
+                   // mWordsAdapter.notifyDataSetChanged(); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
+                    break;
+            }
+                //    board.add(builder.get(i));
+                    builderLetterTypes.remove(i);
+                    builder.remove(i);
+
 
         }
-        mBoardAdapter.notifyDataSetChanged();
-        mBuilderAdapter.notifyDataSetChanged();
-    }
+            mBoardAdapter.notifyDataSetChanged();
+            mBuilderAdapter.notifyDataSetChanged();
+            mWordsAdapter.notifyDataSetChanged();
+        }
 
     public void dialogWrongWord(String word) {
         new AlertDialog.Builder(this).setTitle("TOO BAD")
@@ -358,13 +381,27 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         List<SingleLetter> newWord = new ArrayList<>();
 
         //move letters to myWords
+        int builder_size=builder.size();
+        List<Integer> tempLetterTypes = new ArrayList<>();
 
-        for (int i = 0; i < builder.size(); i++) {
+        for (int i = 0; i < builder_size; i++) {
             newWord.add(i, builder.get(i));
+            if(builderLetterTypes.get(i)[0]==0){
+                tempLetterTypes.add(builderLetterTypes.get(i)[2]);
+            }
         }
+//SORT templettertypes and remove from board accordingly
+        Collections.sort(tempLetterTypes);
+        for (int i=tempLetterTypes.size()-1;i>=0;i--){
+              //0: from board
+            int toRemove = tempLetterTypes.get(i);
+            board.remove(toRemove);//remove place holders
+        }
+
         builder.clear();
         builderLetterTypes.clear();
         mBuilderAdapter.notifyDataSetChanged();;
+        mBoardAdapter.notifyDataSetChanged();
         myWords.add(newWord);
         mWordsAdapter.notifyDataSetChanged();
         playerScore = playerScore + tempScore;
