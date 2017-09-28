@@ -137,6 +137,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 break;
             case R.id.send_word:
                 Log.i("send word", "send word");
+                //test validity of word:
+                //dictionary and complies to rules
+
                 String spellCheckWord = "";
                 int addScore=0;
                 for (int i = 0; i < builder.size(); i++) {
@@ -177,9 +180,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         builderLetterTypes.add(placer(1,clickedWord,clickedLetter));
 
        myWords.get(clickedWord).remove(clickedLetter);
-        //mWordsAdapter.notifyItemRemoved(clickedWord);
-        myWords.get(clickedWord).add(clickedLetter,new SingleLetter("",0,0));
-      //  mWordsAdapter.notifyDataSetChanged();
+       myWords.get(clickedWord).add(clickedLetter,new SingleLetter("",0,0));
+
     }
 
     @Override
@@ -192,22 +194,43 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 builder.add(board.get(clickedItemIndex));
                 //board.remove(board.get(clickedItemIndex));// why not
                 board.remove(clickedItemIndex);
-
-                builderLetterTypes.add(placer(0,0,0));
+                board.add(clickedItemIndex,new SingleLetter("",0,0));
+                builderLetterTypes.add(placer(0,-1,clickedItemIndex));
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
                 break;
             case R.id.word_builder_list: //what if it needs to be returned to myWords??
                 int origin= builderLetterTypes.get(clickedItemIndex)[0];
+                int wordIndex = builderLetterTypes.get(clickedItemIndex)[1];
+                int letterIndex = builderLetterTypes.get(clickedItemIndex)[2];
                 switch (origin) {
                     case 0:
-                        board.add(builder.get(clickedItemIndex));
+                        board.remove(letterIndex);//remove place holder
+                        board.add(letterIndex, builder.get(clickedItemIndex));
                         mBoardAdapter.notifyDataSetChanged();
+                        break;
+                    case 1: //myWords(wordplace.letterplace)
+                        if(wordIndex<0){
+                            Log.i("case word index=-1","shouldn't get here");
+                            break;} //per caution. shouldn't get here
+                        myWords.get(wordIndex).remove(letterIndex);
+                        myWords.get(wordIndex).add(letterIndex,builder.get(clickedItemIndex));
 
-                    case 1:
-                    //turn textview back to visible and clickable
+                        mWordsAdapter.notifyDataSetChanged(); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
+
+                        //how to notify inner board adapter?? ? ? ? ?  ? ?
+                        //mWordsAdapter.notifyDataSetChanged(); --only for whole word
+                        //trick remove word and insert
+                     //  List<SingleLetter> trick = new ArrayList<>();
+                       // trick.addAll(myWords.get(wordIndex));
+                       // myWords.remove(wordIndex);
+                       // myWords.add(wordIndex,trick);
+                       // mWordsAdapter.notifyDataSetChanged();
+
+                        //mWordsAdapter.notifyDataSetChanged();
 
 
+                        break;
                 }  //in any case:
                     builder.remove(clickedItemIndex);
                     builderLetterTypes.remove(clickedItemIndex);
@@ -263,7 +286,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             // int valid=1;
             //   parseWordResult(wordValidateResults);
             String valid = null; //change to get the "scrabble" node , put in try catch incase no reply from server
-            //return this when API works!
+            //TODO return this when API works!
            /* try {
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
@@ -271,7 +294,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 //remove this when API works!
              valid="1"; {
                 wordReview.setText(valid);
-
+//if valid remove place holders
                 if (valid.equals("0")) {
                     // wordReview.setText(wordValidateResults);
                     dialogWrongWord(checkWord);

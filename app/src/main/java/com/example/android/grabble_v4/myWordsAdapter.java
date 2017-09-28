@@ -65,9 +65,10 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
             return;}
 
-
+        holder.mList.clear();
        holder.mList.addAll(myWords.get(position));
-//        holder.mBoardAdapter.notifyItemChanged(position); //duplicates the list! but I want it to know there was a change in the data...
+
+       holder.mBoardAdapter.notifyItemChanged(position); //duplicates the list!
     }
 
     @Override
@@ -75,12 +76,12 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         return myWords.size();
     }
 
-    public class WordViewHolder extends RecyclerView.ViewHolder implements BoardAdapter.ListItemClickListener{//,View.OnClickListener{
+    public class WordViewHolder extends RecyclerView.ViewHolder implements BoardAdapter.ListItemClickListener {//,View.OnClickListener{
 
         RecyclerView eachWordRecView;
         BoardAdapter mBoardAdapter;
         List<SingleLetter> mList = new ArrayList<>();
-       BoardAdapter.ListItemClickListener listener;
+        BoardAdapter.ListItemClickListener listener;
         GridLayoutManager gridLayoutManager;
 
 
@@ -88,47 +89,35 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
             super(itemView);
 
-            eachWordRecView = (RecyclerView)itemView.findViewById(R.id.each_word);
+            eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
 
-      //      listener= new MainActivity();
-            gridLayoutManager= new GridLayoutManager(mContext,7);
+            //      listener= new MainActivity();
+            gridLayoutManager = new GridLayoutManager(mContext, 7);
 
             eachWordRecView.setLayoutManager(gridLayoutManager); //this prevents onClick to work!!
-            mBoardAdapter = new BoardAdapter(mContext, mList ,this, R.id.myWordsRecyclerView );
+            mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView);
 
             //try sending word in list to the adapter and erase the onclick methods here. first erase and see if mywords still gets emptied
             eachWordRecView.setAdapter(mBoardAdapter);
 
 
-     //       eachWordRecView.setLayoutFrozen(true);
+            //       eachWordRecView.setLayoutFrozen(true);
             // itemView.setOnClickListener(this);
         }
 
         @Override
         public void onListItemClick(int view_id, int clickedItemIndex) { // a letter in a word was clicked
-            Log.i("click in word adapter","do u get here?");
+            Log.i("click in word adapter", "do u get here?");
             int position = getAdapterPosition();
             Log.i("adapter position", String.valueOf(position));
             Log.i("letter position", String.valueOf(clickedItemIndex));
             mOnClickListener.onWordItemClick(position, clickedItemIndex);
             mList.remove(clickedItemIndex);
-            mList.add(clickedItemIndex,new SingleLetter("",0,0));
+            mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
             mBoardAdapter.notifyItemRemoved(clickedItemIndex);
             mBoardAdapter.notifyItemInserted(clickedItemIndex);
 
-        }
-/*
-    @Override
-        public void onClick(View view) {
-
-            Log.i("WordAdapter","word clicked");
-            int clickedPosition = getAdapterPosition();
-            mOnClickListener.onWordItemClick(clickedPosition);
-
-
-        }
-*/
-
+       }
     }
 
 }

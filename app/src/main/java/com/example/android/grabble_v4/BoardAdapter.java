@@ -65,16 +65,20 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         String name = mBoard.get(position).letter_name;
         int value = mBoard.get(position).letter_value;
 
-
-
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
-        if(holder.mLetter.getText()==""){
-            holder.mLetterValue.setVisibility(View.INVISIBLE);
-            holder.itemView.setOnClickListener(null);
-            holder.itemView.setBackgroundColor(Color.RED);
-        }
 
+        if(holder.mLetter.getText()=="" ){
+            holder.mLetterValue.setVisibility(View.INVISIBLE);
+            holder.clickable(holder.itemView,0);
+            if(recyclerViewId==R.id.myWordsRecyclerView){
+            holder.itemView.setBackgroundColor(Color.RED);}
+        }
+        else {
+            holder.mLetterValue.setVisibility(View.VISIBLE);
+            holder.clickable(holder.itemView,1);
+
+        }
     }
 
     @Override
@@ -96,25 +100,25 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             mLetterValue = (TextView) itemView.findViewById(R.id.scrabble_letter_value);
             itemView.setOnClickListener(this);
 
+
+        }
+
+        public void clickable(View view, int trigger){
+            switch (trigger){
+                case 0:
+                view.setOnClickListener(null);
+                    break;
+                case 1:
+                view.setOnClickListener(this);
+                    break;
+            }
         }
 
         @Override
         public void onClick(View view) {
             {
                 int clickedPosition = getAdapterPosition();
-                // pass letter tag to textview of main activity. remove letter from list
-                //YOSSI couldn't do toast
                 Log.i("letter clicked",String.valueOf(clickedPosition));
-    //            Log.i("Word in my Word list",String.valueOf(myWordPosition));
-
-                //Object letterTag = view.getTag();
-               /* if(recyclerViewId==R.id.myWordsRecyclerView){
-                    Log.i("onClick board adapter","here");
-                    mLetter.setVisibility(View.INVISIBLE);
-                    mLetterValue.setVisibility(View.INVISIBLE);
-                    itemView.setOnClickListener(null);
-               }*/
-
                 mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);
             }
 
@@ -122,4 +126,5 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
 
     }
+
 }
