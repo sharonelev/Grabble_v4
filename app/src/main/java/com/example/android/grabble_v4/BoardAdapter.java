@@ -24,19 +24,19 @@ import java.util.List;
 public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewHolder> {
 
     List<SingleLetter> mBoard;
-    ListItemClickListener mOnClickListener;
+    LetterClickListener mOnClickListener;
     int recyclerViewId;
 
 
 
 
-    public interface ListItemClickListener {
+    public interface LetterClickListener {
         // YOSSI explanation
 
-        void onListItemClick(int view_id, int clickedItemIndex);
+        void onLetterClick(int view_id, int clickedItemIndex);
     }
 
-    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id){
+    public BoardAdapter(Context context, List<SingleLetter> list, LetterClickListener listener, int recycler_id){
         mBoard = list;
       mOnClickListener =listener;
         recyclerViewId=recycler_id;
@@ -68,14 +68,15 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
 
-        if(holder.mLetter.getText()=="" ){
+        if(name.equals("") ){
             holder.mLetterValue.setVisibility(View.INVISIBLE);
             holder.clickable(holder.itemView,0);
             if(recyclerViewId==R.id.myWordsRecyclerView){
-            holder.itemView.setBackgroundColor(Color.RED);}
+                 holder.itemView.setBackgroundColor(Color.RED);}
         }
         else {
             holder.mLetterValue.setVisibility(View.VISIBLE);
+            holder.itemView.setBackgroundColor(Color.parseColor("#D6C97B"));
             holder.clickable(holder.itemView,1);
 
         }
@@ -119,7 +120,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             {
                 int clickedPosition = getAdapterPosition();
                 Log.i("letter clicked",String.valueOf(clickedPosition));
-                mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);
+                mOnClickListener.onLetterClick(recyclerViewId, clickedPosition);
             }
 
         }

@@ -4,9 +4,12 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.DialogPreference;
 import android.preference.Preference;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.ListItemClickListener, myWordsAdapter.ListWordClickListener {
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.LetterClickListener, myWordsAdapter.ListWordClickListener {
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     ProgressBar pBar;
     TextView mScore;
     int playerScore;
+    int dialogFlag=0;
 
 
     @Override
@@ -130,7 +134,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             case R.id.get_letter:
                 //mLetterBuild.setText(String.valueOf(tilesLeft(bag)));
                 if (tilesLeft(bag) == 0) {
-                    Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "No tiles lift in bag - GAME OVER", Toast.LENGTH_LONG).show();
                     break;
                 }
                 addLetterToBoard();
@@ -182,16 +186,17 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
        myWords.get(clickedWord).remove(clickedLetter);
        myWords.get(clickedWord).add(clickedLetter,new SingleLetter("",0,0));
+      //  mWordsAdapter.notifyItemChanged(clickedWord); notify to mBoardAdapter occurs in myWordsAdapter
 
     }
 
     @Override
-    public void onListItemClick(int recyler_id, int clickedItemIndex) {
+    public void onLetterClick(int recyler_id, int clickedItemIndex) {
 
 
         //convert to drag and drop!
         switch (recyler_id) {
-            case R.id.scrabble_letter_list:
+            case R.id.scrabble_letter_list: //board
                 builder.add(board.get(clickedItemIndex));
                 //board.remove(board.get(clickedItemIndex));// why not
                 board.remove(clickedItemIndex);
@@ -216,27 +221,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                             break;} //per caution. shouldn't get here
                         myWords.get(wordIndex).remove(letterIndex);
                         myWords.get(wordIndex).add(letterIndex,builder.get(clickedItemIndex));
-
-                        mWordsAdapter.notifyDataSetChanged(); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
-
-                        //how to notify inner board adapter?? ? ? ? ?  ? ?
-                        //mWordsAdapter.notifyDataSetChanged(); --only for whole word
-                        //trick remove word and insert
-                     //  List<SingleLetter> trick = new ArrayList<>();
-                       // trick.addAll(myWords.get(wordIndex));
-                       // myWords.remove(wordIndex);
-                       // myWords.add(wordIndex,trick);
-                       // mWordsAdapter.notifyDataSetChanged();
-
-                        //mWordsAdapter.notifyDataSetChanged();
-
-
+                        mWordsAdapter.notifyItemChanged(wordIndex); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
                         break;
                 }  //in any case:
+
                     builder.remove(clickedItemIndex);
                     builderLetterTypes.remove(clickedItemIndex);
-
-                    mBuilderAdapter.notifyDataSetChanged();
+                    mBuilderAdapter.notifyItemRemoved(clickedItemIndex);
                     break;
         }
 
@@ -300,17 +291,28 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     // wordReview.setText(wordValidateResults);
                     dialogWrongWord(checkWord);
                 } else if (valid.equals("1")) {
-    //                dialogCorrectWord(checkWord); //TODO apply dialogue (removed for testing)
-                    List<SingleLetter> newWord = new ArrayList<>();
-                    //move letters to myWords
-                    addWordToMyWords(tempScore);
+                    dialogCorrectWord(checkWord, tempScore); //TODO apply dialogue (removed for testing)
+                    //if (dialogFlag == 1) {
 
+                 //   }
+                    //dialogFlag=0;
                 }
-
 
             }
         }
     }
+    public void afterDialogSuccess(int tempScore){
+        addWordToMyWords(tempScore);
+        if (board.size() == 0) {
+            if (tilesLeft(bag) == 0) {
+                Toast.makeText(getApplicationContext(), "No tiles lift in bag  - GAME OVER", Toast.LENGTH_LONG).show();
+            }
+            addLetterToBoard();
+            mBoardAdapter.notifyDataSetChanged();
+        }
+    }
+
+
     public void clearBuilder() { ///change to clear to mywords as well
         int builder_size = builder.size();
 
@@ -355,22 +357,32 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 .setNeutralButton("OK", null).create().show();
     }
 
-    public void dialogCorrectWord(String word) {
+
+    public void dialogCorrectWord(String word, final int score) {
 
         new AlertDialog.Builder(this).setTitle("Hurray")
                 .setMessage(word + " is great! Keep it up!")
                 .setNeutralButton("Oh Yeah!", new DialogInterface.OnClickListener() {
+
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                       ;
+                afterDialogSuccess(score);
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        afterDialogSuccess(score);
                     }
                 })
                 .setPositiveButton("See word definition", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                  //      dialogFlag=1;
                         //DICTIONARY from internet... With intent - activity WordDefinition -to be continued
+                        //after dictionary back to main screen withoiut dialog box
+                        afterDialogSuccess(score);
                     }
                 }).create().show();
 

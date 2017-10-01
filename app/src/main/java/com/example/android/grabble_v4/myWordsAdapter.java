@@ -58,17 +58,15 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     public void onBindViewHolder(WordViewHolder holder, int position)
 
     {
-
-//        Log.i("on bind", myWords.get(position).get(1).getLetter_name());
-
         if(myWords.get(position)==null){
 
             return;}
 
-        holder.mList.clear();
+       holder.mList.clear();
+        holder.mBoardAdapter.notifyDataSetChanged();
        holder.mList.addAll(myWords.get(position));
-
-       holder.mBoardAdapter.notifyItemChanged(position); //duplicates the list!
+        holder.mBoardAdapter.notifyDataSetChanged();
+        //mBoardAdapter notify change is on all letters in the word
     }
 
     @Override
@@ -76,12 +74,12 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         return myWords.size();
     }
 
-    public class WordViewHolder extends RecyclerView.ViewHolder implements BoardAdapter.ListItemClickListener {//,View.OnClickListener{
+    public class WordViewHolder extends RecyclerView.ViewHolder implements BoardAdapter.LetterClickListener {//,View.OnClickListener{
 
         RecyclerView eachWordRecView;
         BoardAdapter mBoardAdapter;
         List<SingleLetter> mList = new ArrayList<>();
-        BoardAdapter.ListItemClickListener listener;
+        BoardAdapter.LetterClickListener listener;
         GridLayoutManager gridLayoutManager;
 
 
@@ -106,12 +104,13 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         }
 
         @Override
-        public void onListItemClick(int view_id, int clickedItemIndex) { // a letter in a word was clicked
+        public void onLetterClick(int view_id, int clickedItemIndex) { // a letter in a myWords was clicked
             Log.i("click in word adapter", "do u get here?");
             int position = getAdapterPosition();
             Log.i("adapter position", String.valueOf(position));
             Log.i("letter position", String.valueOf(clickedItemIndex));
             mOnClickListener.onWordItemClick(position, clickedItemIndex);
+            Log.i("letter position", "after word click listener");
             mList.remove(clickedItemIndex);
             mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
             mBoardAdapter.notifyItemRemoved(clickedItemIndex);
