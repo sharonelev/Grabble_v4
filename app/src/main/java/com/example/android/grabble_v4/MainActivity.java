@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        wordReview = (TextView) findViewById(R.id.success_words);
+       // wordReview = (TextView) findViewById(R.id.success_words);
         pBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mScore = (TextView) findViewById(R.id.score);
 
@@ -141,6 +141,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 }
                 addLetterToBoard();
                 mBoardAdapter.notifyDataSetChanged();
+                playerScore--; //reduce a point for each tile the user adds
+                mScore.setText(String.valueOf(playerScore));
                 break;
             case R.id.send_word:
                 Log.i("send word", "send word");
@@ -176,6 +178,15 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 }
                 if(wordBroken==1){//word rules don't comply
                     Toast.makeText(this,"Can't use part of a word",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+
+                //must change word order:
+                //THE WORD MUST be checked as opposed to original because vest can become vests while the s is in the middle is from the board
+
+                //word must be 4+
+                if(builder.size()<3){
+                    Toast.makeText(this,"word must be at least 3 letters long",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 URL wordSearchURL = NetworkUtils.buildUrl(spellCheckWord);
@@ -279,13 +290,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             URL searchUrl = params[0];
             String wordValidateResults = null;
             //TODO return this when API works!
-           /*   try {
+              try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
 
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
-            wordValidateResults="temp";
+            }
+            //wordValidateResults="temp";
             return wordValidateResults;
         }
 
@@ -295,27 +306,29 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
             pBar.setVisibility(View.INVISIBLE);
 
-            // int valid=1;
-            //   parseWordResult(wordValidateResults);
             String valid = null; //change to get the "scrabble" node , put in try catch incase no reply from server
+            if(wordValidateResults==null){
+                Toast.makeText(getApplicationContext(), "no reply from server", Toast.LENGTH_SHORT).show();
+                return;
+            }
             //TODO return this when API works!
-           /* try {
+            try {
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
-                e.printStackTrace();*/
-                //remove this when API works!
-             valid="1"; {
-                wordReview.setText(valid);
+                e.printStackTrace();
+                Log.d("valid","did not get valid result");
+            } //remove this when API works!
+
+            // valid="1";
+            {
+             //   wordReview.setText(valid);
 //if valid remove place holders
                 if (valid.equals("0")) {
                     // wordReview.setText(wordValidateResults);
                     dialogWrongWord(checkWord);
                 } else if (valid.equals("1")) {
                     dialogCorrectWord(checkWord, tempScore); //TODO apply dialogue (removed for testing)
-                    //if (dialogFlag == 1) {
 
-                 //   }
-                    //dialogFlag=0;
                 }
 
             }
@@ -323,13 +336,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
     public void afterDialogSuccess(int tempScore){
         addWordToMyWords(tempScore);
-        if (board.size() == 0) {
+      //  if (board.size() == 0) {
             if (tilesLeft(bag) == 0) {
                 Toast.makeText(getApplicationContext(), "No tiles lift in bag  - GAME OVER", Toast.LENGTH_LONG).show();
+                return;
             }
-            addLetterToBoard();
+            addLetterToBoard(); //when word played a new letter is added to board without penalty
             mBoardAdapter.notifyDataSetChanged();
-        }
+        //}
 
     }
 
@@ -381,8 +395,20 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     public void dialogCorrectWord(String word, final int score) {
 
+        //check if reused words
+        //int reusedFlag=0;
+        String extraScore="";
+        for(int[] letter:builderLetterTypes){
+         if(letter[0]==1) { //at least one letter from reused word
+           //  reusedFlag = 1;
+             extraScore=" You get to keep the score for the original word as well!"; //replace original with word..? later on
+
+             break;
+         }
+        }
+
         new AlertDialog.Builder(this).setTitle("Hurray")
-                .setMessage(word + " is great! Keep it up!")
+                .setMessage(word + " is great! Keep it up!" + extraScore)
                 .setNeutralButton("Oh Yeah!", new DialogInterface.OnClickListener() {
 
                     @Override
