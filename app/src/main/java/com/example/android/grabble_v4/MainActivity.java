@@ -16,6 +16,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -90,6 +92,26 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
 
+
+
+    }
+
+
+    public void newGame() {
+        //create bag
+
+
+
+        LetterBag.createScrabbleSet(bag);
+
+        //Log.i("tag", String.valueOf(bag.get(6).getLetter_name()) +" value: "+ String.valueOf(bag.get(5).getLetter_value()));
+        //pick initial 4 randomly into board, remove from bag. recycleview=board
+        for (int i = 0; i < 4; i++) {
+            addLetterToBoard();
+        }
+        playerScore=0;
+
+        mScore.setText(String.valueOf(playerScore));
         mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
         mBoardRecView.setAdapter(mBoardAdapter);
 
@@ -98,20 +120,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
         mWordsAdapter = new myWordsAdapter(this, myWords, this);
         mMyWordsRecView.setAdapter(mWordsAdapter);
-
-    }
-
-
-    public void newGame() {
-        //create bag
-        LetterBag.createScrabbleSet(bag);
-        //Log.i("tag", String.valueOf(bag.get(6).getLetter_name()) +" value: "+ String.valueOf(bag.get(5).getLetter_value()));
-        //pick initial 4 randomly into board, remove from bag. recycleview=board
-        for (int i = 0; i < 4; i++) {
-            addLetterToBoard();
-        }
-        playerScore=0;
-        mScore.setText(String.valueOf(playerScore));
 
     }
 
@@ -532,5 +540,30 @@ return valid;
         int[] series={letterOrigin,wordPlace,letterPlace};//0: 0= from board 1 = from mywords, 1: word index, 2: letter index
       //  placer.add(series);
         return series;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.new_game,menu);
+        return true;
+            }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==  R.id.new_game_button)
+        {
+            board.clear();
+            builder.clear();
+            myWords.clear();
+
+            mBoardAdapter.notifyDataSetChanged();
+            mBuilderAdapter.notifyDataSetChanged();
+            mWordsAdapter.notifyDataSetChanged();
+
+            newGame();
+
+            return true; //exits onOptionsItemSelected
+        }
+        return super.onOptionsItemSelected(item); //if not action_search
     }
 }
