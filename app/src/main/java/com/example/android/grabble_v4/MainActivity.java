@@ -42,7 +42,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.LetterClickListener, myWordsAdapter.ListWordClickListener {
 
@@ -156,6 +158,24 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 //wordReview.setText(spellCheckWord);
                 if(spellCheckWord.equals("")){
                     Toast.makeText(this,"No word",Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                // left a word broken in myWords
+                int wordBroken=0;
+                for(int i=0; i<myWords.size();i++){
+                    int blankCounter=0;
+                    for(int j=0; j<myWords.get(i).size(); j++){
+                        if(myWords.get(i).get(j).getLetter_name().equals("")){
+                            blankCounter++;
+                        }
+                    }
+                    if(blankCounter!=myWords.get(i).size() && blankCounter>0){
+                        wordBroken=1;
+                        break;
+                    }
+                }
+                if(wordBroken==1){//word rules don't comply
+                    Toast.makeText(this,"Can't use part of a word",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 URL wordSearchURL = NetworkUtils.buildUrl(spellCheckWord);
@@ -310,6 +330,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             addLetterToBoard();
             mBoardAdapter.notifyDataSetChanged();
         }
+
     }
 
 
@@ -394,21 +415,39 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
         //move letters to myWords
         int builder_size=builder.size();
-        List<Integer> tempLetterTypes = new ArrayList<>();
+        List<Integer> tempBoardLetters = new ArrayList<>();
+        List<Integer> tempMyWordsLetters = new ArrayList<>();
 
         for (int i = 0; i < builder_size; i++) {
             newWord.add(i, builder.get(i));
             if(builderLetterTypes.get(i)[0]==0){
-                tempLetterTypes.add(builderLetterTypes.get(i)[2]);
+                tempBoardLetters.add(builderLetterTypes.get(i)[2]);
+            }
+            if(builderLetterTypes.get(i)[0]==1)
+            {
+                tempMyWordsLetters.add(builderLetterTypes.get(i)[1]); //save word indexes
             }
         }
 //SORT templettertypes and remove from board accordingly
-        Collections.sort(tempLetterTypes);
-        for (int i=tempLetterTypes.size()-1;i>=0;i--){
+        Collections.sort(tempBoardLetters);
+
+        for (int i=tempBoardLetters.size()-1;i>=0;i--){
               //0: from board
-            int toRemove = tempLetterTypes.get(i);
+            int toRemove = tempBoardLetters.get(i);
             board.remove(toRemove);//remove place holders
         }
+        //remove blank word
+        Collections.sort(tempMyWordsLetters);
+        Set uniqueValues = new HashSet(tempMyWordsLetters); //now unique
+        List<Integer> tempMyWordsLettersUnique =  new ArrayList<>(uniqueValues);
+        for(int i=uniqueValues.size()-1;i>=0;i--)
+        {
+            //none broken letter check was done earlier
+            int toRemove = tempMyWordsLettersUnique.get(i);
+            myWords.remove(toRemove);
+            mWordsAdapter.notifyItemRemoved(toRemove);
+        }
+
 
         builder.clear();
         builderLetterTypes.clear();
@@ -416,6 +455,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         mBoardAdapter.notifyDataSetChanged();
         myWords.add(newWord);
         mWordsAdapter.notifyDataSetChanged();
+
         playerScore = playerScore + tempScore;
         mScore.setText(String.valueOf(playerScore));
 
