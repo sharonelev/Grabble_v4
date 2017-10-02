@@ -4,78 +4,130 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.grabble_v4.MainActivity">
+    tools:context="com.example.android.grabble_v4.MainActivity"
+    android:background="@drawable/fruit_pattern">
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/scrabble_letter_list"
-            android:layout_width="368dp"
-            android:padding="3dp"
-            android:layout_height="120dp" />
-        <Button
-            android:layout_width="368dp"
-            android:layout_height="48dp"
-            android:text="Get another letter (costs 1 point)"
-            android:id="@+id/get_letter"
-            app:layout_constraintTop_toBottomOf="@id/scrabble_letter_list"
-            android:onClick="onClick" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:id="@+id/board_title"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textStyle="bold"/>
 
         <android.support.v7.widget.RecyclerView
-            android:layout_width="368dp"
+            android:id="@+id/scrabble_letter_list"
+            android:layout_width="match_parent"
+            android:padding="3dp"
+            android:foregroundGravity="center"
+             app:layout_constraintTop_toBottomOf="@id/board_title"
+            android:layout_height="120dp"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Get Letter"
+            android:id="@+id/get_letter"
+            android:background="@drawable/button_border"
+            app:layout_constraintTop_toBottomOf="@id/scrabble_letter_list"
+            android:onClick="onClick"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="71dp" />
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
             android:layout_height="75dp"
          android:id="@+id/word_builder_list"
             android:padding="3dp"
-            android:background="#de8762"
+
             app:layout_constraintTop_toBottomOf="@id/get_letter"
-            />
+       />
         <Button
-        android:layout_width="184dp"
+        android:layout_width="206dp"
         android:layout_height="48dp"
         android:text="Play word"
         android:id="@+id/send_word"
         app:layout_constraintTop_toBottomOf="@id/word_builder_list"
-            android:gravity="right"
-        android:onClick="onClick"/>
+            android:gravity="center"
+            android:background="@drawable/button_border"
+        android:onClick="onClick" />
         <Button
-            android:layout_width="184dp"
+            android:layout_width="206dp"
             android:layout_height="48dp"
+            android:gravity="center"
             android:text="Clear Builder"
             android:id="@+id/clear_word"
-
+        android:background="@drawable/button_border"
             app:layout_constraintLeft_toRightOf="@id/send_word"
             app:layout_constraintTop_toBottomOf="@id/word_builder_list"
-
             android:onClick="onClick"/>
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="Your words:"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            app:layout_constraintTop_toBottomOf="@id/send_word"
+            android:id="@+id/my_words_title" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/myWordsRecyclerView"
-            android:layout_width="368dp"
-            android:layout_height="275dp"
-
-            app:layout_constraintTop_toBottomOf="@id/send_word" />
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            app:layout_constraintTop_toBottomOf="@id/my_words_title"
+         />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_border"
             app:layout_constraintTop_toBottomOf="@id/myWordsRecyclerView"
+            >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
             android:text="Your Score:"
             android:id="@+id/your_score_title"
             android:textStyle="bold"
-            android:textSize="15sp"
+android:paddingLeft="5dp"
+            android:textColor="#000000"
+            android:textSize="20sp"
             />
+
         <TextView
-            android:layout_width="100dp"
-            android:layout_height="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textColor="#000000"
             android:id="@+id/score"
-            android:textSize="15sp"
-            app:layout_constraintLeft_toRightOf="@id/your_score_title"
+            android:paddingLeft="10dp"
+            android:textSize="20sp"
+            android:layout_toRightOf="@id/your_score_title"
             android:text="0"
-            app:layout_constraintTop_toBottomOf="@id/myWordsRecyclerView"/>
+            />
 
-
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_below="@id/your_score_title"
+            android:text="Tiles Left:"
+            android:id="@+id/tiles_title"
+            android:textStyle="bold"
+            android:paddingLeft="5dp"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:textColor="#000000"
+            android:layout_height="30dp"
+            android:id="@+id/tiles_left"
+            android:textSize="20sp"
+            android:paddingLeft="10dp"
+            android:layout_toRightOf="@id/tiles_title"
+            android:layout_below="@id/score"/>
+        </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
     <ProgressBar

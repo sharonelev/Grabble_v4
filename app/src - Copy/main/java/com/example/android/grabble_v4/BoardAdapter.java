@@ -1,12 +1,7 @@
 package com.example.android.grabble_v4;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.net.sip.SipAudioCall;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,24 +23,20 @@ import java.util.List;
 public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewHolder> {
 
     List<SingleLetter> mBoard;
-    LetterClickListener mOnClickListener;
+    ListItemClickListener mOnClickListener;
     int recyclerViewId;
-    Context mContext;
 
 
 
-
-    public interface LetterClickListener {
+    public interface ListItemClickListener {
         // YOSSI explanation
-
-        void onLetterClick(int view_id, int clickedItemIndex);
+        void onListItemClick(int view_id, int clickedItemIndex);
     }
 
-    public BoardAdapter(Context context, List<SingleLetter> list, LetterClickListener listener, int recycler_id){
+    public BoardAdapter(Context context, List<SingleLetter> list, ListItemClickListener listener, int recycler_id){
         mBoard = list;
       mOnClickListener =listener;
         recyclerViewId=recycler_id;
-        mContext=context;
     };
     @Override
     public LetterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -60,9 +51,10 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         return viewHolder;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onBindViewHolder(LetterViewHolder holder, int position) {
+
+
 
         if(mBoard.get(position)==null){
             return;
@@ -72,26 +64,9 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         String name = mBoard.get(position).letter_name;
         int value = mBoard.get(position).letter_value;
 
+
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
-
-        if(name.equals("") ){
-            holder.mLetterValue.setVisibility(View.INVISIBLE);
-            holder.clickable(holder.itemView,0);
-            //if(recyclerViewId==R.id.myWordsRecyclerView){
-                 holder.itemView.setBackgroundColor(Color.TRANSPARENT);
-            //}
-            //else{
-             //   holder.itemView.setBackgroundColor(Color.TRANSPARENT);
-            //}
-        }
-
-        else {
-            holder.mLetterValue.setVisibility(View.VISIBLE);
-            holder.itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border));
-            holder.clickable(holder.itemView,1);
-
-        }
     }
 
     @Override
@@ -113,31 +88,24 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             mLetterValue = (TextView) itemView.findViewById(R.id.scrabble_letter_value);
             itemView.setOnClickListener(this);
 
-
-        }
-
-        public void clickable(View view, int trigger){
-            switch (trigger){
-                case 0:
-                view.setOnClickListener(null);
-                    break;
-                case 1:
-                view.setOnClickListener(this);
-                    break;
-            }
         }
 
         @Override
         public void onClick(View view) {
             {
-                int clickedPosition = getAdapterPosition();
-                Log.i("letter clicked",String.valueOf(clickedPosition));
-                mOnClickListener.onLetterClick(recyclerViewId, clickedPosition);
-            }
 
+                // pass letter tag to textview of main activity. remove letter from list
+                //YOSSI couldn't do toast
+                Log.i("first","letter clicked");
+                int clickedPosition = getAdapterPosition();
+                //Object letterTag = view.getTag();
+
+                mOnClickListener.onListItemClick(recyclerViewId, clickedPosition);
+                //view.getId() - pass this if able to use same adapter for several recyclerviews
+                // Toast.makeText(this, "letter clicked", Toast.LENGTH_LONG).show;
+            }
         }
 
 
     }
-
 }

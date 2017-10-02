@@ -64,8 +64,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     TextView wordReview;
     ProgressBar pBar;
     TextView mScore;
+    TextView mTiles;
     int playerScore;
-    int dialogFlag=0;
+    int lettersLeft;
+    int game_limit=10;
 
 
     @Override
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
        // wordReview = (TextView) findViewById(R.id.success_words);
         pBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mScore = (TextView) findViewById(R.id.score);
+        mTiles =(TextView)findViewById(R.id.tiles_left);
+
 
         //RecycleView reference
         mBoardRecView = (RecyclerView) findViewById(R.id.scrabble_letter_list);
@@ -100,8 +104,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void newGame() {
         //create bag
 
-
-
         LetterBag.createScrabbleSet(bag);
 
         //Log.i("tag", String.valueOf(bag.get(6).getLetter_name()) +" value: "+ String.valueOf(bag.get(5).getLetter_value()));
@@ -109,8 +111,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         for (int i = 0; i < 4; i++) {
             addLetterToBoard();
         }
-        playerScore=0;
 
+        lettersLeft=game_limit;
+        mTiles.setText(String.valueOf(lettersLeft));
+        playerScore=0;
         mScore.setText(String.valueOf(playerScore));
         mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
         mBoardRecView.setAdapter(mBoardAdapter);
@@ -128,13 +132,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         SingleLetter selectedLetter;
         selectedLetter = randomSelector.getRandom();
         //reduce from bag
-        for (int j = 0; j < bag.size(); j++) {
+        for (int j = 0; j < game_limit; j++) { //limited game to 40 tiles
             if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
                 bag.get(j).reduce_letter_probability();
             }
         }
         board.add(selectedLetter);
-
+        lettersLeft--;
+        mTiles.setText(String.valueOf(lettersLeft));
     }
 
     @Override
@@ -143,7 +148,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         switch (view.getId()) {
             case R.id.get_letter:
                 //mLetterBuild.setText(String.valueOf(tilesLeft(bag)));
-                if (tilesLeft(bag) == 0) {
+                if (lettersLeft==0) {
                     Toast.makeText(getApplicationContext(), "No tiles lift in bag - GAME OVER", Toast.LENGTH_LONG).show();
                     break;
                 }
@@ -298,13 +303,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             URL searchUrl = params[0];
             String wordValidateResults = null;
             //TODO return this when API works!
-              try {
+         /*     try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
             //wordValidateResults="temp";
+            */
             return wordValidateResults;
         }
 
@@ -315,19 +321,20 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             pBar.setVisibility(View.INVISIBLE);
 
             String valid = null; //change to get the "scrabble" node , put in try catch incase no reply from server
-            if(wordValidateResults==null){
+          /* if(wordValidateResults==null){
                 Toast.makeText(getApplicationContext(), "no reply from server", Toast.LENGTH_SHORT).show();
                 return;
             }
+            */
             //TODO return this when API works!
-            try {
+            /*try {
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.d("valid","did not get valid result");
             } //remove this when API works!
-
-            // valid="1";
+*/
+            valid="1";
             {
              //   wordReview.setText(valid);
 //if valid remove place holders
@@ -345,7 +352,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void afterDialogSuccess(int tempScore){
         addWordToMyWords(tempScore);
       //  if (board.size() == 0) {
-            if (tilesLeft(bag) == 0) {
+            if (lettersLeft == 0) {
                 Toast.makeText(getApplicationContext(), "No tiles lift in bag  - GAME OVER", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -555,7 +562,8 @@ return valid;
             board.clear();
             builder.clear();
             myWords.clear();
-
+            builderLetterTypes.clear();
+            bag.clear();
             mBoardAdapter.notifyDataSetChanged();
             mBuilderAdapter.notifyDataSetChanged();
             mWordsAdapter.notifyDataSetChanged();
