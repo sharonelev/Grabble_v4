@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                         wordBroken=1;
                         break;
                     }
+
                 }
                 if(wordBroken==1){//word rules don't comply
                     Toast.makeText(this,"Can't use part of a word",Toast.LENGTH_SHORT).show();
