@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,13 +68,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit=10;
+    int game_limit=50; //+4 from start// above 26 doesn't work??
+    Button getLetter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getLetter = (Button) findViewById(R.id.get_letter);
 
        // wordReview = (TextView) findViewById(R.id.success_words);
         pBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
@@ -89,9 +93,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7);
         GridLayoutManager BuilderGridLayoutManager = new GridLayoutManager(this, 7);
         LinearLayoutManager linearLayout = new LinearLayoutManager(this);
+        //BuilderGridLayoutManager.setAutoMeasureEnabled(true);
         mMyWordsRecView.setLayoutManager(linearLayout);
         mBoardRecView.setLayoutManager(gridLayoutManager);
         mBuilderRecView.setLayoutManager(BuilderGridLayoutManager);
+
       /*  int spacingInPixels = getResources().getDimensionPixelSize(R.id.scrabble_letter_list);
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
@@ -104,15 +110,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void newGame() {
         //create bag
 
-        LetterBag.createScrabbleSet(bag);
+        lettersLeft=game_limit;
 
-        //Log.i("tag", String.valueOf(bag.get(6).getLetter_name()) +" value: "+ String.valueOf(bag.get(5).getLetter_value()));
-        //pick initial 4 randomly into board, remove from bag. recycleview=board
+        LetterBag.createScrabbleSet(bag);
         for (int i = 0; i < 4; i++) {
             addLetterToBoard();
         }
 
-        lettersLeft=game_limit;
+
         mTiles.setText(String.valueOf(lettersLeft));
         playerScore=0;
         mScore.setText(String.valueOf(playerScore));
@@ -132,7 +137,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         SingleLetter selectedLetter;
         selectedLetter = randomSelector.getRandom();
         //reduce from bag
-        for (int j = 0; j < game_limit; j++) { //limited game to 40 tiles
+        for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
             if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
                 bag.get(j).reduce_letter_probability();
             }
@@ -149,7 +154,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             case R.id.get_letter:
                 //mLetterBuild.setText(String.valueOf(tilesLeft(bag)));
                 if (lettersLeft==0) {
-                    Toast.makeText(getApplicationContext(), "No tiles lift in bag - GAME OVER", Toast.LENGTH_LONG).show();
+                 //END GAME DIALOG! WITH NEW GAME OPTION
+                    int reduceScore=0;
+                    for(SingleLetter letter:board){
+                        reduceScore=-letter.getLetter_probability();
+                    }
+                    playerScore=-reduceScore;
+                    Toast.makeText(getApplicationContext(), "you lost " + reduceScore +". ADD END GAME DIALOG! WITH NEW GAME OPTION", Toast.LENGTH_LONG).show();
                     break;
                 }
                 addLetterToBoard();
@@ -188,7 +199,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                         wordBroken=1;
                         break;
                     }
-
                 }
                 if(wordBroken==1){//word rules don't comply
                     Toast.makeText(this,"Can't use part of a word",Toast.LENGTH_SHORT).show();
@@ -207,6 +217,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
                 //add dictionary check!
                 break;
+
             case R.id.clear_word:
                 clearBuilder();
                 break;
@@ -214,6 +225,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         }
     }
 
+    //tiles left algortihm if not game limit
     public int tilesLeft(List<SingleLetter> list) {
         int totalSum = 0;
         for (SingleLetter item : list) {
@@ -221,6 +233,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         }
         return totalSum;
     }
+
+
     @Override
     public void onWordItemClick(int clickedWord, int clickedLetter) {
         Log.i("Clicked Letter in Word",myWords.get(clickedWord).get(clickedLetter).letter_name);
@@ -304,14 +318,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             URL searchUrl = params[0];
             String wordValidateResults = null;
             //TODO return this when API works!
-         /*     try {
+           try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
             //wordValidateResults="temp";
-            */
+
             return wordValidateResults;
         }
 
@@ -328,14 +342,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             }
             */
             //TODO return this when API works!
-            /*try {
+            try {
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.d("valid","did not get valid result");
             } //remove this when API works!
-*/
-            valid="1";
+
+//            valid="1";
             {
              //   wordReview.setText(valid);
 //if valid remove place holders
@@ -354,7 +368,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         addWordToMyWords(tempScore);
       //  if (board.size() == 0) {
             if (lettersLeft == 0) {
-                Toast.makeText(getApplicationContext(), "No tiles lift in bag  - GAME OVER", Toast.LENGTH_LONG).show();
+              getLetter.setText("END GAME");
+                Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
                 return;
             }
             addLetterToBoard(); //when word played a new letter is added to board without penalty
@@ -405,7 +420,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void dialogWrongWord(String word) {
         new AlertDialog.Builder(this).setTitle("TOO BAD")
                 .setMessage(word + " is not a valid word. Try again!")
-                .setNeutralButton("OK", null).create().show();
+                .setNeutralButton("My bad", null).create().show();
     }
 
 
@@ -414,6 +429,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         //check if reused words
         //int reusedFlag=0;
         String extraScore="";
+        String longScore="";
         for(int[] letter:builderLetterTypes){
          if(letter[0]==1) { //at least one letter from reused word
            //  reusedFlag = 1;
@@ -422,9 +438,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
              break;
          }
         }
+        int wordLength=word.length();
+        if(wordLength>=7){
+            longScore=" Woohoo! "+ wordLength+" extra points for a "+wordLength+" letter word!";
+        }
 
         new AlertDialog.Builder(this).setTitle("Hurray")
-                .setMessage(word + " is great! Keep it up!" + extraScore)
+                .setMessage(word + " is great! Keep it up!" + extraScore+ longScore)
                 .setNeutralButton("Oh Yeah!", new DialogInterface.OnClickListener() {
 
                     @Override
@@ -459,6 +479,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         int builder_size=builder.size();
         List<Integer> tempBoardLetters = new ArrayList<>();
         List<Integer> tempMyWordsLetters = new ArrayList<>();
+
+        if (builder_size>=7) { //BONUS for long words!
+            tempScore = +builder_size;
+        }
+
 
         for (int i = 0; i < builder_size; i++) {
             newWord.add(i, builder.get(i));
@@ -499,6 +524,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         mWordsAdapter.notifyDataSetChanged();
 
         playerScore = playerScore + tempScore;
+
         mScore.setText(String.valueOf(playerScore));
 
     };
