@@ -90,6 +90,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             holder.mLetterValue.setVisibility(View.VISIBLE);
             holder.itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border));
             holder.clickable(holder.itemView,1);
+//holder.itemView.getLayoutParams().width=130;
 
         }
     }
