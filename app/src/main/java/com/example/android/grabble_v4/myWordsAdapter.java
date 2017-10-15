@@ -6,6 +6,7 @@ import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,7 @@ import com.example.android.grabble_v4.data.SingleLetter;
 import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.List;
-
+import android.support.v7.widget.StaggeredGridLayoutManager;
 /**
  * Created by user on 25/09/2017.
  */
@@ -67,6 +68,10 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
        holder.mList.addAll(myWords.get(position));
         holder.mBoardAdapter.notifyDataSetChanged();
         //mBoardAdapter notify change is on all letters in the word
+
+      //  holder.itemView.setLayoutParams(new StaggeredGridLayoutManager.LayoutParams(StaggeredGridLayoutManager.LayoutParams.FILL_PARENT,
+        //        StaggeredGridLayoutManager.LayoutParams.WRAP_CONTENT));
+        holder.itemView.getLayoutParams().width=holder.mList.size()*150+(holder.mList.size()-1)*20+120;
     }
 
     @Override
@@ -90,9 +95,9 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
 
             //      listener= new MainActivity();
-            gridLayoutManager = new GridLayoutManager(mContext, 7);
+            LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
 
-            eachWordRecView.setLayoutManager(gridLayoutManager); //this prevents onClick to work!!
+            eachWordRecView.setLayoutManager(wordLayoutManager); //this prevents onClick to work!!
             mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView);
 
             //try sending word in list to the adapter and erase the onclick methods here. first erase and see if mywords still gets emptied

@@ -25,12 +25,14 @@ public class RandomSelector {
 
     public SingleLetter getRandom() {
 
-        int index = rand.nextInt(totalSum);
+        int index = rand.nextInt(totalSum+1);
+
         int sum = 0;
         int i=0;
         while(sum < index ) {
             sum = sum + items.get(i++).letter_probability;
         }
+        SingleLetter test=items.get(Math.max(0,i-1));
         return items.get(Math.max(0,i-1));
     }
 

@@ -75,6 +75,40 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
 
+        int numOfTiles = mBoard.size();
+        if(recyclerViewId==R.id.word_builder_list||recyclerViewId==R.id.myWordsRecyclerView){
+           /* if(numOfTiles<=7){
+                holder.itemView.getLayoutParams().width = 130;
+                holder.itemView.getLayoutParams().height = 140;
+                holder.mLetter.setTextSize(35);
+                holder.mLetterValue.setTextSize(20);
+            }*/
+            if(numOfTiles<=8){
+                holder.itemView.getLayoutParams().width = 135;//130
+                holder.itemView.getLayoutParams().height = 160;//140
+                holder.mLetter.setTextSize(30);
+                holder.mLetterValue.setTextSize(15);
+            }
+            if(numOfTiles==9){
+                holder.itemView.getLayoutParams().width = 115;//130
+                holder.itemView.getLayoutParams().height = 140;//140
+                holder.mLetter.setTextSize(25);
+                holder.mLetterValue.setTextSize(14);
+            }
+            if(numOfTiles>=10) {
+                holder.itemView.getLayoutParams().width = 100;//130
+                holder.itemView.getLayoutParams().height = 120;//140
+                holder.mLetter.setTextSize(20);
+                holder.mLetterValue.setTextSize(13);
+                //make margin thinner, perhaps in mainactivity
+            }
+
+
+
+
+
+        }
+
         if(name.equals("") ){
             holder.mLetterValue.setVisibility(View.INVISIBLE);
             holder.clickable(holder.itemView,0);
@@ -90,7 +124,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             holder.mLetterValue.setVisibility(View.VISIBLE);
             holder.itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border));
             holder.clickable(holder.itemView,1);
-//holder.itemView.getLayoutParams().width=130;
+
 
         }
     }

@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">Grabble_v4</string>
+    <string name="app_name">Grabble</string>
+    <string name="instructions">Make 3 or more letter words by using letters from the board on top and from words you already created. A new must contain at least one letter from the board. When reusing a word from your list you must use all of its letters. You may use several words to make a new one. You can not open more than 16 tiles on the board.</string>
+    <string name="score_instructions">After playing a word you will receive points according to the letter values in your word. If you reuse an existing word, you get to keep the points you got for the original word. 7 letter words or more will grant you with bonus points- 1 per letter! Requesting a tile from the bag will reduce a point from your score. At the end of the game you will lose points for the tiles left on the board according to their value.</string>
+    <string name="welcome">Welcome to...</string>
+    <string name="get_letter">Get Letter</string>
+    <string name="end_game">END GAME</string>
 </resources>
