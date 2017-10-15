@@ -29,5 +29,16 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|center"
+        android:clickable="true"
+        android:onClick="onClick"
+        android:text="SKIP"
+        android:textSize="20dp"
+        android:gravity="bottom"
+        android:paddingBottom="10dp"/>
 
 </LinearLayout>
