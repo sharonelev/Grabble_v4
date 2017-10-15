@@ -129,6 +129,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     }
 
 
+
+
     public void newGame() {
         //create bag
 
