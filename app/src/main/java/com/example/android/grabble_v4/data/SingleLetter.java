@@ -1,5 +1,8 @@
 package com.example.android.grabble_v4.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.style.ParagraphStyle;
 import android.widget.TextView;
 
 /**
@@ -49,6 +52,7 @@ public class SingleLetter {
     public void reduce_letter_probability(){
         this.letter_probability=letter_probability-1;
     }
+
 
 
 }

@@ -114,13 +114,14 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             int position = getAdapterPosition();
             Log.i("adapter position", String.valueOf(position));
             Log.i("letter position", String.valueOf(clickedItemIndex));
-            mOnClickListener.onWordItemClick(position, clickedItemIndex);
+
             Log.i("letter position", "after word click listener");
             mList.remove(clickedItemIndex);
             mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
             mBoardAdapter.notifyItemRemoved(clickedItemIndex);
             mBoardAdapter.notifyItemInserted(clickedItemIndex);
 
+            mOnClickListener.onWordItemClick(position, clickedItemIndex);
        }
     }
 

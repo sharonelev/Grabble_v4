@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.preference.Preference;
 import android.support.annotation.RequiresApi;
@@ -66,13 +67,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit=20; //+4 from start//
+    int game_limit=50; //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
-    MenuItem newGameMenuItem;
-    MenuItem feedbackMenuItem;
-    MenuItem instructionsMenuItem;
 
 
     @Override
@@ -103,12 +101,19 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
         checkForUpdates();
 
+  //      savedInstanceState.getParcelableArrayList("BOARD");
 
 }
 
+/*
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    //    outState.putParcelableArrayList("BOARD",  board);
+        outState.put
+    }*/
 
-
-//ADD SHARED PREFERNCES TO SAVE GAME STATE
+    //ADD SAVE GAME STATE for on destroy
     @Override
     public void onResume() {
         super.onResume();
@@ -220,10 +225,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     }
                     playerScore=playerScore-reduceScore;
                     if(board.size()>0){
-                        dialogEndGameSure(reduceScore, playerScore);
+                        dialogEndGameSure(reduceScore);
+                      ;
                     }
                     else {
-                    dialogEndGame(playerScore);}
+                    dialogEndGame();
+                   }
+
                     break;
                 }
 
@@ -528,19 +536,21 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     }
                 }).create().show();
     }
-    public void dialogEndGameSure(final int boardPoints,final int finalScore) {
+    public void dialogEndGameSure(final int boardPoints) {
         new AlertDialog.Builder(this).setTitle("End Game")
                 .setMessage("Are you sure you want to end game? You will lose " + boardPoints + " for tiles left in the board")
                 .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogEndGame(finalScore);
+                        dialogEndGame();
+                        mScore.setText(String.valueOf(playerScore));
+
                     }
                 }).setNegativeButton("I'll keep trying",null).create().show();
     }
-    public void dialogEndGame(final int finalScore) {
+    public void dialogEndGame() {
         new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
-                .setMessage("Your Score: " + finalScore)
+                .setMessage("Your Score: " + playerScore)
                 .setNeutralButton("NEW GAME", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -549,7 +559,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 }).setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
-                dialogEndGame(finalScore);
+                dialogEndGame();
             }
         }).create().show();
     }
@@ -776,4 +786,22 @@ return valid;
         UpdateManager.unregister();
     }
 
+
+    private String wordBuilder(){
+
+
+        //for letter in board
+            // for word in my words
+                //add letter to word
+                    //change A and B
+        //for two letters in board
+        // check board
+        return null;
+    }
+
+
+
+
 }
+
+
