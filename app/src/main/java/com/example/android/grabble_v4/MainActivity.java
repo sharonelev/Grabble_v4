@@ -33,6 +33,7 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
+import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.data.Instructions;
 import com.example.android.grabble_v4.data.SendFeedback;
 import com.example.android.grabble_v4.data.SingleLetter;
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity  implements
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit=10; //including 4 from start//
+    int game_limit=5; //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
@@ -236,7 +237,13 @@ public class MainActivity extends AppCompatActivity  implements
                         reduceScore=reduceScore+letter.getLetter_value();
 
                     }
-                    playerScore=playerScore-reduceScore;
+                    int tempScore= playerScore;
+                   // if(playerScore>=0){
+                    playerScore=tempScore-reduceScore;
+                    //}
+                    //else{
+                    //playerScore=playerScore-reduceScore;
+                    //}
                     if(board.size()>0){
                         dialogEndGameSure(reduceScore);
                       ;
@@ -589,6 +596,11 @@ public class MainActivity extends AppCompatActivity  implements
                 }).setNegativeButton("I'll keep trying",null).create().show();
     }
     public void dialogEndGame() {
+
+       int res= PreferenceUtilities.newScoreSend(this,playerScore);
+
+//if res =0 nothing. if res=1 you got a new high score!
+
         new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
                 .setMessage("Your Score: " + playerScore)
                 .setNeutralButton("NEW GAME", new DialogInterface.OnClickListener() {
@@ -596,7 +608,15 @@ public class MainActivity extends AppCompatActivity  implements
                     public void onClick(DialogInterface dialogInterface, int i) {
                         newGame();
                     }
-                }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                }).setPositiveButton("HIGH SCORES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent= new Intent(MainActivity.this, HighScoreActivity.class);
+                startActivity(intent);
+
+            }
+        })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 dialogEndGame();

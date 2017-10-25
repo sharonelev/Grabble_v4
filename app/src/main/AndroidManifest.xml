@@ -23,10 +23,17 @@
             android:name="net.hockeyapp.android.appIdentifier"
             android:value="${HOCKEYAPP_APP_ID}" />
 
-        <activity android:name=".data.Instructions"></activity>
-        <activity android:name=".data.SendFeedback"></activity>
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"></activity>
+        <activity android:name=".data.Instructions" />
+        <activity android:name=".data.SendFeedback" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HighScoreActivity"
+            android:label="@string/title_activity_high_score"
+            android:theme="@android:style/Theme.Translucent">
+
+        </activity>
     </application>
 
 </manifest>

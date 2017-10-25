@@ -5,4 +5,5 @@
     <string name="welcome">Welcome to...</string>
     <string name="get_letter">Get Letter</string>
     <string name="end_game">END GAME</string>
+    <string name="title_activity_high_score">HighScoreActivity</string>
 </resources>
