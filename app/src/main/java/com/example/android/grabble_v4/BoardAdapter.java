@@ -77,7 +77,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         holder.mLetterValue.setText(String.valueOf(value));
 
         int numOfTiles = mBoard.size();
-        if(recyclerViewId==R.id.word_builder_list||recyclerViewId==R.id.myWordsRecyclerView) {
+        if(recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) {
            /* if(numOfTiles<=7){
                 holder.itemView.getLayoutParams().width = 130;
                 holder.itemView.getLayoutParams().height = 140;

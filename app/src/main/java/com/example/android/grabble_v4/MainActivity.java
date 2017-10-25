@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,7 +50,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity  implements View.OnClickListener, BoardAdapter.LetterClickListener, myWordsAdapter.ListWordClickListener {
+public class MainActivity extends AppCompatActivity  implements
+        View.OnClickListener,
+        BoardAdapter.LetterClickListener,
+        myWordsAdapter.ListWordClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
@@ -67,7 +73,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit=50; //including 4 from start//
+    int game_limit=10; //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
@@ -94,12 +100,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
         //set Layout
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
       /*  int spacingInPixels = getResources().getDimensionPixelSize(R.id.scrabble_letter_list);
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
 
         checkForUpdates();
+
+        /** Setup the shared preference listener **/
 
   //      savedInstanceState.getParcelableArrayList("BOARD");
 
@@ -131,6 +141,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void onDestroy() {
         super.onDestroy();
         unregisterManagers();
+        /** Cleanup the shared preference listener **/
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
     }
 
 
@@ -273,10 +286,32 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                         break;
                     }
                 }
+
                 if(wordBroken==1){//word rules don't comply
                     Toast.makeText(this,"Can't use part of a word",Toast.LENGTH_SHORT).show();
                     break;
                 }
+
+                //only  pluralised
+                int i=0;
+                int lastLetterIndex= builderLetterTypes.size() - 1;
+                if (builderLetterTypes.get(lastLetterIndex)[0]==0)//last letter from board (0)
+                {
+                    if (builder.get(lastLetterIndex).getLetter_name().equals("S"))
+                    {
+                        for (i=0; i<builderLetterTypes.size()-1;i++) {
+                            if(builderLetterTypes.get(i)[0]==0) break; //another letter is from board
+                            if (builderLetterTypes.get(i)[2] != i) break; //letter index in a different order
+                        }
+                        if (i == builderLetterTypes.size() - 1)//go to end without breaking
+                        {
+                            Toast.makeText(this,"You can't only pluralise a word",Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                }
+
+                }
+
 
                 //must add letters to existing word
                 int fromWordsCounter=0;
@@ -391,8 +426,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
-
+    }
 
 
     public class WordValidator extends AsyncTask<URL, Void, String>
@@ -447,7 +484,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 Log.d("valid","did not get valid result");
             } //remove this when API works!
 
-           // valid="1"; ///REMOVE / 1 for testing
+            valid="1"; //TODO REMVOE AFTER TESTING
             {
              //   wordReview.setText(valid);
 //if valid remove place holders
@@ -473,6 +510,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         if(lettersLeft==0){
             noLettersInBag();
                    }
+        if(board.isEmpty()){
+            dialogEndGame();
+        }
         setEnableAll(true);
 
 
@@ -712,7 +752,9 @@ return valid;
     public void noLettersInBag(){
 
         if(getLetter.getText()==getResources().getString(R.string.end_game))
-        {return;}
+        {
+
+            return;}
        getLetter.setText(getResources().getString(R.string.end_game));
         Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
     }
