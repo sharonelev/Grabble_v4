@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity  implements
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit=5; //including 4 from start//
+    int game_limit=50; //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
@@ -230,7 +230,11 @@ public class MainActivity extends AppCompatActivity  implements
         switch (view.getId()) {
             case R.id.get_letter: //or end game
                 //mLetterBuild.setText(String.valueOf(tilesLeft(bag)));
-                if (lettersLeft==0) { //means he tapped end game
+                if(getLetter.getText().equals("NEW GAME")){
+                    newGame();
+                    break;
+                }
+                 if (lettersLeft==0) { //means he tapped end game
                  //END GAME DIALOG! WITH NEW GAME OPTION
                     int reduceScore=0;
                     for(SingleLetter letter:board){
@@ -491,7 +495,7 @@ public class MainActivity extends AppCompatActivity  implements
                 Log.d("valid","did not get valid result");
             } //remove this when API works!
 
-            valid="1"; //TODO REMVOE AFTER TESTING
+           // valid="1"; //TODO REMVOE AFTER TESTING
             {
              //   wordReview.setText(valid);
 //if valid remove place holders
@@ -596,13 +600,18 @@ public class MainActivity extends AppCompatActivity  implements
                 }).setNegativeButton("I'll keep trying",null).create().show();
     }
     public void dialogEndGame() {
-
+        String msg="";
        int res= PreferenceUtilities.newScoreSend(this,playerScore);
-
+        if(res ==1 ){
+           msg= " You made a new high score!";
+        }
+        if(res==0){
+            msg= " Well done!";
+        }
 //if res =0 nothing. if res=1 you got a new high score!
 
         new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
-                .setMessage("Your Score: " + playerScore)
+                .setMessage("Your Score: " + playerScore+"/n" + msg)
                 .setNeutralButton("NEW GAME", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -611,6 +620,9 @@ public class MainActivity extends AppCompatActivity  implements
                 }).setPositiveButton("HIGH SCORES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                setEnableAll(false);
+                getLetter.setText("NEW GAME");
+                getLetter.setEnabled(true);
                 Intent intent= new Intent(MainActivity.this, HighScoreActivity.class);
                 startActivity(intent);
 
@@ -810,6 +822,13 @@ return valid;
 
 
             return true;
+        }
+        if(item.getItemId()==R.id.high_score_in_menu){
+
+            Context context = MainActivity.this;
+            Class destinationActivity = HighScoreActivity.class;
+            Intent highscore_intent= new Intent(context,destinationActivity);
+            startActivity(highscore_intent); ///MUST ADD BACK TO GAME!!!! AND UNVISIBLE IF END OF GAME
         }
         if(item.getItemId()==R.id.send_feedback){
 

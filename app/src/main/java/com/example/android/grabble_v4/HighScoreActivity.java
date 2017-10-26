@@ -33,10 +33,14 @@ public class HighScoreActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-    if(view.getId()==R.id.new_game_in_high_score){
+         if(view.getId()==R.id.new_game_in_high_score){
         Intent homeIntent = new Intent(HighScoreActivity.this, MainActivity.class);
-        startActivity(homeIntent);
+        startActivity(homeIntent);//starts a new activity of MainActivity- new game
         finish();
 }
+
+        if(view.getId()==R.id.back_to_game_in_high_score){
+        finish();
+        }
     }
 }

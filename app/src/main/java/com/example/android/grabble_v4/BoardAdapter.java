@@ -85,20 +85,20 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.mLetterValue.setTextSize(20);
             }*/
             if (numOfTiles <= 8) {
-                holder.itemView.getLayoutParams().width = 135;//130
-                holder.itemView.getLayoutParams().height = 160;//140
-                holder.mLetter.setTextSize(30);
+                holder.itemView.getLayoutParams().width = 90;//130
+                holder.itemView.getLayoutParams().height = 120;//140
+                holder.mLetter.setTextSize(28);
                 holder.mLetterValue.setTextSize(15);
             }
             if (numOfTiles == 9) {
-                holder.itemView.getLayoutParams().width = 115;//130
-                holder.itemView.getLayoutParams().height = 140;//140
+                holder.itemView.getLayoutParams().width = 75;//130
+                holder.itemView.getLayoutParams().height = 100;//140
                 holder.mLetter.setTextSize(25);
                 holder.mLetterValue.setTextSize(14);
             }
             if (numOfTiles >= 10) {
-                holder.itemView.getLayoutParams().width = 100;//130
-                holder.itemView.getLayoutParams().height = 120;//140
+                holder.itemView.getLayoutParams().width = 65;//130
+                holder.itemView.getLayoutParams().height = 90;//140
                 holder.mLetter.setTextSize(20);
                 holder.mLetterValue.setTextSize(13);
                 //make margin thinner, perhaps in mainactivity
