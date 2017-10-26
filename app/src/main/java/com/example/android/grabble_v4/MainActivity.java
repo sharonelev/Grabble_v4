@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
@@ -38,9 +39,11 @@ import com.example.android.grabble_v4.data.Instructions;
 import com.example.android.grabble_v4.data.SendFeedback;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.LetterBag;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,17 +54,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity  implements
+public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
         myWordsAdapter.ListWordClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
     List<SingleLetter> builder = new ArrayList<SingleLetter>();
     List<int[]> builderLetterTypes = new ArrayList<>();// 0=from board 1=from myWords
-    List<List<SingleLetter>> myWords =new ArrayList<>();
+    List<List<SingleLetter>> myWords = new ArrayList<>();
     private BoardAdapter mBoardAdapter;
     private BoardAdapter mBuilderAdapter;
     private myWordsAdapter mWordsAdapter;
@@ -74,10 +77,11 @@ public class MainActivity extends AppCompatActivity  implements
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit=50; //including 4 from start//
+    int game_limit = 5; //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
+    public final static int RESULT_CODE = 123;
 
 
     @Override
@@ -90,10 +94,10 @@ public class MainActivity extends AppCompatActivity  implements
         clearWord = (Button) findViewById(R.id.clear_word);
 
 
-       // wordReview = (TextView) findViewById(R.id.success_words);
+        // wordReview = (TextView) findViewById(R.id.success_words);
         pBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mScore = (TextView) findViewById(R.id.score);
-        mTiles =(TextView)findViewById(R.id.tiles_left);
+        mTiles = (TextView) findViewById(R.id.tiles_left);
 
 
         //RecycleView reference
@@ -112,9 +116,9 @@ public class MainActivity extends AppCompatActivity  implements
 
         /** Setup the shared preference listener **/
 
-  //      savedInstanceState.getParcelableArrayList("BOARD");
+        //      savedInstanceState.getParcelableArrayList("BOARD");
 
-}
+    }
 
 /*
     @Override
@@ -148,14 +152,12 @@ public class MainActivity extends AppCompatActivity  implements
     }
 
 
-
-
     public void newGame() {
         //create bag
 
-        lettersLeft=game_limit;
+        lettersLeft = game_limit;
 
-
+        setEnableAll(true);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 8);
         LinearLayoutManager BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
@@ -168,15 +170,18 @@ public class MainActivity extends AppCompatActivity  implements
         builderLetterTypes.clear();
         bag.clear();
 
-        if(board.size()>0){
+        if (board.size() > 0) {
             board.clear();
-            mBoardAdapter.notifyDataSetChanged();}
-        if(builder.size()>0){
+            mBoardAdapter.notifyDataSetChanged();
+        }
+        if (builder.size() > 0) {
             builder.clear();
-            mBuilderAdapter.notifyDataSetChanged();}
-        if(myWords.size()>0){
+            mBuilderAdapter.notifyDataSetChanged();
+        }
+        if (myWords.size() > 0) {
             myWords.clear();
-            mWordsAdapter.notifyDataSetChanged();}
+            mWordsAdapter.notifyDataSetChanged();
+        }
 
         LetterBag.createScrabbleSet(bag);
         for (int i = 0; i < 4; i++) {
@@ -185,7 +190,7 @@ public class MainActivity extends AppCompatActivity  implements
 
         getLetter.setText(getResources().getString(R.string.get_letter));
         mTiles.setText(String.valueOf(lettersLeft));
-        playerScore=0;
+        playerScore = 0;
         mScore.setText(String.valueOf(playerScore));
         mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
         mBoardRecView.setAdapter(mBoardAdapter);
@@ -199,13 +204,11 @@ public class MainActivity extends AppCompatActivity  implements
     }
 
     public void addLetterToBoard() {
-    if(lettersLeft==0)
-    {return;}
-
-        if (board.size()==16){
-            Toast.makeText(getApplicationContext(), "The board is full", Toast.LENGTH_SHORT).show();
+        if (lettersLeft == 0) {
             return;
         }
+
+
         RandomSelector randomSelector = new RandomSelector(bag);
         SingleLetter selectedLetter;
         selectedLetter = randomSelector.getRandom();
@@ -218,44 +221,48 @@ public class MainActivity extends AppCompatActivity  implements
         board.add(selectedLetter);
         lettersLeft--;
         mTiles.setText(String.valueOf(lettersLeft));
-        if(lettersLeft==0){
+        if (lettersLeft == 0) {
             noLettersInBag();
-                   }
-                   return;
+        }
+        return;
     }
 
     @Override
     public void onClick(View view) {
 
         switch (view.getId()) {
-            case R.id.get_letter: //or end game
+            case R.id.get_letter: //or end game or new game
                 //mLetterBuild.setText(String.valueOf(tilesLeft(bag)));
-                if(getLetter.getText().equals("NEW GAME")){
+                if (getLetter.getText().equals(getResources().getString(R.string.new_game))) {
                     newGame();
                     break;
                 }
-                 if (lettersLeft==0) { //means he tapped end game
-                 //END GAME DIALOG! WITH NEW GAME OPTION
-                    int reduceScore=0;
-                    for(SingleLetter letter:board){
-                        reduceScore=reduceScore+letter.getLetter_value();
+                if (lettersLeft == 0) { //means he tapped end game
+                    //END GAME DIALOG! WITH NEW GAME OPTION
+                    int reduceScore = 0;
+                    for (SingleLetter letter : board) {
+                        reduceScore = reduceScore + letter.getLetter_value();
 
                     }
-                    int tempScore= playerScore;
-                   // if(playerScore>=0){
-                    playerScore=tempScore-reduceScore;
+                    int tempScore = playerScore;
+                    // if(playerScore>=0){
+                    playerScore = tempScore - reduceScore;
                     //}
                     //else{
                     //playerScore=playerScore-reduceScore;
                     //}
-                    if(board.size()>0){
+                    if (board.size() > 0) {
                         dialogEndGameSure(reduceScore);
-                      ;
+                        ;
+                    } else {
+                        dialogEndGame();
                     }
-                    else {
-                    dialogEndGame();
-                   }
 
+                    break;
+                }
+
+                if (board.size() == 16) {
+                    Toast.makeText(getApplicationContext(), "The board is full", Toast.LENGTH_SHORT).show();
                     break;
                 }
 
@@ -271,70 +278,71 @@ public class MainActivity extends AppCompatActivity  implements
 
 
                 String spellCheckWord = "";
-                int addScore=0;
+                int addScore = 0;
                 for (int i = 0; i < builder.size(); i++) {
 
                     spellCheckWord = spellCheckWord + builder.get(i).getLetter_name();
-                    addScore=addScore+builder.get(i).getLetter_value(); // later change this to include only the new letters score
+                    addScore = addScore + builder.get(i).getLetter_value(); // later change this to include only the new letters score
 
                 }
                 //wordReview.setText(spellCheckWord);
-                if(spellCheckWord.equals("")){
-                    Toast.makeText(this,"No word",Toast.LENGTH_SHORT).show();
+                if (spellCheckWord.equals("")) {
+                    Toast.makeText(this, "No word", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 // left a word broken in myWords
-                int wordBroken=0;
-                for(int i=0; i<myWords.size();i++){
-                    int blankCounter=0;
-                    for(int j=0; j<myWords.get(i).size(); j++){
-                        if(myWords.get(i).get(j).getLetter_name().equals("")){
+                int wordBroken = 0;
+                for (int i = 0; i < myWords.size(); i++) {
+                    int blankCounter = 0;
+                    for (int j = 0; j < myWords.get(i).size(); j++) {
+                        if (myWords.get(i).get(j).getLetter_name().equals("")) {
                             blankCounter++;
                         }
                     }
-                    if(blankCounter!=myWords.get(i).size() && blankCounter>0){
-                        wordBroken=1;
+                    if (blankCounter != myWords.get(i).size() && blankCounter > 0) {
+                        wordBroken = 1;
                         break;
                     }
                 }
 
-                if(wordBroken==1){//word rules don't comply
-                    Toast.makeText(this,"Can't use part of a word",Toast.LENGTH_SHORT).show();
+                if (wordBroken == 1) {//word rules don't comply
+                    Toast.makeText(this, "Can't use part of a word", Toast.LENGTH_SHORT).show();
                     break;
                 }
 
                 //only  pluralised
-                int i=0;
-                int lastLetterIndex= builderLetterTypes.size() - 1;
-                if (builderLetterTypes.get(lastLetterIndex)[0]==0)//last letter from board (0)
+                int i = 0;
+                int lastLetterIndex = builderLetterTypes.size() - 1;
+                if (builderLetterTypes.get(lastLetterIndex)[0] == 0)//last letter from board (0)
                 {
-                    if (builder.get(lastLetterIndex).getLetter_name().equals("S"))
-                    {
-                        for (i=0; i<builderLetterTypes.size()-1;i++) {
-                            if(builderLetterTypes.get(i)[0]==0) break; //another letter is from board
-                            if (builderLetterTypes.get(i)[2] != i) break; //letter index in a different order
+                    if (builder.get(lastLetterIndex).getLetter_name().equals("S")) {
+                        for (i = 0; i < builderLetterTypes.size() - 1; i++) {
+                            if (builderLetterTypes.get(i)[0] == 0)
+                                break; //another letter is from board
+                            if (builderLetterTypes.get(i)[2] != i)
+                                break; //letter index in a different order
                         }
                         if (i == builderLetterTypes.size() - 1)//go to end without breaking
                         {
-                            Toast.makeText(this,"You can't only pluralise a word",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "You can't only pluralise a word", Toast.LENGTH_SHORT).show();
                             break;
                         }
-                }
+                    }
 
                 }
 
 
                 //must add letters to existing word
-                int fromWordsCounter=0;
-                for(int[] place:builderLetterTypes){
-                    if(place[0]==0)
-                    {break;}
+                int fromWordsCounter = 0;
+                for (int[] place : builderLetterTypes) {
+                    if (place[0] == 0) {
+                        break;
+                    }
                     fromWordsCounter++;
-                                    }
+                }
 
-                if(fromWordsCounter==builderLetterTypes.size())
-                {
-                    Toast.makeText(this,"Must add letters from board as well",Toast.LENGTH_SHORT).show();
+                if (fromWordsCounter == builderLetterTypes.size()) {
+                    Toast.makeText(this, "Must add letters from board as well", Toast.LENGTH_SHORT).show();
                     break;
                 }
 
@@ -342,13 +350,13 @@ public class MainActivity extends AppCompatActivity  implements
                 //THE WORD MUST be checked as opposed to original because vest can become vests while the s is in the middle is from the board
 
                 //word must be 4+
-                if(builder.size()<3){
-                    Toast.makeText(this,"word must be at least 3 letters long",Toast.LENGTH_SHORT).show();
+                if (builder.size() < 3) {
+                    Toast.makeText(this, "word must be at least 3 letters long", Toast.LENGTH_SHORT).show();
                     break;
                 }
 
                 //ALL GOOD:
-              setEnableAll(false);
+                setEnableAll(false);
 
 
                 URL wordSearchURL = NetworkUtils.buildUrl(spellCheckWord);
@@ -376,24 +384,26 @@ public class MainActivity extends AppCompatActivity  implements
 
     @Override
     public void onWordItemClick(int clickedWord, int clickedLetter) {
-        Log.i("Clicked Letter in Word",myWords.get(clickedWord).get(clickedLetter).letter_name);
+        Log.i("Clicked Letter in Word", myWords.get(clickedWord).get(clickedLetter).letter_name);
 
         builder.add(myWords.get(clickedWord).get(clickedLetter));
         mBuilderAdapter.notifyDataSetChanged();
-        builderLetterTypes.add(placer(1,clickedWord,clickedLetter));
+        builderLetterTypes.add(placer(1, clickedWord, clickedLetter));
 
-       myWords.get(clickedWord).remove(clickedLetter);
-       myWords.get(clickedWord).add(clickedLetter,new SingleLetter("",0,0));
-      //  mWordsAdapter.notifyItemChanged(clickedWord); notify to mBoardAdapter occurs in myWordsAdapter
+        myWords.get(clickedWord).remove(clickedLetter);
+        myWords.get(clickedWord).add(clickedLetter, new SingleLetter("", 0, 0));
+        //  mWordsAdapter.notifyItemChanged(clickedWord); notify to mBoardAdapter occurs in myWordsAdapter
 
     }
 
     @Override
     public void onLetterClick(int recyler_id, int clickedItemIndex) {
 
-        if(!mBoardRecView.isEnabled() || !mMyWordsRecView.isEnabled() || !mBuilderRecView.isEnabled())
+        if (!mBoardRecView.isEnabled() || !mMyWordsRecView.isEnabled() || !mBuilderRecView.isEnabled())
 
-        {return;}
+        {
+            return;
+        }
 
         //convert to drag and drop!
         switch (recyler_id) { //from builder to board
@@ -401,15 +411,15 @@ public class MainActivity extends AppCompatActivity  implements
                 builder.add(board.get(clickedItemIndex));
                 //board.remove(board.get(clickedItemIndex));// why not
                 board.remove(clickedItemIndex);
-                board.add(clickedItemIndex,new SingleLetter("",0,0));
-                builderLetterTypes.add(placer(0,-1,clickedItemIndex));
+                board.add(clickedItemIndex, new SingleLetter("", 0, 0));
+                builderLetterTypes.add(placer(0, -1, clickedItemIndex));
 
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
 
                 break;
             case R.id.word_builder_list: //from builder to board or words
-                int origin= builderLetterTypes.get(clickedItemIndex)[0];
+                int origin = builderLetterTypes.get(clickedItemIndex)[0];
                 int wordIndex = builderLetterTypes.get(clickedItemIndex)[1];
                 int letterIndex = builderLetterTypes.get(clickedItemIndex)[2];
                 switch (origin) {
@@ -419,20 +429,21 @@ public class MainActivity extends AppCompatActivity  implements
                         mBoardAdapter.notifyDataSetChanged();
                         break;
                     case 1: //myWords(wordplace.letterplace)
-                        if(wordIndex<0){
-                            Log.i("case word index=-1","shouldn't get here");
-                            break;} //per caution. shouldn't get here
+                        if (wordIndex < 0) {
+                            Log.i("case word index=-1", "shouldn't get here");
+                            break;
+                        } //per caution. shouldn't get here
                         myWords.get(wordIndex).remove(letterIndex);
-                        myWords.get(wordIndex).add(letterIndex,builder.get(clickedItemIndex));
+                        myWords.get(wordIndex).add(letterIndex, builder.get(clickedItemIndex));
                         mWordsAdapter.notifyItemChanged(wordIndex); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
                         break;
                 }  //in any case:
 
-                    builder.remove(clickedItemIndex);
-                    builderLetterTypes.remove(clickedItemIndex);
-                   // mBuilderAdapter.notifyItemRemoved(clickedItemIndex);
+                builder.remove(clickedItemIndex);
+                builderLetterTypes.remove(clickedItemIndex);
+                // mBuilderAdapter.notifyItemRemoved(clickedItemIndex);
                 mBuilderAdapter.notifyDataSetChanged();
-                    break;
+                break;
         }
 
     }
@@ -465,7 +476,7 @@ public class MainActivity extends AppCompatActivity  implements
             URL searchUrl = params[0];
             String wordValidateResults = null;
             //TODO return this when API works!
-           try {
+            try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
 
             } catch (IOException e) {
@@ -492,12 +503,12 @@ public class MainActivity extends AppCompatActivity  implements
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.d("valid","did not get valid result");
+                Log.d("valid", "did not get valid result");
             } //remove this when API works!
 
-           // valid="1"; //TODO REMVOE AFTER TESTING
+            // valid="1"; //TODO REMVOE AFTER TESTING
             {
-             //   wordReview.setText(valid);
+                //   wordReview.setText(valid);
 //if valid remove place holders
                 if (valid.equals("0")) {
                     // wordReview.setText(wordValidateResults);
@@ -512,16 +523,17 @@ public class MainActivity extends AppCompatActivity  implements
 
         }
     }
-    public void afterDialogSuccess(int tempScore){
-        addWordToMyWords(tempScore);
-      //  if (board.size() == 0) {
 
-            addLetterToBoard(); //when word played a new letter is added to board without penalty
-            mBoardAdapter.notifyDataSetChanged();
-        if(lettersLeft==0){
+    public void afterDialogSuccess(int tempScore) {
+        addWordToMyWords(tempScore);
+        //  if (board.size() == 0) {
+
+        addLetterToBoard(); //when word played a new letter is added to board without penalty
+        mBoardAdapter.notifyDataSetChanged();
+        if (lettersLeft == 0) {
             noLettersInBag();
-                   }
-        if(board.isEmpty()){
+        }
+        if (board.isEmpty()) {
             dialogEndGame();
         }
         setEnableAll(true);
@@ -546,7 +558,7 @@ public class MainActivity extends AppCompatActivity  implements
                 case 0: //board
                     board.remove(letterIndex);//remove place holder
                     board.add(letterIndex, builder.get(i));
-                   //mBoardAdapter.notifyDataSetChanged();
+                    //mBoardAdapter.notifyDataSetChanged();
                     break;
                 case 1: //myWords(wordplace.letterplace)
                     if (wordIndex < 0) {
@@ -556,19 +568,19 @@ public class MainActivity extends AppCompatActivity  implements
                     myWords.get(wordIndex).remove(letterIndex); //remove space holder
                     myWords.get(wordIndex).add(letterIndex, builder.get(i));
 
-                   // mWordsAdapter.notifyDataSetChanged(); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
+                    // mWordsAdapter.notifyDataSetChanged(); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
                     break;
             }
-                //    board.add(builder.get(i));
-                    builderLetterTypes.remove(i);
-                    builder.remove(i);
+            //    board.add(builder.get(i));
+            builderLetterTypes.remove(i);
+            builder.remove(i);
 
 
         }
-            mBoardAdapter.notifyDataSetChanged();
-            mBuilderAdapter.notifyDataSetChanged();
-            mWordsAdapter.notifyDataSetChanged();
-        }
+        mBoardAdapter.notifyDataSetChanged();
+        mBuilderAdapter.notifyDataSetChanged();
+        mWordsAdapter.notifyDataSetChanged();
+    }
 
     public void dialogWrongWord(String word) {
         new AlertDialog.Builder(this).setTitle("TOO BAD")
@@ -587,6 +599,7 @@ public class MainActivity extends AppCompatActivity  implements
                     }
                 }).create().show();
     }
+
     public void dialogEndGameSure(final int boardPoints) {
         new AlertDialog.Builder(this).setTitle("End Game")
                 .setMessage("Are you sure you want to end game? You will lose " + boardPoints + " for tiles left in the board")
@@ -597,22 +610,23 @@ public class MainActivity extends AppCompatActivity  implements
                         mScore.setText(String.valueOf(playerScore));
 
                     }
-                }).setNegativeButton("I'll keep trying",null).create().show();
+                }).setNegativeButton("I'll keep trying", null).create().show();
     }
+
     public void dialogEndGame() {
-        String msg="";
-       int res= PreferenceUtilities.newScoreSend(this,playerScore);
-        if(res ==1 ){
-           msg= " You made a new high score!";
+        String msg = "";
+        int res = PreferenceUtilities.newScoreSend(this, playerScore);
+        if (res == 1) {
+            msg = "You made a new high score!";
         }
-        if(res==0){
-            msg= " Well done!";
+        if (res == 0) {
+            msg = "Well done!";
         }
 //if res =0 nothing. if res=1 you got a new high score!
 
         new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
-                .setMessage("Your Score: " + playerScore+"/n" + msg)
-                .setNeutralButton("NEW GAME", new DialogInterface.OnClickListener() {
+                .setMessage("Your Score: " + playerScore + "\n" + msg)
+                .setNeutralButton(R.string.new_game, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         newGame();
@@ -621,48 +635,48 @@ public class MainActivity extends AppCompatActivity  implements
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 setEnableAll(false);
-                getLetter.setText("NEW GAME");
+                getLetter.setText(R.string.new_game);
                 getLetter.setEnabled(true);
-                Intent intent= new Intent(MainActivity.this, HighScoreActivity.class);
-                startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, HighScoreActivity.class);
+                startActivityForResult(intent, RESULT_CODE);
 
             }
         })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                dialogEndGame();
-            }
-        }).create().show();
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        dialogEndGame();
+                    }
+                }).create().show();
     }
 
     public void dialogCorrectWord(String word, final int score) {
 
         //check if reused words
         //int reusedFlag=0;
-        String extraScore="";
-        String longScore="";
-        for(int[] letter:builderLetterTypes){
-         if(letter[0]==1) { //at least one letter from reused word
-           //  reusedFlag = 1;
-             extraScore=" You get to keep the score for the original word as well!"; //replace original with word..? later on
+        String extraScore = "";
+        String longScore = "";
+        for (int[] letter : builderLetterTypes) {
+            if (letter[0] == 1) { //at least one letter from reused word
+                //  reusedFlag = 1;
+                extraScore = "\n" + "You get to keep the score for the original word as well!"; //replace original with word..? later on
 
-             break;
-         }
+                break;
+            }
         }
-        int wordLength=word.length();
-        if(wordLength>=7){
-            longScore=" Woohoo! "+ wordLength+" extra points for a "+wordLength+" letter word!";
+        int wordLength = word.length();
+        if (wordLength >= 7) {
+            longScore = "\n" + "Woohoo! " + wordLength + " extra points for a " + wordLength + " letter word!";
         }
 
         new AlertDialog.Builder(this).setTitle("Hurray")
-                .setMessage(word + " is great! Keep it up!" + extraScore+ longScore)
+                .setMessage(word + " is great! Keep it up!" + extraScore + longScore)
                 .setNeutralButton("Oh Yeah!", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                afterDialogSuccess(score);
+                        afterDialogSuccess(score);
                     }
                 })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -674,7 +688,7 @@ public class MainActivity extends AppCompatActivity  implements
                 .setPositiveButton("See word definition", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                  //      dialogFlag=1;
+                        //      dialogFlag=1;
                         //DICTIONARY from internet... With intent - activity WordDefinition -to be continued
                         //after dictionary back to main screen withoiut dialog box
                         afterDialogSuccess(score);
@@ -683,44 +697,42 @@ public class MainActivity extends AppCompatActivity  implements
 
     }
 
-    public void addWordToMyWords(  int tempScore){
+    public void addWordToMyWords(int tempScore) {
 
         List<SingleLetter> newWord = new ArrayList<>();
 
         //move letters to myWords
-        int builder_size=builder.size();
+        int builder_size = builder.size();
         List<Integer> tempBoardLetters = new ArrayList<>();
         List<Integer> tempMyWordsLetters = new ArrayList<>();
 
-        if (builder_size>=7) { //BONUS for long words!
-            tempScore = tempScore+builder_size;
+        if (builder_size >= 7) { //BONUS for long words!
+            tempScore = tempScore + builder_size;
         }
 
 
         for (int i = 0; i < builder_size; i++) {
             newWord.add(i, builder.get(i));
-            if(builderLetterTypes.get(i)[0]==0){
+            if (builderLetterTypes.get(i)[0] == 0) {
                 tempBoardLetters.add(builderLetterTypes.get(i)[2]);
             }
-            if(builderLetterTypes.get(i)[0]==1)
-            {
+            if (builderLetterTypes.get(i)[0] == 1) {
                 tempMyWordsLetters.add(builderLetterTypes.get(i)[1]); //save word indexes
             }
         }
 //SORT templettertypes and remove from board accordingly
         Collections.sort(tempBoardLetters);
 
-        for (int i=tempBoardLetters.size()-1;i>=0;i--){
-              //0: from board
+        for (int i = tempBoardLetters.size() - 1; i >= 0; i--) {
+            //0: from board
             int toRemove = tempBoardLetters.get(i);
             board.remove(toRemove);//remove place holders
         }
         //remove blank letter
         Collections.sort(tempMyWordsLetters);
         Set uniqueValues = new HashSet(tempMyWordsLetters); //now unique
-        List<Integer> tempMyWordsLettersUnique =  new ArrayList<>(uniqueValues);
-        for(int i=uniqueValues.size()-1;i>=0;i--)
-        {
+        List<Integer> tempMyWordsLettersUnique = new ArrayList<>(uniqueValues);
+        for (int i = uniqueValues.size() - 1; i >= 0; i--) {
             //none broken letter check was done earlier
             int toRemove = tempMyWordsLettersUnique.get(i);
             myWords.remove(toRemove);
@@ -730,7 +742,8 @@ public class MainActivity extends AppCompatActivity  implements
 
         builder.clear();
         builderLetterTypes.clear();
-        mBuilderAdapter.notifyDataSetChanged();;
+        mBuilderAdapter.notifyDataSetChanged();
+        ;
         mBoardAdapter.notifyDataSetChanged();
         myWords.add(newWord);
         mWordsAdapter.notifyDataSetChanged();
@@ -739,7 +752,9 @@ public class MainActivity extends AppCompatActivity  implements
 
         mScore.setText(String.valueOf(playerScore));
 
-    };
+    }
+
+    ;
 
 
     public String parseWordResult(String xmlString) throws IOException {
@@ -747,101 +762,108 @@ public class MainActivity extends AppCompatActivity  implements
         InputStream stream = new ByteArrayInputStream(xmlString.getBytes());
         XmlPullParserFactory xmlFactoryObject = null;
         XmlPullParser myParser = null;
-        String valid="";
+        String valid = "";
         try {
             xmlFactoryObject = XmlPullParserFactory.newInstance();
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         }
         try {
-           myParser = xmlFactoryObject.newPullParser();
-            myParser.setInput(stream,null);
+            myParser = xmlFactoryObject.newPullParser();
+            myParser.setInput(stream, null);
             int event = myParser.getEventType();
 
-            while (event != XmlPullParser.END_DOCUMENT)  {
-                String name=myParser.getName();
-                switch (event){
+            while (event != XmlPullParser.END_DOCUMENT) {
+                String name = myParser.getName();
+                switch (event) {
 
                     case XmlPullParser.START_TAG:
-                        if(name.equals("scrabble")){
-                            if(myParser.next() == XmlPullParser.TEXT) {
-                            valid = myParser.getText();}
+                        if (name.equals("scrabble")) {
+                            if (myParser.next() == XmlPullParser.TEXT) {
+                                valid = myParser.getText();
+                            }
                             //(null,"value");
 
-                        }break;
+                        }
+                        break;
 
                 }
-                    event = myParser.next();
+                event = myParser.next();
 
             }
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         }
-return valid;
+        return valid;
 
     }
 
-    public void noLettersInBag(){
+    public void noLettersInBag() {
 
-        if(getLetter.getText()==getResources().getString(R.string.end_game))
-        {
+        if (getLetter.getText() == getResources().getString(R.string.end_game)) {
 
-            return;}
-       getLetter.setText(getResources().getString(R.string.end_game));
+            return;
+        }
+        getLetter.setText(getResources().getString(R.string.end_game));
         Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
     }
 
-    public  int[] placer(int letterOrigin, int wordPlace, int letterPlace){
-       //List placer = new ArrayList();
-        int[] series={letterOrigin,wordPlace,letterPlace};//0: 0= from board 1 = from mywords, 1: word index, 2: letter index
-      //  placer.add(series);
+    public int[] placer(int letterOrigin, int wordPlace, int letterPlace) {
+        //List placer = new ArrayList();
+        int[] series = {letterOrigin, wordPlace, letterPlace};//0: 0= from board 1 = from mywords, 1: word index, 2: letter index
+        //  placer.add(series);
         return series;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.new_game,menu);
+        getMenuInflater().inflate(R.menu.new_game, menu);
         return true;
-            }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==  R.id.new_game_button)
-        {
+        if (item.getItemId() == R.id.new_game_button) {
             newGame();
 
             return true; //exits onOptionsItemSelected
         }
 
-        if(item.getItemId()==R.id.instructions_menu)
-        {
+        if (item.getItemId() == R.id.instructions_menu) {
             Context context = MainActivity.this;
             Class destinationActivity = Instructions.class;
-            Intent instructions_intent= new Intent(context,destinationActivity);
+            Intent instructions_intent = new Intent(context, destinationActivity);
             startActivity(instructions_intent);
 
 
             return true;
         }
-        if(item.getItemId()==R.id.high_score_in_menu){
+        if (item.getItemId() == R.id.high_score_in_menu) {
 
             Context context = MainActivity.this;
             Class destinationActivity = HighScoreActivity.class;
-            Intent highscore_intent= new Intent(context,destinationActivity);
-            startActivity(highscore_intent); ///MUST ADD BACK TO GAME!!!! AND UNVISIBLE IF END OF GAME
+            Intent highscore_intent = new Intent(context, destinationActivity);
+            startActivityForResult(highscore_intent, RESULT_CODE); ///MUST ADD BACK TO GAME!!!! AND UNVISIBLE IF END OF GAME
         }
-        if(item.getItemId()==R.id.send_feedback){
+        if (item.getItemId() == R.id.send_feedback) {
 
             Context context = MainActivity.this;
             Class destinationActivity = SendFeedback.class;
-            Intent feedback_intent= new Intent(context,destinationActivity);
+            Intent feedback_intent = new Intent(context, destinationActivity);
             startActivity(feedback_intent);
         }
-        return super.onOptionsItemSelected(item); //if not action_search
+        if (item.getItemId() == R.id.settings) {
+
+            Context context = MainActivity.this;
+            Class destinationActivity = SendFeedback.class;
+            Intent feedback_intent = new Intent(context, destinationActivity);
+            startActivity(feedback_intent);
+        }
+            return super.onOptionsItemSelected(item); //if not action_search
     }
 
 
-    private void setEnableAll (boolean state){
+    private void setEnableAll(boolean state) {
         getLetter.setEnabled(state);
         playWord.setEnabled(state);
         clearWord.setEnabled(state);
@@ -850,10 +872,11 @@ return valid;
         mBuilderRecView.setEnabled(state);
         mMyWordsRecView.setEnabled(state);
 //        newGameMenuItem.setEnabled(state);
-  //      feedbackMenuItem.setEnabled(state);
-    //    instructionsMenuItem.setEnabled(state);
+        //      feedbackMenuItem.setEnabled(state);
+        //    instructionsMenuItem.setEnabled(state);
 
     }
+
     private void checkForCrashes() {
         CrashManager.register(this);
     }
@@ -868,21 +891,26 @@ return valid;
     }
 
 
-    private String wordBuilder(){
+    private String wordBuilder() {
 
 
         //for letter in board
-            // for word in my words
-                //add letter to word
-                    //change A and B
+        // for word in my words
+        //add letter to word
+        //change A and B
         //for two letters in board
         // check board
         return null;
     }
 
-
-
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_CODE && resultCode == RESULT_CODE) {
+            if (data.getIntExtra("Button_tapped", 0) == (R.string.new_game))
+                newGame();
+        }
+    }
 }
 
 

@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-        <group android:id="@+id/group_all">
+    <group android:id="@+id/group_all">
         <item
             android:id="@+id/new_game_button"
             android:orderInCategory="1"
-            android:title="New Game"/>
+            android:title="New Game" />
         <item
-                android:id="@+id/instructions_menu"
-                android:orderInCategory="2"
+            android:id="@+id/instructions_menu"
+            android:orderInCategory="2"
 
-                android:title="Instructions"
-      />
-                <item
-                        android:id="@+id/high_score_in_menu"
-                    android:orderInCategory="3"
-                    android:title="My High Scores"
-                        ></item>
+            android:title="Instructions" />
         <item
-                android:id="@+id/send_feedback"
-                android:orderInCategory="4"
-                android:title="Send Feedback" />
+            android:id="@+id/high_score_in_menu"
+            android:orderInCategory="3"
+            android:title="My High Scores"></item>
+        <item
+            android:id="@+id/send_feedback"
+            android:orderInCategory="4"
+            android:title="Send Feedback" />
 
+        <item
+            android:id="@+id/settings"
+            android:orderInCategory="5"
+            android:title="Settings"></item>
 
-</group>
+    </group>
 </menu>

@@ -31,9 +31,8 @@
         <activity
             android:name=".HighScoreActivity"
             android:label="@string/title_activity_high_score"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-
-        </activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
