@@ -17,14 +17,15 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    final static String BASE_URL="http://www.wordgamedictionary.com/api/v1/references/scrabble/";
+    final static String BASE_URL_CHK_WORD="http://www.wordgamedictionary.com/api/v1/references/scrabble/";
     final static String KEY = "key";
-    final static String API = "2.6319805885208397e29";
+    final static String API_CHK_WORD = "2.6319805885208397e29";
+    final static String BASE_URL_OXFORD ="https://od-api.oxforddictionaries.com/api/v1";
 
         //http://www.wordgamedictionary.com/api/v1/references/scrabble/test?key=2.6319805885208397e29
 
-    public static URL buildUrl(String checkWord) {
-        Uri builtUri =  Uri.parse(BASE_URL).buildUpon().appendPath(checkWord).appendQueryParameter(KEY,API).build();
+    public static URL buildUrlCheckWord(String checkWord) {
+        Uri builtUri =  Uri.parse(BASE_URL_CHK_WORD).buildUpon().appendPath(checkWord).appendQueryParameter(KEY,API_CHK_WORD).build();
 
 
         URL url = null;
@@ -41,7 +42,6 @@ public class NetworkUtils {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream in = urlConnection.getInputStream();
-
             Scanner scanner = new Scanner(in);
             scanner.useDelimiter("\\A");
 

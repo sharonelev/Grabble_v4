@@ -14,13 +14,14 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="1dp"
+    android:layout_margin="2dp"
     android:background="@drawable/border"
-    android:layout_margin="5dp"
+    android:padding="1dp"
+    android:paddingBottom="3dp"
 
 
     >
@@ -28,11 +29,12 @@
     <TextView
         android:id="@+id/scrabble_letter_name"
         style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="18dp"
-        android:paddingLeft="1dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|left"
         android:fontFamily="monospace"
+        android:paddingLeft="3dp"
+        android:paddingBottom="1dp"
         android:textSize="28sp"
         tools:text="Q" />
 
@@ -44,8 +46,10 @@
         android:layout_gravity="bottom|right"
 
         android:fontFamily="monospace"
-        android:textSize="15sp"
+        android:textSize="10sp"
+        android:paddingRight="3dp"
+        android:paddingBottom="3dp"
         tools:text="10" />
 
 
-</FrameLayout>
+</GridLayout>

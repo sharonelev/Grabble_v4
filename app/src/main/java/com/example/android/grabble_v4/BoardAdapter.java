@@ -84,23 +84,23 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.mLetter.setTextSize(35);
                 holder.mLetterValue.setTextSize(20);
             }*/
-            if (numOfTiles <= 8) {
-                holder.itemView.getLayoutParams().width = 90;//130
-                holder.itemView.getLayoutParams().height = 120;//140
-                holder.mLetter.setTextSize(28);
-                holder.mLetterValue.setTextSize(15);
+            if (numOfTiles <= 11 ){
+               // holder.itemView.getLayoutParams().width = 90;//130
+                //holder.itemView.getLayoutParams().height = 120;//140
+                holder.mLetter.setTextSize (28);
+                holder.mLetterValue.setTextSize(10);
             }
-            if (numOfTiles == 9) {
-                holder.itemView.getLayoutParams().width = 75;//130
-                holder.itemView.getLayoutParams().height = 100;//140
+            if (numOfTiles == 12) {
+               // holder.itemView.getLayoutParams().width = 75;//130
+                //holder.itemView.getLayoutParams().height = 100;//140
                 holder.mLetter.setTextSize(25);
-                holder.mLetterValue.setTextSize(14);
+                holder.mLetterValue.setTextSize(8);
             }
-            if (numOfTiles >= 10) {
-                holder.itemView.getLayoutParams().width = 65;//130
-                holder.itemView.getLayoutParams().height = 90;//140
-                holder.mLetter.setTextSize(20);
-                holder.mLetterValue.setTextSize(13);
+            if (numOfTiles >= 13) {
+                //holder.itemView.getLayoutParams().width = 65;//130
+                //holder.itemView.getLayoutParams().height = 90;//140
+                holder.mLetter.setTextSize(22);
+                holder.mLetterValue.setTextSize(7);
                 //make margin thinner, perhaps in mainactivity
             }
         }

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
@@ -77,11 +78,15 @@ public class MainActivity extends AppCompatActivity implements
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit = 5; //including 4 from start//
+    int game_limit = 50; //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
     public final static int RESULT_CODE = 123;
+    public boolean showCorrectPopUp;
+    public boolean showWrongPopUp;
+    
+
 
 
     @Override
@@ -107,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements
         //set Layout
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
-
+        setupSharedPreferences();
       /*  int spacingInPixels = getResources().getDimensionPixelSize(R.id.scrabble_letter_list);
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
@@ -158,10 +163,11 @@ public class MainActivity extends AppCompatActivity implements
         lettersLeft = game_limit;
 
         setEnableAll(true);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 8);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
         LinearLayoutManager BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
-        StaggeredGridLayoutManager linearLayout = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL);
+        StaggeredGridLayoutManager linearLayout = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
+
         //  BuilderLayoutManager.setAutoMeasureEnabled(false);
         mMyWordsRecView.setLayoutManager(linearLayout);
         mBoardRecView.setLayoutManager(gridLayoutManager);
@@ -261,9 +267,9 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
 
-                if (board.size() == 16) {
-                    Toast.makeText(getApplicationContext(), "The board is full", Toast.LENGTH_SHORT).show();
-                    break;
+                if (board.size() == 2*(getResources().getInteger(R.integer.tiles_on_board))) {
+                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+
                 }
 
                 addLetterToBoard();
@@ -359,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements
                 setEnableAll(false);
 
 
-                URL wordSearchURL = NetworkUtils.buildUrl(spellCheckWord);
+                URL wordSearchURL = NetworkUtils.buildUrlCheckWord(spellCheckWord);
                 new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
                 //add dictionary check!
 
@@ -449,8 +455,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pop_up_correct_key))) {
+            showCorrectPopUp=(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
+        } else if (key.equals(getString(R.string.pop_up_wrong_key))) {
+           showWrongPopUp=(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
+        }
     }
 
 
@@ -506,15 +516,23 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d("valid", "did not get valid result");
             } //remove this when API works!
 
-            // valid="1"; //TODO REMVOE AFTER TESTING
+             //valid="1"; //TODO REMVOE AFTER TESTING
             {
                 //   wordReview.setText(valid);
 //if valid remove place holders
                 if (valid.equals("0")) {
                     // wordReview.setText(wordValidateResults);
-                    dialogWrongWord(checkWord);
+                    if(showWrongPopUp)
+                    dialogWrongWord(checkWord); //todo test change
+                    else
+                    {Toast.makeText(getApplicationContext(),checkWord+" is not a valid word",Toast.LENGTH_LONG).show();
+                    setEnableAll(true);
+                    }
                 } else if (valid.equals("1")) {
-                    dialogCorrectWord(checkWord, tempScore); //TODO apply dialogue (removed for testing)
+                    if(showCorrectPopUp) dialogCorrectWord(checkWord, tempScore); //TODO no pop up test
+                    else {
+                        afterDialogSuccess(tempScore); //just for test
+                    }
 
                 }
 
@@ -844,6 +862,7 @@ public class MainActivity extends AppCompatActivity implements
             Class destinationActivity = HighScoreActivity.class;
             Intent highscore_intent = new Intent(context, destinationActivity);
             startActivityForResult(highscore_intent, RESULT_CODE); ///MUST ADD BACK TO GAME!!!! AND UNVISIBLE IF END OF GAME
+            return true;
         }
         if (item.getItemId() == R.id.send_feedback) {
 
@@ -851,13 +870,15 @@ public class MainActivity extends AppCompatActivity implements
             Class destinationActivity = SendFeedback.class;
             Intent feedback_intent = new Intent(context, destinationActivity);
             startActivity(feedback_intent);
+            return true;
         }
         if (item.getItemId() == R.id.settings) {
 
             Context context = MainActivity.this;
-            Class destinationActivity = SendFeedback.class;
-            Intent feedback_intent = new Intent(context, destinationActivity);
-            startActivity(feedback_intent);
+            Class destinationActivity = SettingsActivity.class;
+            Intent settings_intent = new Intent(context, destinationActivity);
+            startActivity(settings_intent);
+            return true;
         }
             return super.onOptionsItemSelected(item); //if not action_search
     }
@@ -911,6 +932,17 @@ public class MainActivity extends AppCompatActivity implements
                 newGame();
         }
     }
+
+    private void setupSharedPreferences() {
+        // Get all of the values from shared preferences to set it up
+        SharedPreferences sharedPreferences = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        showCorrectPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_correct_key),getResources().getBoolean(R.bool.popup_default));
+        showWrongPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_wrong_key),getResources().getBoolean(R.bool.popup_default));
+        // Register the listener
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+
 }
 
 

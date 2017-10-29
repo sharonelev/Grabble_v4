@@ -2,8 +2,12 @@ package com.example.android.grabble_v4.Utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
+import com.example.android.grabble_v4.R;
 import com.example.android.grabble_v4.data.HighScore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -26,6 +30,8 @@ public class PreferenceUtilities {
 
     // public static final String NEW_HIGH_SCORE = "new-high-score";
     public static final String HIGH_SCORE_LIST = "high-score-list";
+    public static final String CHECK_BOX_CORRECT_DIALOG = "cb-correct-d";
+    public static final String CHECK_BOX_WRONG_DIALOG = "cb-wrong-d";
     public static final int NUM_OF_SCORES = 5;
 
 
@@ -91,5 +97,46 @@ public class PreferenceUtilities {
 
         return highScoreList;
     }
+
+/*    public static boolean getCheckBoxSettings(CompoundButton checkBox, Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+       switch (checkBox.getId())
+       {
+           case R.id.checkBoxCorrectDialog:
+
+           {
+               return prefs.getBoolean(CHECK_BOX_CORRECT_DIALOG, true); //true default
+           }
+           case R.id.checkBoxWrongDialog:
+           {
+               return prefs.getBoolean(CHECK_BOX_WRONG_DIALOG, true);
+
+           }
+
+       }
+
+
+       return true;
+    }*/
+
+/*    public static void setCheckBoxSettings(CompoundButton checkBox, Context context){
+        SharedPreferences prefs  = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        switch (checkBox.getId()){
+            case R.id.checkBoxCorrectDialog:
+            {
+                editor.putBoolean(CHECK_BOX_CORRECT_DIALOG, checkBox.isChecked());
+            }
+            case R.id.checkBoxWrongDialog:
+            {
+                editor.putBoolean(CHECK_BOX_WRONG_DIALOG, checkBox.isChecked());
+
+            }
+            editor.apply();
+        }
+    }*/
+
 
 }

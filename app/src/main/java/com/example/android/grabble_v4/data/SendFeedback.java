@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -29,7 +30,12 @@ public class SendFeedback extends AppCompatActivity implements View.OnClickListe
         feedback =(EditText) findViewById(R.id.feedback_text);
 
 
+        ActionBar actionBar = this.getSupportActionBar();
 
+        // Set the action bar back button to look like an up button
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
 
     }

@@ -1,6 +1,7 @@
 package com.example.android.grabble_v4.data;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -20,5 +21,11 @@ public class Instructions extends AppCompatActivity {
 
         /* Typical usage of findViewById... */
         //  mDisplayText = (TextView) findViewById(R.id.tv_display);
+
+    ActionBar actionBar = this.getSupportActionBar();
+
+    // Set the action bar back button to look like an up button
+        if (actionBar != null) {
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
-}
+}}

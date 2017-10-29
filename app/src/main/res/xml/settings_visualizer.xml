@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+        <!-- COMPLETED (1) Add two more checkboxes for the treble and mid-range -->
+        <CheckBoxPreference
+            android:defaultValue="@bool/popup_default"
+            android:key="@string/pop_up_correct_key"
+            android:summaryOff="@string/prefs_false"
+            android:summaryOn="@string/prefs_true"
+            android:title="@string/pop_up_correct_label" />
+
+        <CheckBoxPreference
+            android:defaultValue="@bool/popup_default"
+            android:key="@string/pop_up_wrong_key"
+            android:summaryOff="@string/prefs_false"
+            android:summaryOn="@string/prefs_true"
+            android:title="@string/pop_up_wrong_label" />
+
+
+</PreferenceScreen>
