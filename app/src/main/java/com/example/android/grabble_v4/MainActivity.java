@@ -55,6 +55,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.krtkush.lineartimer.LinearTimer;
+import io.github.krtkush.lineartimer.LinearTimerView;
+
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
@@ -72,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements
     RecyclerView mBoardRecView;
     RecyclerView mBuilderRecView;
     RecyclerView mMyWordsRecView;
+    GridLayoutManager gridLayoutManager;
+    LinearLayoutManager BuilderLayoutManager;
+    StaggeredGridLayoutManager linearLayout;
     TextView wordReview;
     ProgressBar pBar;
     TextView mScore;
@@ -85,9 +91,11 @@ public class MainActivity extends AppCompatActivity implements
     public final static int RESULT_CODE = 123;
     public boolean showCorrectPopUp;
     public boolean showWrongPopUp;
-    
-
-
+    LinearTimerView linearTimerView;
+    LinearTimer linearTimer;
+    CountDownTimer countDownTimer;
+    TextView countDownView;
+    boolean countDownInd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,9 +118,41 @@ public class MainActivity extends AppCompatActivity implements
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
         //set Layout
+
+       /* linearTimerView = (LinearTimerView) findViewById(R.id.linearTimer);
+        linearTimer = new LinearTimer.Builder()
+                .linearTimerView(linearTimerView)
+                .duration(20 * 1000)
+                .build();
+*/
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         setupSharedPreferences();
+        countDownView = (TextView) findViewById(R.id.linearTimer);
+        countDownTimer = new CountDownTimer(16000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                if (countDownInd)
+                    countDownView.setText(String.format("%02d", millisUntilFinished / 1000));
+            }
+
+            public void onFinish() {
+                if (countDownInd) {
+                    if(lettersLeft>0) {
+                        addLetterToBoard(false);
+                        playerScore = playerScore - 1;
+                        mScore.setText(String.valueOf(playerScore));
+                    }
+                    else if(lettersLeft==0){ //keep countdown for last time
+
+                    }
+                }
+            }
+        };
+        if(countDownInd)
+
+            enableCountDown(true);
+
       /*  int spacingInPixels = getResources().getDimensionPixelSize(R.id.scrabble_letter_list);
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
         newGame();
@@ -163,10 +203,13 @@ public class MainActivity extends AppCompatActivity implements
         lettersLeft = game_limit;
 
         setEnableAll(true);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
-        LinearLayoutManager BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        if(countDownInd)
+        { gridLayoutManager= new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));}
+        else
+        { gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));}
+        BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
-        StaggeredGridLayoutManager linearLayout = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
+        linearLayout = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
 
         //  BuilderLayoutManager.setAutoMeasureEnabled(false);
         mMyWordsRecView.setLayoutManager(linearLayout);
@@ -191,8 +234,9 @@ public class MainActivity extends AppCompatActivity implements
 
         LetterBag.createScrabbleSet(bag);
         for (int i = 0; i < 4; i++) {
-            addLetterToBoard();
+            addLetterToBoard(true);
         }
+
 
         getLetter.setText(getResources().getString(R.string.get_letter));
         mTiles.setText(String.valueOf(lettersLeft));
@@ -207,9 +251,13 @@ public class MainActivity extends AppCompatActivity implements
         mWordsAdapter = new myWordsAdapter(this, myWords, this);
         mMyWordsRecView.setAdapter(mWordsAdapter);
 
+      /*  linearTimer.restartTimer();
+        linearTimer.startTimer();*/
+      if(countDownInd)
+        countDownTimer.start();
     }
 
-    public void addLetterToBoard() {
+    public void addLetterToBoard(boolean newGame) {
         if (lettersLeft == 0) {
             return;
         }
@@ -227,6 +275,12 @@ public class MainActivity extends AppCompatActivity implements
         board.add(selectedLetter);
         lettersLeft--;
         mTiles.setText(String.valueOf(lettersLeft));
+
+
+       if(!newGame&& countDownInd) {
+                countDownTimer.start();
+       }
+
         if (lettersLeft == 0) {
             noLettersInBag();
         }
@@ -272,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 }
 
-                addLetterToBoard();
+                addLetterToBoard(false);
                 mBoardAdapter.notifyDataSetChanged();
                 playerScore--; //reduce a point for each tile the user adds
                 mScore.setText(String.valueOf(playerScore));
@@ -460,6 +514,12 @@ public class MainActivity extends AppCompatActivity implements
             showCorrectPopUp=(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
         } else if (key.equals(getString(R.string.pop_up_wrong_key))) {
            showWrongPopUp=(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
+        } else if (key.equals(getString(R.string.timer_pref_key))){
+            countDownInd=(sharedPreferences.getBoolean(key ,getResources().getBoolean(R.bool.timer_default)));
+            if(countDownInd)
+            enableCountDown(true);
+            else
+            enableCountDown(false);
         }
     }
 
@@ -529,6 +589,12 @@ public class MainActivity extends AppCompatActivity implements
                     setEnableAll(true);
                     }
                 } else if (valid.equals("1")) {
+                    //   linearTimer.pauseTimer();
+                    if (countDownInd) {
+
+
+                    countDownTimer.cancel();
+                }
                     if(showCorrectPopUp) dialogCorrectWord(checkWord, tempScore); //TODO no pop up test
                     else {
                         afterDialogSuccess(tempScore); //just for test
@@ -546,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements
         addWordToMyWords(tempScore);
         //  if (board.size() == 0) {
 
-        addLetterToBoard(); //when word played a new letter is added to board without penalty
+        addLetterToBoard(false); //when word played a new letter is added to board without penalty
         mBoardAdapter.notifyDataSetChanged();
         if (lettersLeft == 0) {
             noLettersInBag();
@@ -885,7 +951,12 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void setEnableAll(boolean state) {
-        getLetter.setEnabled(state);
+
+        if(countDownInd){
+            getLetter.setEnabled(false);
+        }
+        else
+            getLetter.setEnabled(state);
         playWord.setEnabled(state);
         clearWord.setEnabled(state);
         mBoardRecView.setEnabled(state);
@@ -938,11 +1009,29 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences sharedPreferences = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
         showCorrectPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_correct_key),getResources().getBoolean(R.bool.popup_default));
         showWrongPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_wrong_key),getResources().getBoolean(R.bool.popup_default));
+        countDownInd = sharedPreferences.getBoolean(getString(R.string.timer_pref_key),getResources().getBoolean(R.bool.timer_default));
         // Register the listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
+    public void enableCountDown(boolean enable) {
+        if(enable) {
+            countDownView.setVisibility(View.VISIBLE);
+            getLetter.setEnabled(false);
+            countDownTimer.start();
+            gridLayoutManager.setSpanCount(getResources().getInteger(R.integer.tiles_on_board));
 
+
+        }
+        else {
+            countDownTimer.cancel();
+            gridLayoutManager.setSpanCount(getResources().getInteger(R.integer.tiles_on_board_no_timer));
+            countDownView.setVisibility(View.GONE);
+            getLetter.setEnabled(true);
+        }
+
+
+    }
 }
 
 

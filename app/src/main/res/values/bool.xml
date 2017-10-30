@@ -2,4 +2,5 @@
 <resources>
 
     <bool name="popup_default">true</bool>
+    <bool name="timer_default">false</bool>
 </resources>
