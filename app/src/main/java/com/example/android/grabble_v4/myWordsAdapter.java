@@ -112,7 +112,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         public void onLetterClick(int view_id, int clickedItemIndex) { // a letter in a myWords was clicked
             Log.i("click in word adapter", "do u get here?");
             int position = getAdapterPosition();
-            Log.i("adapter position", String.valueOf(position));
+            Log.i("adapter position", String.valueOf(position)); //word number
             Log.i("letter position", String.valueOf(clickedItemIndex));
 
             Log.i("letter position", "after word click listener");

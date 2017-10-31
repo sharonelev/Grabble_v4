@@ -14,5 +14,5 @@
     <string name="pop_up_wrong_key">pop_up_wrong</string>
     <string name="pop_up_wrong_label">Pop-up for wrong word</string>
     <string name="timer_pref_key">timer_key</string>
-    <string name="timer_pref_label">Timer</string>
+    <string name="timer_pref_label">Timer- this will restart the game</string>
 </resources>

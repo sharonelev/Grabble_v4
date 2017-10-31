@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements
     TextView mTiles;
     int playerScore;
     int lettersLeft;
-    int game_limit = 50; //including 4 from start//
+    int game_limit;  //including 4 from start//
     Button getLetter;
     Button playWord;
     Button clearWord;
@@ -93,9 +94,11 @@ public class MainActivity extends AppCompatActivity implements
     public boolean showWrongPopUp;
     LinearTimerView linearTimerView;
     LinearTimer linearTimer;
-    CountDownTimer countDownTimer;
+    CountDownTimer countDownTimer=null;
     TextView countDownView;
     boolean countDownInd;
+    long toEndTimer=0;
+    CheckBoxPreference timerCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,29 +132,11 @@ public class MainActivity extends AppCompatActivity implements
         prefs.registerOnSharedPreferenceChangeListener(this);
         setupSharedPreferences();
         countDownView = (TextView) findViewById(R.id.linearTimer);
-        countDownTimer = new CountDownTimer(16000, 1000) {
+        //createTimer(getResources().getInteger(R.integer.timer_initial));
+      //  if (countDownInd)
 
-            public void onTick(long millisUntilFinished) {
-                if (countDownInd)
-                    countDownView.setText(String.format("%02d", millisUntilFinished / 1000));
-            }
+//            enableCountDown(true);
 
-            public void onFinish() {
-                if (countDownInd) {
-                    if(lettersLeft>0) {
-                        addLetterToBoard(false);
-                        playerScore = playerScore - 1;
-                        mScore.setText(String.valueOf(playerScore));
-                    }
-                    else if(lettersLeft==0){ //keep countdown for last time
-
-                    }
-                }
-            }
-        };
-        if(countDownInd)
-
-            enableCountDown(true);
 
       /*  int spacingInPixels = getResources().getDimensionPixelSize(R.id.scrabble_letter_list);
         mBoardRecView.addItemDecoration(new GridSpacingItemDecoration(2, spacingInPixels, true, 0));*/
@@ -199,14 +184,20 @@ public class MainActivity extends AppCompatActivity implements
 
     public void newGame() {
         //create bag
-
+        game_limit = getResources().getInteger(R.integer.tiles_in_game);
         lettersLeft = game_limit;
 
         setEnableAll(true);
-        if(countDownInd)
-        { gridLayoutManager= new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));}
-        else
-        { gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));}
+        if (countDownInd) {
+            createTimer(getResources().getInteger(R.integer.timer_initial));
+
+            gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
+            enableCountDown(true);
+        } else {
+
+            gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
+            enableCountDown(false);
+        }
         BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
         linearLayout = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
@@ -253,8 +244,8 @@ public class MainActivity extends AppCompatActivity implements
 
       /*  linearTimer.restartTimer();
         linearTimer.startTimer();*/
-      if(countDownInd)
-        countDownTimer.start();
+       // if (countDownInd)
+         //   countDownTimer.start();
     }
 
     public void addLetterToBoard(boolean newGame) {
@@ -277,9 +268,9 @@ public class MainActivity extends AppCompatActivity implements
         mTiles.setText(String.valueOf(lettersLeft));
 
 
-       if(!newGame&& countDownInd) {
-                countDownTimer.start();
-       }
+        if (!newGame && countDownInd) {
+            countDownTimer.start();
+        }
 
         if (lettersLeft == 0) {
             noLettersInBag();
@@ -299,18 +290,9 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 if (lettersLeft == 0) { //means he tapped end game
                     //END GAME DIALOG! WITH NEW GAME OPTION
-                    int reduceScore = 0;
-                    for (SingleLetter letter : board) {
-                        reduceScore = reduceScore + letter.getLetter_value();
 
-                    }
-                    int tempScore = playerScore;
-                    // if(playerScore>=0){
-                    playerScore = tempScore - reduceScore;
-                    //}
-                    //else{
-                    //playerScore=playerScore-reduceScore;
-                    //}
+                    int reduceScore = reduceScoreEndGame();
+
                     if (board.size() > 0) {
                         dialogEndGameSure(reduceScore);
                         ;
@@ -321,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
 
-                if (board.size() == 2*(getResources().getInteger(R.integer.tiles_on_board))) {
+                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
                     Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
 
                 }
@@ -495,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements
                         } //per caution. shouldn't get here
                         myWords.get(wordIndex).remove(letterIndex);
                         myWords.get(wordIndex).add(letterIndex, builder.get(clickedItemIndex));
-                        mWordsAdapter.notifyItemChanged(wordIndex); //sometimes it's ok and sometimes the letter disappears. debug. LESERUGIN. it works evey other time
+                        mWordsAdapter.notifyItemChanged(wordIndex); //
                         break;
                 }  //in any case:
 
@@ -511,15 +493,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pop_up_correct_key))) {
-            showCorrectPopUp=(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
+            showCorrectPopUp = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
         } else if (key.equals(getString(R.string.pop_up_wrong_key))) {
-           showWrongPopUp=(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
-        } else if (key.equals(getString(R.string.timer_pref_key))){
-            countDownInd=(sharedPreferences.getBoolean(key ,getResources().getBoolean(R.bool.timer_default)));
-            if(countDownInd)
-            enableCountDown(true);
+            showWrongPopUp = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
+        } else if (key.equals(getString(R.string.timer_pref_key))) {
+            //should restart game
+          //dialogRestartGame(sharedPreferences,key);
+            countDownInd = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.timer_default)));
+            newGame();
+           /* if (countDownInd)
+                enableCountDown(true);
             else
-            enableCountDown(false);
+                enableCountDown(false);*/
         }
     }
 
@@ -576,26 +561,25 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d("valid", "did not get valid result");
             } //remove this when API works!
 
-             //valid="1"; //TODO REMVOE AFTER TESTING
+            //valid="1"; //TODO REMVOE AFTER TESTING
             {
                 //   wordReview.setText(valid);
 //if valid remove place holders
                 if (valid.equals("0")) {
                     // wordReview.setText(wordValidateResults);
-                    if(showWrongPopUp)
-                    dialogWrongWord(checkWord); //todo test change
-                    else
-                    {Toast.makeText(getApplicationContext(),checkWord+" is not a valid word",Toast.LENGTH_LONG).show();
-                    setEnableAll(true);
+                    if (showWrongPopUp)
+                        dialogWrongWord(checkWord); //todo test change
+                    else {
+                        Toast.makeText(getApplicationContext(), checkWord + " is not a valid word", Toast.LENGTH_LONG).show();
+                        setEnableAll(true);
                     }
                 } else if (valid.equals("1")) {
                     //   linearTimer.pauseTimer();
                     if (countDownInd) {
-
-
-                    countDownTimer.cancel();
-                }
-                    if(showCorrectPopUp) dialogCorrectWord(checkWord, tempScore); //TODO no pop up test
+                        countDownTimer.cancel();
+                    }
+                    if (showCorrectPopUp)
+                        dialogCorrectWord(checkWord, tempScore);
                     else {
                         afterDialogSuccess(tempScore); //just for test
                     }
@@ -616,6 +600,7 @@ public class MainActivity extends AppCompatActivity implements
         mBoardAdapter.notifyDataSetChanged();
         if (lettersLeft == 0) {
             noLettersInBag();
+
         }
         if (board.isEmpty()) {
             dialogEndGame();
@@ -691,13 +676,12 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogEndGame();
-                        mScore.setText(String.valueOf(playerScore));
-
                     }
                 }).setNegativeButton("I'll keep trying", null).create().show();
     }
 
     public void dialogEndGame() {
+        mScore.setText(String.valueOf(playerScore));
         String msg = "";
         int res = PreferenceUtilities.newScoreSend(this, playerScore);
         if (res == 1) {
@@ -766,15 +750,6 @@ public class MainActivity extends AppCompatActivity implements
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
-                        afterDialogSuccess(score);
-                    }
-                })
-                .setPositiveButton("See word definition", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //      dialogFlag=1;
-                        //DICTIONARY from internet... With intent - activity WordDefinition -to be continued
-                        //after dictionary back to main screen withoiut dialog box
                         afterDialogSuccess(score);
                     }
                 }).create().show();
@@ -885,7 +860,11 @@ public class MainActivity extends AppCompatActivity implements
     public void noLettersInBag() {
 
         if (getLetter.getText() == getResources().getString(R.string.end_game)) {
-
+            //not the first time counter became 0
+            //RESUME counter
+            Log.d("timer","creating_new_timer");
+            createTimer(toEndTimer);
+         //   countDownTimer.start();
             return;
         }
         getLetter.setText(getResources().getString(R.string.end_game));
@@ -946,16 +925,15 @@ public class MainActivity extends AppCompatActivity implements
             startActivity(settings_intent);
             return true;
         }
-            return super.onOptionsItemSelected(item); //if not action_search
+        return super.onOptionsItemSelected(item); //if not action_search
     }
 
 
     private void setEnableAll(boolean state) {
 
-        if(countDownInd){
+        if (countDownInd) {
             getLetter.setEnabled(false);
-        }
-        else
+        } else
             getLetter.setEnabled(state);
         playWord.setEnabled(state);
         clearWord.setEnabled(state);
@@ -1007,31 +985,107 @@ public class MainActivity extends AppCompatActivity implements
     private void setupSharedPreferences() {
         // Get all of the values from shared preferences to set it up
         SharedPreferences sharedPreferences = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        showCorrectPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_correct_key),getResources().getBoolean(R.bool.popup_default));
-        showWrongPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_wrong_key),getResources().getBoolean(R.bool.popup_default));
-        countDownInd = sharedPreferences.getBoolean(getString(R.string.timer_pref_key),getResources().getBoolean(R.bool.timer_default));
+        showCorrectPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_correct_key), getResources().getBoolean(R.bool.popup_default));
+        showWrongPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_wrong_key), getResources().getBoolean(R.bool.popup_default));
+        countDownInd = sharedPreferences.getBoolean(getString(R.string.timer_pref_key), getResources().getBoolean(R.bool.timer_default));
         // Register the listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
+    public int reduceScoreEndGame() {
+        int reduceScore = 0;
+        for (SingleLetter letter : board) {
+            reduceScore = reduceScore + letter.getLetter_value();
+
+        }
+        int tempScore = playerScore;
+
+        playerScore = tempScore - reduceScore;
+        return reduceScore;
+    }
+
     public void enableCountDown(boolean enable) {
-        if(enable) {
+        if (enable) {
             countDownView.setVisibility(View.VISIBLE);
             getLetter.setEnabled(false);
             countDownTimer.start();
-            gridLayoutManager.setSpanCount(getResources().getInteger(R.integer.tiles_on_board));
+            gridLayoutManager =new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
 
+        } else {
 
-        }
-        else {
-            countDownTimer.cancel();
-            gridLayoutManager.setSpanCount(getResources().getInteger(R.integer.tiles_on_board_no_timer));
-            countDownView.setVisibility(View.GONE);
             getLetter.setEnabled(true);
+            gridLayoutManager=new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
+            countDownView.setVisibility(View.GONE);
+            if(countDownTimer!=null )
+              countDownTimer.cancel();
         }
 
 
     }
+
+    public void createTimer(final long milliseconds)
+
+    {
+        if(countDownTimer!=null){
+            countDownTimer.cancel();
+            countDownTimer=null;
+        }
+        countDownTimer = new CountDownTimer(milliseconds, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                toEndTimer=millisUntilFinished;
+                Log.i("timer",String.valueOf(millisUntilFinished));
+                if (countDownInd)
+                    countDownView.setText(String.format("%02d", millisUntilFinished / 1000));
+            }
+
+            public void onFinish() {
+                if (countDownInd) {
+                    if (lettersLeft > 0) {
+                        addLetterToBoard(false);
+                        playerScore = playerScore - 1;
+                        mScore.setText(String.valueOf(playerScore));
+                    } else if (lettersLeft == 0){
+                            //&& toEndTimer/1000<=1) { //keep countdown for last time
+                        countDownTimer.cancel();
+                        reduceScoreEndGame();
+                        dialogEndGame();
+                    }
+                }
+            }
+        }.start();
+    }
+
+
+    /*public  void dialogRestartGame(final SharedPreferences sp, final String key){
+        new AlertDialog.Builder(this).setTitle("Change preferences")
+                .setMessage("Changing this preference will restart the game."+"\n"+ "Are you sure?")
+                .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        newGame();
+                    }
+                }).setNegativeButton("ok, not now", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                boolean currentStat= sp.getBoolean(key, getResources().getBoolean(R.bool.timer_default));
+                timerCheckBox.setEnabled(!currentStat);
+
+            }
+        }).setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                boolean currentStat= sp.getBoolean(key, getResources().getBoolean(R.bool.timer_default));
+                timerCheckBox.setEnabled(!currentStat);
+            }
+        })
+
+
+                .create().show();
+    }
+*/
 }
+
 
 
