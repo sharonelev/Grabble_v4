@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.android.grabble_v4.MainActivity"
-    android:background="@drawable/fruit_pattern">
+    android:background="@drawable/tile_pattern">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

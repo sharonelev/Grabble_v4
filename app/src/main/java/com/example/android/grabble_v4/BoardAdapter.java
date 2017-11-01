@@ -170,7 +170,8 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 int clickedPosition = getAdapterPosition();
                 if(clickedPosition<0)
                     return;
-                Log.i("letter clicked",String.valueOf(clickedPosition));
+             //   Log.i("letter clicked",String.valueOf(clickedPosition));
+                Log.i("Board adpater", "onClick "+clickedPosition);
                 mOnClickListener.onLetterClick(recyclerViewId, clickedPosition);
             }
 

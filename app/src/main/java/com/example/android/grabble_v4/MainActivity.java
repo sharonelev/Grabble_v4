@@ -426,8 +426,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onWordItemClick(int clickedWord, int clickedLetter) {
-        Log.i("Clicked Letter in Word", myWords.get(clickedWord).get(clickedLetter).letter_name);
-
+       // Log.i("Clicked Letter in Word", myWords.get(clickedWord).get(clickedLetter).letter_name);
+        Log.i("Main Activity", "onWordItemClick " +clickedLetter);
         builder.add(myWords.get(clickedWord).get(clickedLetter));
         mBuilderAdapter.notifyDataSetChanged();
         builderLetterTypes.add(placer(1, clickedWord, clickedLetter));
@@ -441,6 +441,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLetterClick(int recyler_id, int clickedItemIndex) {
 
+        Log.i("Main Activity", "onLetterClick "+ clickedItemIndex);
         if (!mBoardRecView.isEnabled() || !mMyWordsRecView.isEnabled() || !mBuilderRecView.isEnabled())
 
         {

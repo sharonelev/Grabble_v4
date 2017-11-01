@@ -20,12 +20,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private List<SingleLetter> mList = new ArrayList<>();
     RecyclerView recyclerView;
     BoardAdapter mWelcomeAdapter;
-    private SingleLetter letterG =new SingleLetter("G",1,0);
-    private SingleLetter letterR =new SingleLetter("R",1,0);
-    private SingleLetter letterA =new SingleLetter("A",1,0);
-    private SingleLetter letterB= new SingleLetter("B",1,0);
+    private SingleLetter letterT =new SingleLetter("T",1,0);
+    private SingleLetter letterI =new SingleLetter("I",1,0);
     private SingleLetter letterL =new SingleLetter("L",1,0);
-    private SingleLetter letterE =new SingleLetter("E",1,0);
+    private SingleLetter letterE= new SingleLetter("E",1,0);
+    private SingleLetter letterS =new SingleLetter("S",1,0);
+   // private SingleLetter letterE =new SingleLetter("E",1,0);
     Handler myHandler= new Handler();
     Runnable screenRun =new Runnable() {
         @Override
@@ -35,15 +35,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     };
 
 
-    Runnable addE = new Runnable() {
+    Runnable addI = new Runnable() {
         @Override
         public void run() {
             //     mList.clear();
             //    mWelcomeAdapter.notifyDataSetChanged();
-            mList.set(0,letterG);
-            mList.set(1,letterE);
-            mList.set(2,letterA);
-            mList.add(3,letterR);
+            mList.set(0,letterI);
+            mWelcomeAdapter.notifyDataSetChanged();
+        }
+    };
+
+    Runnable addS = new Runnable() {
+        @Override
+        public void run() {
+            mList.set(0,letterI);
+            mList.add(1,letterS);
+            mWelcomeAdapter.notifyDataSetChanged();
+        }
+    };
+
+    Runnable addT = new Runnable() {
+        @Override
+        public void run() {
+            mList.set(0,letterS);
+            mList.set(1,letterI);
+            mList.add(2,letterT);
 
 
             mWelcomeAdapter.notifyDataSetChanged();
@@ -54,40 +70,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void run() {
             mList.set(0,letterL);
-            mList.set(1,letterA);
-            mList.set(2,letterR);
-            mList.set(3,letterG);
-            mList.add(4,letterE);
-            mWelcomeAdapter.notifyDataSetChanged();
-        }
-    };
-
-    Runnable addB = new Runnable() {
-        @Override
-        public void run() {
-            mList.set(0,letterG);
-            mList.set(1,letterA);
-            mList.set(2,letterR);
-            mList.set(3,letterB);
-            mList.set(4,letterL);
-            mList.add(5,letterE);
-
+            mList.set(1,letterI);
+            mList.set(2,letterT);
+            mList.add(3,letterS);
 
             mWelcomeAdapter.notifyDataSetChanged();
         }
     };
-
-    Runnable addB2 = new Runnable() {
+    Runnable addE = new Runnable() {
         @Override
         public void run() {
-            mList.set(0,letterG);
-            mList.set(1,letterR);
-            mList.set(2,letterA);
-            mList.set(3,letterB);
-            mList.set(4,letterB);
-            mList.set(5,letterL);
-            mList.add(6,letterE);
-
+            mList.set(0,letterT);
+            mList.set(1,letterI);
+            mList.set(2,letterL);
+            mList.set(3,letterE);
+            mList.add(4,letterS);
             mWelcomeAdapter.notifyDataSetChanged();
         }
     };
@@ -99,17 +96,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView =(RecyclerView) findViewById(R.id.welcomeRecyclerView);
         LinearLayoutManager WelcomeLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(WelcomeLayoutManager);
-        mList.add(letterR);
-        mList.add(letterA);
-        mList.add(letterG);
+        mList.add(letterI);
 
         mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView);
         recyclerView.setAdapter(mWelcomeAdapter);
         myHandler.postDelayed(screenRun,SPLASH_TIME_OUT);
-        myHandler.postDelayed(addE,LETTER_TIME_OUT);
-        myHandler.postDelayed(addL ,LETTER_TIME_OUT*2);
-        myHandler.postDelayed(addB,LETTER_TIME_OUT*3);
-        myHandler.postDelayed(addB2,LETTER_TIME_OUT*4);
+        myHandler.postDelayed(addI,LETTER_TIME_OUT);
+        myHandler.postDelayed(addS,LETTER_TIME_OUT*2);
+        myHandler.postDelayed(addT ,LETTER_TIME_OUT*3);
+        myHandler.postDelayed(addL,LETTER_TIME_OUT*4);
+        myHandler.postDelayed(addE,LETTER_TIME_OUT*5);
     }
 
     @Override

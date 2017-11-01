@@ -6,7 +6,7 @@
 <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="Grabble Instructions:"
+    android:text="Tiles Instructions:"
     android:id="@+id/instructions_title"
     android:textStyle="bold"/>
     <TextView

@@ -110,12 +110,13 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
         @Override
         public void onLetterClick(int view_id, int clickedItemIndex) { // a letter in a myWords was clicked
-            Log.i("click in word adapter", "do u get here?");
+            Log.i("MyWordsAdapter", "onLetterClick " +clickedItemIndex);
+          //  Log.i("click in word adapter", "do u get here?");
             int position = getAdapterPosition();
-            Log.i("adapter position", String.valueOf(position)); //word number
-            Log.i("letter position", String.valueOf(clickedItemIndex));
+           // Log.i("adapter position", String.valueOf(position)); //word number
+            //Log.i("letter position", String.valueOf(clickedItemIndex));
 
-            Log.i("letter position", "after word click listener");
+            //Log.i("letter position", "after word click listener");
             mList.remove(clickedItemIndex);
             mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
             mBoardAdapter.notifyItemRemoved(clickedItemIndex);
