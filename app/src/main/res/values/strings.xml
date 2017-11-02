@@ -2,7 +2,7 @@
     <string name="app_name">Tiles</string>
     <string name="instructions">Make 3 or more letter words by using letters from the board on top and from words you already created. A new must contain at least one letter from the board. When reusing a word from your list you must use all of its letters. You may use several words to make a new one. Pluralising an existing word by only adding the letter "s" to the end is invalid. You can not open more than 16 tiles on the board.</string>
     <string name="score_instructions">After playing a word you will receive points according to the letter values in your word. If you reuse an existing word, you get to keep the points you got for the original word. 7 letter words or more will grant you with bonus points- 1 per letter! Requesting a tile from the bag will reduce a point from your score. At the end of the game you will lose points for the tiles left on the board according to their value.</string>
-    <string name="welcome">Welcome to...</string>
+    <string name="welcome">Let"'"s play</string>
     <string name="get_letter">Get Letter</string>
     <string name="end_game">END GAME</string>
     <string name="new_game">NEW GAME</string>
@@ -15,4 +15,11 @@
     <string name="pop_up_wrong_label">Pop-up for wrong word</string>
     <string name="timer_pref_key">timer_key</string>
     <string name="timer_pref_label">Timer- this will restart the game</string>
+    <string name="classic_game">Classic Game</string>
+    <string name="moderate_game">Moderate Game</string>
+    <string name="speedy_game">Speedy Game</string>
+    <string name="made_by">brought to you by SHA</string>
+    <string name="classic_high_score">My Classic Mode High Scores</string>
+    <string name="speedy_high_score">My Speedy Mode High Scores</string>
+    <string name="moderate_high_score">My Moderate Mode High Scores</string>
 </resources>

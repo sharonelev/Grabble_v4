@@ -17,7 +17,7 @@
         android:text="@string/welcome"
         android:textSize="40dp"
         android:textStyle="bold"
-        android:textColor="#ffffff"
+        android:textColor="@color/colorAccent"
         />
 
     <android.support.v7.widget.RecyclerView
@@ -29,14 +29,39 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <Button
+        android:id="@+id/button_classic_game"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/classic_game"
+        android:layout_marginTop="100dp"
+        android:textAlignment="center"
+        android:clickable="true"
+        android:onClick="onClick"/>
+    <Button
+        android:id="@+id/button_speedy_game"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="@string/speedy_game"
+        android:onClick="onClick"/>
+    <Button
+        android:id="@+id/button_moderate_game"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="@string/moderate_game"
+        android:onClick="onClick"/>
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="bottom|center"
-        android:clickable="true"
-        android:onClick="onClick"
-        android:text="SKIP"
+        android:text="@string/made_by"
         android:textSize="20dp"
         android:gravity="bottom"
         android:paddingBottom="10dp"/>

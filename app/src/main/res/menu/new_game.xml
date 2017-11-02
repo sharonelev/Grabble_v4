@@ -7,22 +7,26 @@
             android:orderInCategory="1"
             android:title="New Game" />
         <item
-            android:id="@+id/instructions_menu"
+            android:id="@+id/home_screen"
             android:orderInCategory="2"
+            android:title="Home Screen" />
+        <item
+            android:id="@+id/instructions_menu"
+            android:orderInCategory="3"
 
             android:title="Instructions" />
         <item
             android:id="@+id/high_score_in_menu"
-            android:orderInCategory="3"
+            android:orderInCategory="4"
             android:title="My High Scores"></item>
         <item
             android:id="@+id/send_feedback"
-            android:orderInCategory="4"
+            android:orderInCategory="5"
             android:title="Send Feedback" />
 
         <item
             android:id="@+id/settings"
-            android:orderInCategory="5"
+            android:orderInCategory="6"
             android:title="Settings"></item>
 
     </group>

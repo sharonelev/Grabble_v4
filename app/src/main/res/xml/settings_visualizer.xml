@@ -2,6 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
         <!-- COMPLETED (1) Add two more checkboxes for the treble and mid-range -->
+        <PreferenceCategory android:title="Classic Game Settings"></PreferenceCategory>
         <CheckBoxPreference
             android:defaultValue="@bool/popup_default"
             android:key="@string/pop_up_correct_key"
@@ -14,12 +15,5 @@
             android:summaryOff="@string/prefs_false"
             android:summaryOn="@string/prefs_true"
             android:title="@string/pop_up_wrong_label" />
-        <CheckBoxPreference
-                android:defaultValue="@bool/timer_default"
-            android:key="@string/timer_pref_key"
-            android:title="@string/timer_pref_label"
-            android:summaryOff="@string/prefs_false"
-            android:summaryOn="@string/prefs_true"
 
-                />
 </PreferenceScreen>

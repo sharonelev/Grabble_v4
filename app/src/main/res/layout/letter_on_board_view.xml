@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="2dp"
     android:background="@drawable/border"
-    android:padding="1dp"
+    android:padding="3dp"
     android:paddingBottom="3dp"
 
 
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-
+android:textScaleX="0.75"
         android:fontFamily="monospace"
         android:textSize="10sp"
         android:paddingRight="3dp"

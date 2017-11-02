@@ -8,6 +8,13 @@
     tools:context="com.example.android.grabble_v4.MainActivity"
     android:background="@drawable/tile_pattern">
 
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_height="42dp"
+        android:layout_width="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,21 +25,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginRight="0dp"
-            android:layout_marginTop="4dp"
+            android:background="@drawable/timer_border"
+            android:gravity="center"
             android:padding="15dp"
             android:text="15"
+            android:textColor="#fcb851"
             android:textSize="35sp"
             android:textStyle="bold"
             android:visibility="gone"
-            android:textColor="#fcb851"
-            android:gravity="center"
-            android:background="@drawable/timer_border"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/scrabble_letter_list"
-            android:layout_marginBottom="4dp"
-            android:layout_marginEnd="4dp" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/get_letter"
@@ -93,30 +96,33 @@
                 android:onClick="onClick"
                 android:text="Clear Builder" />
         </LinearLayout>
+
         <TextView
+            android:id="@+id/my_words_title"
             android:layout_width="395dp"
             android:layout_height="22dp"
-            android:text="Your words:"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textSize="18dp"
-            app:layout_constraintTop_toBottomOf="@+id/buttons"
-            android:id="@+id/my_words_title"
             android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
+            android:gravity="center"
+            android:text="Your words:"
+            android:textSize="18dp"
+            android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginStart="1dp" />
+            app:layout_constraintTop_toBottomOf="@+id/buttons" />
 
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="1dp"
             android:background="@drawable/button_border"
             android:gravity="bottom"
+            android:id="@+id/bottom_relative_layout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/myWordsRecyclerView"
             app:layout_constraintRight_toRightOf="@+id/myWordsRecyclerView"
             app:layout_constraintTop_toBottomOf="@+id/myWordsRecyclerView"
-            app:layout_constraintVertical_bias="0.842">
+            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintHorizontal_bias="0.0">
 
             <TextView
                 android:id="@+id/your_score_title"
@@ -165,40 +171,33 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/myWordsRecyclerView"
             android:layout_width="0dp"
-            android:layout_height="225dp"
+            android:layout_height="250dp"
             android:layout_marginLeft="1dp"
             android:layout_marginStart="1dp"
-            android:padding="3dp"
+            android:paddingBottom="3dp"
             android:scrollbars="vertical"
             app:layout_constraintLeft_toLeftOf="@+id/buttons"
-            app:layout_constraintTop_toBottomOf="@+id/my_words_title"
-            app:layout_constraintRight_toRightOf="@+id/buttons" />
+            app:layout_constraintRight_toRightOf="@+id/buttons"
+            app:layout_constraintTop_toBottomOf="@+id/my_words_title" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/scrabble_letter_list"
             android:layout_width="0dp"
             android:layout_height="100dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginLeft="1dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="1dp"
             android:foregroundGravity="left"
-            android:padding="1dp"
+            android:paddingBottom="1dp"
             android:scrollbars="vertical"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/linearTimer"
-            android:layout_marginEnd="8dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </android.support.constraint.ConstraintLayout>
-
-    <ProgressBar
-        android:id="@+id/pb_loading_indicator"
-        android:layout_height="42dp"
-        android:layout_width="42dp"
-        android:layout_gravity="center"
-        android:visibility="invisible" />
 
 </FrameLayout>
 

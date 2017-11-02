@@ -9,14 +9,14 @@
     android:orientation="vertical"
     android:background="@drawable/border_score"
 
-    tools:context="com.example.android.grabble_v4.HighScoreActivity">
+    tools:context="com.example.android.grabble_v4.HighScoreSpeedyActivity">
 
     <TextView
         android:id="@+id/textView7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="@string/classic_high_score"
+        android:text="@string/speedy_high_score"
         android:textColor="#000000" />
 
 

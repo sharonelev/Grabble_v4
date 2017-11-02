@@ -2,6 +2,7 @@ package com.example.android.grabble_v4;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
     private static  int SPLASH_TIME_OUT=7000;
-    private static  int LETTER_TIME_OUT=1500;
+    private static  int LETTER_TIME_OUT=1000;
     private List<SingleLetter> mList = new ArrayList<>();
     RecyclerView recyclerView;
     BoardAdapter mWelcomeAdapter;
@@ -27,12 +28,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private SingleLetter letterS =new SingleLetter("S",1,0);
    // private SingleLetter letterE =new SingleLetter("E",1,0);
     Handler myHandler= new Handler();
-    Runnable screenRun =new Runnable() {
+   /* Runnable screenRun =new Runnable() {
         @Override
         public void run() {
             endActivity();
         }
-    };
+    };*/
 
 
     Runnable addI = new Runnable() {
@@ -100,7 +101,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView);
         recyclerView.setAdapter(mWelcomeAdapter);
-        myHandler.postDelayed(screenRun,SPLASH_TIME_OUT);
+   //     myHandler.postDelayed(screenRun,SPLASH_TIME_OUT);
         myHandler.postDelayed(addI,LETTER_TIME_OUT);
         myHandler.postDelayed(addS,LETTER_TIME_OUT*2);
         myHandler.postDelayed(addT ,LETTER_TIME_OUT*3);
@@ -111,17 +112,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         //SKIP tapped
-        myHandler.removeCallbacksAndMessages(null);
-        endActivity();
+
+        switch (view.getId()) {
+            case R.id.button_classic_game:
+                myHandler.removeCallbacksAndMessages(null);
+                endActivity(view.getId());
+                break;
+            case R.id.button_moderate_game:
+                myHandler.removeCallbacksAndMessages(null);
+                endActivity(view.getId());
+                break;
+            case R.id.button_speedy_game:
+                myHandler.removeCallbacksAndMessages(null);
+                endActivity(view.getId());
+                break;
+        }
 
     }
 
 
-    public void endActivity() {
+    public void endActivity(int gameType) {
         Intent homeIntent = new Intent(HomeActivity.this, MainActivity.class);
+        homeIntent.putExtra("game_type",gameType);
         startActivity(homeIntent);
         finish();
     }
-
 
 }
