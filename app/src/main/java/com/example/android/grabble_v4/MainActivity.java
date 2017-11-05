@@ -98,14 +98,17 @@ public class MainActivity extends AppCompatActivity implements
     TextView countDownView;
     int countDownInd; //0 = classic. 1=moderate. 2=speedy.
     long toEndTimer = 0;
-    CheckBoxPreference timerCheckBox;
+    boolean fromResume;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent homeScreen = getIntent();
+        Log.i("lifecycleEvent","onCreate");
         int gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
+        fromResume=false;
+
         switch (gameType) {
             case R.id.button_classic_game:
                 countDownInd = 0;
@@ -154,13 +157,34 @@ public class MainActivity extends AppCompatActivity implements
     public void onResume() {
         super.onResume();
         // ... your own onResume implementation
+        Log.i("lifecycleEvent","onResume");
+       long prevTimer= getIntent().getLongExtra("timer",0);
+        if(prevTimer>0 && countDownInd!=0) {
+            fromResume=true;
+            createTimer(prevTimer);
+
+        }
+        getIntent().putExtra("timer",0);
         checkForCrashes();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
         unregisterManagers();
+        Log.i("lifecycleEvent","onPause");
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        unregisterManagers();
+        if(countDownInd!=0) {
+            countDownTimer.cancel();
+            getIntent().putExtra("timer", toEndTimer);
+        }
+        Log.i("lifecycleEvent","onStop");
+
     }
 
     @Override
@@ -170,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements
         /** Cleanup the shared preference listener **/
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
+        Log.i("lifecycleEvent","onDestroy");
     }
 
 
@@ -265,7 +290,19 @@ public class MainActivity extends AppCompatActivity implements
 
 
         if (!newGame && countDownInd!=0) {
-            countDownTimer.start();
+            if(fromResume) {
+                switch (countDownInd) {
+                    case 1:
+                        createTimer(getResources().getInteger(R.integer.timer_initial_moderate));
+                        break;
+                    case 2:
+                        createTimer(getResources().getInteger(R.integer.timer_initial_speedy));
+
+                }
+                fromResume=false;
+            }
+            else
+                countDownTimer.start();
         }
 
         if (lettersLeft == 0) {
@@ -707,7 +744,9 @@ public class MainActivity extends AppCompatActivity implements
                 setEnableAll(false);
                 getLetter.setText(R.string.new_game);
                 getLetter.setEnabled(true);
-                Intent intent = new Intent(MainActivity.this, HighScoreActivity.class);
+                Class destinationActivity =HighScoreActivity.class;
+                Intent intent = new Intent(MainActivity.this, destinationActivity);
+                intent.putExtra("gameType",countDownInd);
                 startActivityForResult(intent, RESULT_CODE);
 
             }
@@ -914,9 +953,10 @@ public class MainActivity extends AppCompatActivity implements
         if (item.getItemId() == R.id.high_score_in_menu) {
 
             Context context = MainActivity.this;
-            Class destinationActivity = HighScoreActivity.class;
+            Class destinationActivity =HighScoreActivity.class;
             Intent highscore_intent = new Intent(context, destinationActivity);
-            startActivityForResult(highscore_intent, RESULT_CODE); ///MUST ADD BACK TO GAME!!!! AND UNVISIBLE IF END OF GAME
+            highscore_intent.putExtra("gameType", countDownInd);
+            startActivityForResult(highscore_intent, RESULT_CODE);
             return true;
         }
         if (item.getItemId() == R.id.send_feedback) {
@@ -971,17 +1011,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private String wordBuilder() {
-
-
-        //for letter in board
-        // for word in my words
-        //add letter to word
-        //change A and B
-        //for two letters in board
-        // check board
-        return null;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("message", "This is my message to be reloaded");
+        super.onSaveInstanceState(outState);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1039,7 +1074,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void createTimer(final long milliseconds)
-
     {
         if (countDownTimer != null) {
             countDownTimer.cancel();
@@ -1071,35 +1105,14 @@ public class MainActivity extends AppCompatActivity implements
         }.start();
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+        finish();
 
-    /*public  void dialogRestartGame(final SharedPreferences sp, final String key){
-        new AlertDialog.Builder(this).setTitle("Change preferences")
-                .setMessage("Changing this preference will restart the game."+"\n"+ "Are you sure?")
-                .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        newGame();
-                    }
-                }).setNegativeButton("ok, not now", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                boolean currentStat= sp.getBoolean(key, getResources().getBoolean(R.bool.timer_default));
-                timerCheckBox.setEnabled(!currentStat);
-
-            }
-        }).setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                boolean currentStat= sp.getBoolean(key, getResources().getBoolean(R.bool.timer_default));
-                timerCheckBox.setEnabled(!currentStat);
-            }
-        })
-
-
-                .create().show();
     }
-*/
 }
 
 

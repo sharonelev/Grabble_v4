@@ -31,6 +31,8 @@
 
     <Button
         android:id="@+id/button_classic_game"
+        android:background="@drawable/button_border"
+
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -41,17 +43,23 @@
         android:onClick="onClick"/>
     <Button
         android:id="@+id/button_speedy_game"
+        android:background="@drawable/button_border"
         android:layout_width="300dp"
         android:layout_gravity="center"
         android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+
         android:clickable="true"
         android:text="@string/speedy_game"
         android:onClick="onClick"/>
     <Button
         android:id="@+id/button_moderate_game"
+        android:background="@drawable/button_border"
+
         android:layout_gravity="center"
         android:clickable="true"
         android:layout_width="300dp"
+        android:layout_marginTop="3dp"
         android:layout_height="wrap_content"
         android:text="@string/moderate_game"
         android:onClick="onClick"/>

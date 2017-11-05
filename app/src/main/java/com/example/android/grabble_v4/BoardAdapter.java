@@ -167,6 +167,10 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         @Override
         public void onClick(View view) {
             {
+                if(recyclerViewId==R.id.welcomeRecyclerView){
+                    return;
+                }
+
                 int clickedPosition = getAdapterPosition();
                 if(clickedPosition<0)
                     return;

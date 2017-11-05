@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
-        android:id="@+id/score_list_view"
+        android:id="@+id/score_speedy_list_view"
         android:paddingBottom="10dp">
     </android.support.v7.widget.RecyclerView>
 <LinearLayout
@@ -82,4 +82,13 @@
     android:background="#ffffff"/>
 
 </LinearLayout>
+    <com.matthewtamlin.sliding_intro_screen_library.indicators.DotIndicator
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:numberOfDots="2"
+        app:selectedDotIndex="2"
+        app:selectedDotColor="#a39292"
+        app:unselectedDotColor="#aeadad"
+        android:paddingBottom="3dp"
+        android:layout_gravity="center"/>
 </LinearLayout>

@@ -3,27 +3,37 @@ package com.example.android.grabble_v4;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
+import com.matthewtamlin.sliding_intro_screen_library.indicators.DotIndicator;
 
 public class HighScoreSpeedyActivity extends Activity implements View.OnClickListener{
 
     RecyclerView scoresRecyclerView;
     HighScoreAdapter scoreAdapter;
-
+    TextView mDate;
+    TextView mScore;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_high_score_speedy);
-        scoresRecyclerView = (RecyclerView)findViewById(R.id.score_list_view);
-        scoreAdapter = new HighScoreAdapter(PreferenceUtilities.getTopFive(getBaseContext()));
+        scoresRecyclerView = (RecyclerView)findViewById(R.id.score_speedy_list_view);
+        scoreAdapter = new HighScoreAdapter(PreferenceUtilities.getTopFive(getBaseContext(),2));
         LinearLayoutManager scoreLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         scoreLayoutManager.setAutoMeasureEnabled(true);
         scoresRecyclerView.setLayoutManager(scoreLayoutManager);
         scoresRecyclerView.setAdapter(scoreAdapter);
+        if(scoreAdapter.highScoreList==null){
+            mDate = (TextView) findViewById(R.id.Date_title);
+            mDate.setText("No High Scores");
+            mScore = (TextView) findViewById(R.id.score_title);
+            mScore.setVisibility(View.GONE);
+        }
 
         }
 
@@ -43,4 +53,6 @@ public class HighScoreSpeedyActivity extends Activity implements View.OnClickLis
              finish();
         }
     }
+
+
 }

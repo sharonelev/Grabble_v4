@@ -55,7 +55,9 @@ public class HighScoreAdapter extends RecyclerView.Adapter<HighScoreAdapter.Scor
 
     @Override
     public int getItemCount() {
-        return highScoreList.size();
+        if(highScoreList!=null){
+        return highScoreList.size();}
+        else return 0;
     }
 
     public class ScoreViewHolder extends RecyclerView.ViewHolder  {

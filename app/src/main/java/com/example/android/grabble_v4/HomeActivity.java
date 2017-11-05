@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
-    private static  int SPLASH_TIME_OUT=7000;
+
     private static  int LETTER_TIME_OUT=1000;
     private List<SingleLetter> mList = new ArrayList<>();
     RecyclerView recyclerView;
@@ -27,6 +27,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private SingleLetter letterE= new SingleLetter("E",1,0);
     private SingleLetter letterS =new SingleLetter("S",1,0);
    // private SingleLetter letterE =new SingleLetter("E",1,0);
+
     Handler myHandler= new Handler();
    /* Runnable screenRun =new Runnable() {
         @Override
@@ -101,6 +102,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView);
         recyclerView.setAdapter(mWelcomeAdapter);
+        recyclerView.setEnabled(false);
    //     myHandler.postDelayed(screenRun,SPLASH_TIME_OUT);
         myHandler.postDelayed(addI,LETTER_TIME_OUT);
         myHandler.postDelayed(addS,LETTER_TIME_OUT*2);
