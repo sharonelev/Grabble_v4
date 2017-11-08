@@ -31,10 +31,10 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
 
    public interface ListWordClickListener {
-        // YOSSI explanation
         void onWordItemClick(int clickedWord, int clickedLetter);
-        ;
     }
+
+
 
     public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener){
         mContext=context;
@@ -67,11 +67,12 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         holder.mBoardAdapter.notifyDataSetChanged();
        holder.mList.addAll(myWords.get(position));
         holder.mBoardAdapter.notifyDataSetChanged();
+        holder.isEnabled=true;
         //mBoardAdapter notify change is on all letters in the word
 
       //  holder.itemView.setLayoutParams(new StaggeredGridLayoutManager.LayoutParams(StaggeredGridLayoutManager.LayoutParams.FILL_PARENT,
         //        StaggeredGridLayoutManager.LayoutParams.WRAP_CONTENT));
-        holder.itemView.getLayoutParams().width=holder.mList.size()*130+(holder.mList.size()-1)*20+100;
+        holder.itemView.getLayoutParams().width=holder.mList.size()*100+(holder.mList.size()-1)*20+50;
     }
 
     @Override
@@ -84,8 +85,13 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         RecyclerView eachWordRecView;
         BoardAdapter mBoardAdapter;
         List<SingleLetter> mList = new ArrayList<>();
-        BoardAdapter.LetterClickListener listener;
-        GridLayoutManager gridLayoutManager;
+        boolean isEnabled= true;
+
+
+        public void mySetEnabled(boolean state){
+  //          eachWordRecView.setEnabled(state);
+            isEnabled= state;
+        }
 
 
         public WordViewHolder(View itemView) {
@@ -108,22 +114,23 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             // itemView.setOnClickListener(this);
         }
 
+
         @Override
         public void onLetterClick(int view_id, int clickedItemIndex) { // a letter in a myWords was clicked
-            Log.i("MyWordsAdapter", "onLetterClick " +clickedItemIndex);
-          //  Log.i("click in word adapter", "do u get here?");
-            int position = getAdapterPosition();
-           // Log.i("adapter position", String.valueOf(position)); //word number
-            //Log.i("letter position", String.valueOf(clickedItemIndex));
-
-            //Log.i("letter position", "after word click listener");
-            mList.remove(clickedItemIndex);
-            mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
-            mBoardAdapter.notifyItemRemoved(clickedItemIndex);
-            mBoardAdapter.notifyItemInserted(clickedItemIndex);
-
-            mOnClickListener.onWordItemClick(position, clickedItemIndex);
+            if(isEnabled) {
+                Log.i("MyWordsAdapter", "onLetterClick " + clickedItemIndex);
+                int position = getAdapterPosition();
+                mList.remove(clickedItemIndex);
+                mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
+                mBoardAdapter.notifyItemRemoved(clickedItemIndex);
+                mBoardAdapter.notifyItemInserted(clickedItemIndex);
+                mOnClickListener.onWordItemClick(position, clickedItemIndex);
+            }
        }
+
+
+
     }
+
 
 }

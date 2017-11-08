@@ -9,7 +9,7 @@ import android.widget.TextView;
  * Created by user on 9/19/2017.
  */
 
-public class SingleLetter {
+public class SingleLetter implements Parcelable{
 
     public String letter_name;
     public int letter_value;
@@ -54,5 +54,14 @@ public class SingleLetter {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+parcel.writeString(letter_name);
+    }
 
 }

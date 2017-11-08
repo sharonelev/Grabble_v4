@@ -2,7 +2,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:timer="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.android.grabble_v4.MainActivity"
@@ -56,13 +55,13 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="1dp"
-
             android:layout_marginStart="1dp"
             android:padding="3dp"
             android:scrollbars="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="@+id/get_letter"
-            app:layout_constraintTop_toBottomOf="@+id/get_letter" />
+            app:layout_constraintTop_toBottomOf="@+id/get_letter"
+            tools:listitem="@layout/letter_on_board_view"/>
 
         <LinearLayout
             android:id="@+id/buttons"
@@ -113,14 +112,13 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="1dp"
+            android:layout_marginBottom="0dp"
             android:background="@drawable/button_border"
             android:gravity="bottom"
             android:id="@+id/bottom_relative_layout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/myWordsRecyclerView"
             app:layout_constraintRight_toRightOf="@+id/myWordsRecyclerView"
-            app:layout_constraintTop_toBottomOf="@+id/myWordsRecyclerView"
             app:layout_constraintVertical_bias="1.0"
             app:layout_constraintHorizontal_bias="0.0">
 
@@ -171,14 +169,17 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/myWordsRecyclerView"
             android:layout_width="0dp"
-            android:layout_height="250dp"
+            android:layout_height="match_parent"
             android:layout_marginLeft="1dp"
             android:layout_marginStart="1dp"
             android:paddingBottom="3dp"
             android:scrollbars="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_relative_layout"
             app:layout_constraintLeft_toLeftOf="@+id/buttons"
             app:layout_constraintRight_toRightOf="@+id/buttons"
-            app:layout_constraintTop_toBottomOf="@+id/my_words_title" />
+            app:layout_constraintTop_toBottomOf="@+id/my_words_title"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/scrabble_letter_list"

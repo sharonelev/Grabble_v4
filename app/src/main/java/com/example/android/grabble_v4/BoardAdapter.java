@@ -90,13 +90,13 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.mLetter.setTextSize (28);
                 holder.mLetterValue.setTextSize(10);
             }
-            if (numOfTiles == 12) {
+            else if (numOfTiles == 12) {
                // holder.itemView.getLayoutParams().width = 75;//130
                 //holder.itemView.getLayoutParams().height = 100;//140
                 holder.mLetter.setTextSize(25);
                 holder.mLetterValue.setTextSize(8);
             }
-            if (numOfTiles >= 13) {
+            else if ( numOfTiles >= 13) {
                 //holder.itemView.getLayoutParams().width = 65;//130
                 //holder.itemView.getLayoutParams().height = 90;//140
                 holder.mLetter.setTextSize(22);
