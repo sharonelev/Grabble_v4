@@ -42,7 +42,7 @@
             android:label="@string/title_activity_high_score"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
         <activity
-            android:name=".HighScoreSpeedyActivity"
+            android:name=".HighScoreScreenSlide"
             android:label="@string/title_speedy_activity_high_score"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
         <activity

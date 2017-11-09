@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.example.android.grabble_v4.Utilities.OnSwipeTouchListener;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 
-public class HighScoreActivity extends Activity implements View.OnClickListener {
+public class HighScoreActivity extends Activity{// implements View.OnClickListener {
     RecyclerView scoresRecyclerView;
     HighScoreAdapter scoreAdapter;
     TextView mDate;
@@ -50,8 +50,7 @@ public class HighScoreActivity extends Activity implements View.OnClickListener 
 
     }
 
-
-    @Override
+   /* @Override
     public void onClick(View view) {
         if (view.getId() == R.id.new_game_in_high_score) {
             Intent homeIntent = new Intent(HighScoreActivity.this, MainActivity.class);
@@ -66,7 +65,7 @@ public class HighScoreActivity extends Activity implements View.OnClickListener 
 
             finish();
         }
-    }
+    }*/
 
     public void setContent(int gameType){
         switch (gameType) {
@@ -101,7 +100,7 @@ public class HighScoreActivity extends Activity implements View.OnClickListener 
             mDate.setText("No High Scores");
             mScore = (TextView) findViewById(R.id.score_title);
             mScore.setVisibility(View.GONE);
-        }
+    }
         onSwipe(activityView);
 
 

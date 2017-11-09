@@ -1,6 +1,8 @@
 package com.example.android.grabble_v4;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -916,7 +918,9 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.high_score_in_menu:
-                destinationActivity = HighScoreActivity.class;
+
+                //destinationActivity = HighScoreActivity.class;
+               destinationActivity = HighScoreScreenSlide.class;
                 Intent highscore_intent = new Intent(context, destinationActivity);
                 highscore_intent.putExtra("gameType", countDownInd);
                 startActivityForResult(highscore_intent, RESULT_CODE);
