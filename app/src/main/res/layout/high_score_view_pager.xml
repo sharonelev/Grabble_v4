@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="150dp"
+    android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:id="@+id/linear_viewpager"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:overScrollMode="never"
-        android:background="@drawable/border_score"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-    </android.support.v4.view.ViewPager>
     <com.pixelcan.inkpageindicator.InkPageIndicator
         android:id="@+id/ink_indicator"
         android:layout_width="wrap_content"
@@ -31,6 +21,15 @@
         app:dotDiameter="15dp"
         app:dotGap="8dp"
         app:pageIndicatorColor="#a3a0a0" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:overScrollMode="never"
+        android:background="@drawable/border_score"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </android.support.v4.view.ViewPager>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -62,7 +61,7 @@
             android:text="NEW GAME"
             android:layout_gravity="right"
             android:id="@+id/new_game_in_high_score"
-           />
+            />
 
 
     </LinearLayout>

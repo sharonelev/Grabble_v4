@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +17,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +42,7 @@ import android.widget.Toast;
 import android.transition.TransitionManager;
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
+import com.example.android.grabble_v4.Utilities.ShakeDetector;
 import com.example.android.grabble_v4.data.Instructions;
 import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.SendFeedback;
@@ -108,6 +113,11 @@ public class MainActivity extends AppCompatActivity implements
     FallTextView pointsFallAnimation;
     TextView pointsAnimation;
 
+    // The following are used for the shake detection
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeDetector mShakeDetector;
+
     //Device specs
     public static final String DEVICE_HEIGHT = "Device_Height_px";
     public static final String DEVICE_WIDTH = "Device_Width_px";
@@ -128,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent homeScreen = getIntent();
         Log.i("lifecycleEvent","onCreate");
         Hawk.init(this).build();
+        shakeDetectorInit();
 
         if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
             //save device metrics:
@@ -172,15 +183,19 @@ public class MainActivity extends AppCompatActivity implements
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
         pointsAnimation = (TextView) findViewById(R.id.points_textview);
 
+        DividerItemDecoration divider;
+        divider= new DividerItemDecoration(mBuilderRecView.getContext(),DividerItemDecoration.HORIZONTAL);
+        divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider));
+        mBuilderRecView.addItemDecoration(divider);
 
 
-        //Shared prefernces
+
+        //Shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         setupSharedPreferences();
 
         newGame();
-
         //HockeyApp
         checkForUpdates();
 
@@ -201,7 +216,8 @@ public class MainActivity extends AppCompatActivity implements
 
         }
         getIntent().putExtra("timer",0);
-
+        if(mSensorManager!=null)
+            mSensorManager.registerListener(mShakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
         //HockeyApp
         checkForCrashes();
 
@@ -209,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onPause() {
+        mSensorManager.unregisterListener(mShakeDetector);
         super.onPause();
         unregisterManagers();
         Log.i("lifecycleEvent","onPause");
@@ -392,30 +409,16 @@ public class MainActivity extends AppCompatActivity implements
                     newGame();
                     break;
                 }
-                if (lettersLeft == 0) { //means he tapped end game
+                else if (lettersLeft == 0) { //means he tapped end game
+                    getLetter.setEnabled(false);
                     int reduceScore = reduceScoreEndGame(); //calculate value of letters left on board
                     dialogEndGameSure(reduceScore); //could be 0
 
                     break;
                 }
 
-                if(countDownInd!=0) {
-                    if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
-                        Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+                onGetLetter();
 
-                    }
-                }
-                else {
-                    if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
-                        Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                addLetterToBoard(false);
-                startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss),"-");
-
-                mBoardAdapter.notifyDataSetChanged();
-                playerScore--; //reduce a point for each tile the user adds
-                mScore.setText(String.valueOf(playerScore));
                 break;
 
             case R.id.send_word:
@@ -773,6 +776,8 @@ public class MainActivity extends AppCompatActivity implements
         mScore.setText(String.valueOf(playerScore));
         final int res = PreferenceUtilities.newScoreSend(this, playerScore, countDownInd);
         Handler myHandler= new Handler();
+        getLetter.setEnabled(false);
+        setEnableAll(false);
         myHandler.postDelayed(new Runnable(){
             @Override
             public void run()
@@ -802,12 +807,12 @@ if(highScoreScreenSlideDialog!=null) {
 
         new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
                 .setMessage("Your Score: " + playerScore + "\n" + msg)
-                .setNeutralButton(R.string.new_game, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.new_game, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         newGame();
                     }
-                }).setNegativeButton("BACK", new DialogInterface.OnClickListener() {
+                }).setNeutralButton("BACK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 getLetterButtonToNewGame();
@@ -1240,6 +1245,54 @@ if(highScoreScreenSlideDialog!=null) {
         pointsAnimation.setY(mBuilderRecView.getY());
         pointsAnimation.startAnimation(animation);
         pointsAnimation.setVisibility(View.INVISIBLE);
+    }
+
+    public void shakeDetectorInit(){
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mShakeDetector = new ShakeDetector();
+        mShakeDetector.setOnShakeListener(new ShakeDetector.OnShakeListener() {
+
+            @Override
+            public void onShake(int count) {
+				/*
+				 * The following method, "handleShakeEvent(count):" is a stub //
+				 * method you would use to setup whatever you want done once the
+				 * device has been shook.
+				 */
+                handleShakeEvent();
+            }
+        });
+    }
+
+    public void handleShakeEvent(){
+
+        onGetLetter();
+        Log.i("fruit","shake");
+    }
+
+    public void onGetLetter() {
+        if (getLetter.getText().equals(getString(R.string.get_letter))) {
+
+            if (countDownInd != 0) {
+                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
+                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+
+                }
+            } else {
+                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
+                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+                }
+            }
+            addLetterToBoard(false);
+            startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
+
+            mBoardAdapter.notifyDataSetChanged();
+            playerScore--; //reduce a point for each tile the user adds
+            mScore.setText(String.valueOf(playerScore));
+
+        }
     }
 }
 

@@ -59,7 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="55dp"
             android:layout_marginLeft="0dp"
-            android:layout_marginStart="1dp"
+            android:layout_marginStart="0dp"
             android:padding="3dp"
             android:scrollbars="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"

@@ -91,6 +91,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 //holder.itemView.getLayoutParams().height = 120;//140
                 holder.mLetter.setTextSize (28);
                 holder.mLetterValue.setTextSize(10);
+
             }
             else if (numOfTiles == 11) {
                // holder.itemView.getLayoutParams().width = 75;//130

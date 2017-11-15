@@ -2,7 +2,10 @@ package com.example.android.grabble_v4;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuView;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.example.android.grabble_v4.data.SingleLetter;
+import com.orhanobut.hawk.Hawk;
 
 import java.nio.channels.Selector;
 import java.util.ArrayList;
@@ -72,7 +76,12 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
       //  holder.itemView.setLayoutParams(new StaggeredGridLayoutManager.LayoutParams(StaggeredGridLayoutManager.LayoutParams.FILL_PARENT,
         //        StaggeredGridLayoutManager.LayoutParams.WRAP_CONTENT));
-        holder.itemView.getLayoutParams().width=holder.mList.size()*100+(holder.mList.size()-1)*20+100;
+        int screenWidth = Hawk.get(MainActivity.DEVICE_WIDTH);
+        int tileSize =(int) screenWidth/11;
+        holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
+        //holder.itemView.setBackgroundColor(Color.RED);
+                // ((100*1.25)*holder.mList.size()+75);
+                //holder.mList.size()*100+(holder.mList.size()-1)*20+100;
     }
 
     @Override
@@ -99,19 +108,17 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             super(itemView);
 
             eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
+            DividerItemDecoration divider = new DividerItemDecoration(eachWordRecView.getContext(), DividerItemDecoration.HORIZONTAL);
+            divider.setDrawable(ContextCompat.getDrawable(mContext,R.drawable.line_divider));
+            eachWordRecView.addItemDecoration(divider);
 
-            //      listener= new MainActivity();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
 
             eachWordRecView.setLayoutManager(wordLayoutManager); //this prevents onClick to work!!
             mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView);
 
-            //try sending word in list to the adapter and erase the onclick methods here. first erase and see if mywords still gets emptied
             eachWordRecView.setAdapter(mBoardAdapter);
 
-
-            //       eachWordRecView.setLayoutFrozen(true);
-            // itemView.setOnClickListener(this);
         }
 
 

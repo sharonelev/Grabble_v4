@@ -15,6 +15,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+
+import com.orhanobut.hawk.Hawk;
 import com.pixelcan.inkpageindicator.InkPageIndicator;
 
 /**
@@ -50,8 +52,10 @@ public static HighScoreScreenSlideDialog crateInstance(int gameType){
     public void onResume()
     {
         super.onResume();
+        int screenHeight = Hawk.get(MainActivity.DEVICE_HEIGHT);
+
         Window window = getDialog().getWindow();
-        window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT,1000);
+        window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT, (int) (screenHeight/1.5));
         //window.setGravity(Gravity.CENTER);
         //TODO:
     }
