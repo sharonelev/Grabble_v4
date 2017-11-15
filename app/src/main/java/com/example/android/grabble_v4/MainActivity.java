@@ -1,6 +1,5 @@
 package com.example.android.grabble_v4;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +14,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,22 +22,18 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.transition.Explode;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.transition.TransitionManager;
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
@@ -48,16 +42,12 @@ import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.SendFeedback;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
-import com.hanks.htextview.fall.FallTextView;
 import com.orhanobut.hawk.Hawk;
-
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean showWrongPopUp;
     int countDownInd; //0 = classic. 1=moderate. 2=speedy.
     long toEndTimer = 0;
-    boolean fromResume;
+    boolean initalizeTimers;
 
     //UI elements
     ProgressBar pBar;
@@ -110,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements
     Button clearWord;
     CountDownTimer countDownTimer = null;
     TextView countDownView;
-    FallTextView pointsFallAnimation;
     TextView pointsAnimation;
 
     // The following are used for the shake detection
@@ -124,11 +113,15 @@ public class MainActivity extends AppCompatActivity implements
     public int deviceHeight;
     public int deviceWidth;
 
+    //add letter to board sources
+    public static final String NEW_GAME = "new_game";
+    public static final String MODERATE_GET_LETTER = "moderate_mid_timer";
+    public static final String TIME_UP = "time_up";
+    public static final String CLASSIC_GET_LETTER = "get_letter";
+    public static final String AFTER_PLAYED_WORD = "after_played_word";
+
     //others
     public final static int RESULT_CODE = 123;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         int gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
-        fromResume=false;
+        initalizeTimers=false;
 
         switch (gameType) {
             case R.id.button_classic_game:
@@ -183,19 +176,16 @@ public class MainActivity extends AppCompatActivity implements
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
         pointsAnimation = (TextView) findViewById(R.id.points_textview);
 
-        DividerItemDecoration divider;
-        divider= new DividerItemDecoration(mBuilderRecView.getContext(),DividerItemDecoration.HORIZONTAL);
-        divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider));
-        mBuilderRecView.addItemDecoration(divider);
-
-
+        setDivider();
 
         //Shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         setupSharedPreferences();
 
+        //game initialization
         newGame();
+
         //HockeyApp
         checkForUpdates();
 
@@ -211,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements
         //in case a game with timer was stopped and resumed
         long prevTimer= getIntent().getLongExtra("timer",0);
         if(prevTimer>0 && countDownInd!=0) {
-            fromResume=true;
+            initalizeTimers=true;
             createTimer(prevTimer);
 
         }
@@ -311,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements
 
         LetterBag.createScrabbleSet(bag);
         for (int i = 0; i < 4; i++) {
-            addLetterToBoard(true);
+            addLetterToBoard(NEW_GAME);
         }
 
 
@@ -358,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements
         else return;
     }
 
-    public void addLetterToBoard(boolean newGame) {
+    public void addLetterToBoard(String src){//(boolean newGame, boolean midTimer) {
         if (lettersLeft == 0) {
             return;
         }
@@ -377,17 +367,22 @@ public class MainActivity extends AppCompatActivity implements
         mTiles.setText(String.valueOf(lettersLeft));
 
 
-        if (!newGame && countDownInd!=0) {
-            if(fromResume) { //if game was stopped and resumed
+        if (!src.equals(NEW_GAME) && countDownInd!=0) {
+            if(initalizeTimers) { //if game was stopped and resumed
                 switch (countDownInd) {
                     case 1:
                         createTimer(getResources().getInteger(R.integer.timer_initial_moderate));
+                        //createTimer(toEndTimer);
                         break;
                     case 2:
                         createTimer(getResources().getInteger(R.integer.timer_initial_speedy));
 
                 }
-                fromResume=false;
+                initalizeTimers=false;
+            }
+            else if(src.equals(MODERATE_GET_LETTER)){
+                createTimer(toEndTimer);
+                initalizeTimers=true;
             }
             else
                 countDownTimer.start(); //start timer for new tile
@@ -696,7 +691,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void afterDialogSuccess(int tempScore) {
         addWordToMyWords(tempScore);
-        addLetterToBoard(false); //when word played a new letter is added to board without penalty
+        addLetterToBoard(AFTER_PLAYED_WORD); //when word played a new letter is added to board without penalty
         mBoardAdapter.notifyDataSetChanged();
         if (lettersLeft == 0) {
             noLettersInBag();
@@ -756,6 +751,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void dialogEndGameSure(final int boardPoints) {
+        getLetter.setEnabled(true);
         new AlertDialog.Builder(this).setTitle("End Game")
                 .setMessage("Are you sure you want to end game? You will lose " + boardPoints + " for tiles left in the board")
                 .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
@@ -1170,7 +1166,7 @@ if(highScoreScreenSlideDialog!=null) {
             public void onFinish() {
                 if (countDownInd!=0) {
                     if (lettersLeft > 0) {
-                        addLetterToBoard(false);
+                        addLetterToBoard(TIME_UP);
                         startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss),"-");
                         playerScore = playerScore - 1;
                         mScore.setText(String.valueOf(playerScore));
@@ -1278,21 +1274,39 @@ if(highScoreScreenSlideDialog!=null) {
             if (countDownInd != 0) {
                 if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
                     Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-
                 }
             } else {
                 if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
                     Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
                 }
             }
-            addLetterToBoard(false);
-            startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
 
+            if(countDownInd==1)//moderate mode
+            {
+                addLetterToBoard(MODERATE_GET_LETTER);
+                initalizeTimers=false;
+            }
+            else
+            addLetterToBoard(CLASSIC_GET_LETTER);
+
+            startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
             mBoardAdapter.notifyDataSetChanged();
             playerScore--; //reduce a point for each tile the user adds
             mScore.setText(String.valueOf(playerScore));
 
         }
+    }
+
+    public void setDivider(){
+        DividerItemDecoration divider;
+        divider= new DividerItemDecoration(mBuilderRecView.getContext(),DividerItemDecoration.HORIZONTAL);
+        if(deviceWidth<800)
+            divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_s));
+        else if(deviceWidth<1000)
+            divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_m));
+        else
+            divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_l));
+        mBuilderRecView.addItemDecoration(divider);
     }
 }
 

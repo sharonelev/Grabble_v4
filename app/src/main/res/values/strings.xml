@@ -28,9 +28,5 @@
     <string name="classic_high_score">My Classic Mode High Scores</string>
     <string name="speedy_high_score">My Speedy Mode High Scores</string>
     <string name="moderate_high_score">My Moderate Mode High Scores</string>
-    <integer-array name="img_id_arr">
-        <item>@drawable/dot</item>
-        <item>@drawable/dot</item>
-        <item>@drawable/dot</item>
-        </integer-array>
+    <string name="no_high_score">No High Scores Yet</string>
 </resources>

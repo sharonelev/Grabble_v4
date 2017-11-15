@@ -8,8 +8,7 @@
     android:layout_gravity="center"
     android:orientation="vertical"
     android:background="@drawable/border_score"
-    android:id="@+id/high_score_activity_layout"
-    tools:context="com.example.android.grabble_v4.HighScoreActivity">
+    android:id="@+id/high_score_activity_layout">
 
     <TextView
         android:id="@+id/high_score_title"

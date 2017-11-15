@@ -60,7 +60,8 @@
             android:layout_height="55dp"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"
-            android:padding="3dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
             android:scrollbars="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="@+id/get_letter"
@@ -72,7 +73,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:layout_marginStart="1dp"
+            android:layout_marginStart="0dp"
             android:orientation="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="@+id/get_letter"
@@ -111,7 +112,8 @@
             android:textSize="18dp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttons" />
+            app:layout_constraintTop_toBottomOf="@+id/buttons"
+            android:layout_marginTop="-1dp" />
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -122,8 +124,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/myWordsRecyclerView"
             app:layout_constraintRight_toRightOf="@+id/myWordsRecyclerView"
-            app:layout_constraintVertical_bias="1.0"
-            app:layout_constraintHorizontal_bias="0.0">
+           >
 
             <TextView
                 android:id="@+id/your_score_title"
@@ -175,7 +176,7 @@
             android:overScrollMode="never"
             android:layout_height="0dp"
             android:layout_marginLeft="0dp"
-            android:layout_marginStart="1dp"
+            android:layout_marginStart="0dp"
             android:paddingBottom="3dp"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="@+id/bottom_relative_layout"
@@ -187,14 +188,15 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/scrabble_letter_list"
-            android:overScrollMode="never"
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="0dp"
             android:layout_marginRight="8dp"
-            android:layout_marginStart="1dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="-18dp"
             android:foregroundGravity="left"
+            android:overScrollMode="never"
             android:paddingBottom="1dp"
             android:scrollbars="vertical"
             app:layout_constraintHorizontal_bias="0.0"
@@ -210,6 +212,7 @@
         android:paddingBottom="20dp"
         android:id="@+id/points_textview"
         android:text=""
+        android:fontFamily="sans-serif-condensed"
         android:layout_gravity="center_horizontal"
         android:textStyle="bold"
         android:textSize="50sp"/>

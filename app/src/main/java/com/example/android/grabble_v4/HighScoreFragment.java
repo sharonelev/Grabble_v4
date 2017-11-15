@@ -69,15 +69,11 @@ public class HighScoreFragment extends Fragment implements View.OnClickListener 
             Intent homeIntent = new Intent(getActivity(), MainActivity.class);
             homeIntent.putExtra("Button_tapped", R.string.new_game);
             getActivity().setResult(MainActivity.RESULT_CODE, homeIntent);
-            //startActivity(homeIntent);
             getActivity().finish();
 
         }
 
         if (view.getId() == R.id.back_to_game_in_high_score) {
-
-
-
             }
         }
 
@@ -105,7 +101,7 @@ public class HighScoreFragment extends Fragment implements View.OnClickListener 
 
         if (scoreAdapter.highScoreList == null) {
             mDate = (TextView) view.findViewById(R.id.Date_title);
-            mDate.setText("No High Scores");
+            mDate.setText(getString(R.string.no_high_score));
             mScore = (TextView) view.findViewById(R.id.score_title);
             mScore.setVisibility(View.GONE);
         }

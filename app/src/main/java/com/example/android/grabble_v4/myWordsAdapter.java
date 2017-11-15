@@ -1,28 +1,22 @@
 package com.example.android.grabble_v4;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.view.menu.MenuView;
+import android.support.v7.view.menu.MenuAdapter;
 import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.orhanobut.hawk.Hawk;
 
-import java.nio.channels.Selector;
 import java.util.ArrayList;
 import java.util.List;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+
 /**
  * Created by user on 25/09/2017.
  */
@@ -108,10 +102,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             super(itemView);
 
             eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
-            DividerItemDecoration divider = new DividerItemDecoration(eachWordRecView.getContext(), DividerItemDecoration.HORIZONTAL);
-            divider.setDrawable(ContextCompat.getDrawable(mContext,R.drawable.line_divider));
-            eachWordRecView.addItemDecoration(divider);
-
+            setDivider();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
 
             eachWordRecView.setLayoutManager(wordLayoutManager); //this prevents onClick to work!!
@@ -135,9 +126,20 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             }
        }
 
-
+        public void setDivider(){
+            int deviceWidth =Hawk.get(MainActivity.DEVICE_WIDTH);
+            DividerItemDecoration divider;
+            divider= new DividerItemDecoration(eachWordRecView.getContext(),DividerItemDecoration.HORIZONTAL);
+            if(deviceWidth<800)
+                divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_s));
+            else if(deviceWidth<1000)
+                divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_m));
+            else
+                divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_l));
+            eachWordRecView.addItemDecoration(divider);
 
     }
 
 
+    }
 }
