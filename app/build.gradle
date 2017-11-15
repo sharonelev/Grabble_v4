@@ -40,7 +40,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.pacioianu.david:ink-page-indicator:1.2.0'
     compile 'com.orhanobut:hawk:2.0.1'
-
+    compile 'com.hanks:htextview-base:0.1.2'
+    compile 'com.hanks:htextview-fall:0.1.2'
 
 
 

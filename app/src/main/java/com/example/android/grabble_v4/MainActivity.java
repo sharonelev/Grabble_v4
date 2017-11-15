@@ -1,46 +1,58 @@
 package com.example.android.grabble_v4;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.transition.Explode;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import net.hockeyapp.android.CrashManager;
-import net.hockeyapp.android.UpdateManager;
+import android.transition.TransitionManager;
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.data.Instructions;
+import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.SendFeedback;
 import com.example.android.grabble_v4.data.SingleLetter;
-import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.Word;
+import com.hanks.htextview.fall.FallTextView;
 import com.orhanobut.hawk.Hawk;
+
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,8 +62,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import io.github.krtkush.lineartimer.LinearTimer;
-import io.github.krtkush.lineartimer.LinearTimerView;
 
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
@@ -95,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements
     Button clearWord;
     CountDownTimer countDownTimer = null;
     TextView countDownView;
-
+    FallTextView pointsFallAnimation;
+    TextView pointsAnimation;
 
     //Device specs
     public static final String DEVICE_HEIGHT = "Device_Height_px";
@@ -159,6 +170,9 @@ public class MainActivity extends AppCompatActivity implements
         mBoardRecView = (RecyclerView) findViewById(R.id.scrabble_letter_list);
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
+        pointsAnimation = (TextView) findViewById(R.id.points_textview);
+
+
 
         //Shared prefernces
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -232,21 +246,22 @@ public class MainActivity extends AppCompatActivity implements
 
         setEnableAll(true);
 
-        switch (countDownInd){
-            case 0:
+        if(countDownInd==0) {
                 gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
                 enableCountDown(false);
-                break;
-            case 1:
-                createTimer(getResources().getInteger(R.integer.timer_initial_moderate));
-                gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
-                enableCountDown(true);
-                break;
-            case 2:
-                createTimer(getResources().getInteger(R.integer.timer_initial_speedy));
-                gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
-                enableCountDown(true);
-                break;
+        }
+       else {
+            gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
+
+            if(countDownInd==1){
+                createTimer(getResources().getInteger(R.integer.timer_initial_moderate));}
+            else    { //countDownInd==2
+                createTimer(getResources().getInteger(R.integer.timer_initial_speedy));}
+
+            enableCountDown(true);
+            setTimerSize();
+
+
         }
 
         BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -311,16 +326,19 @@ public class MainActivity extends AppCompatActivity implements
 
     private int setHeightForRV() {
       if(deviceHeight<1500)
-          return dpToPx(this,60);
-       if (deviceHeight<1750)
-            return  dpToPx(this,80);
-        else return  dpToPx(this,100);
+           return dpToPx(this,60);
+      else if (deviceHeight<1750)
+           return  dpToPx(this,80);
+      else return  dpToPx(this,100);
+
     }
 
-    private int setTilesInRVrow(){
-        //get width
-        //divide
-        return 0;
+    private void setTimerSize(){
+        if(deviceHeight<1500)
+            countDownView.setTextSize(22);
+        else if (deviceHeight<1750)
+            countDownView.setTextSize(28);
+        else return;
     }
 
     public void addLetterToBoard(boolean newGame) {
@@ -364,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements
         return;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClick(View view) {
 
@@ -392,6 +411,8 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 addLetterToBoard(false);
+                startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss),"-");
+
                 mBoardAdapter.notifyDataSetChanged();
                 playerScore--; //reduce a point for each tile the user adds
                 mScore.setText(String.valueOf(playerScore));
@@ -737,7 +758,6 @@ public class MainActivity extends AppCompatActivity implements
                 .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
                         setFinalPoints(boardPoints);
                     }
                 }).setNegativeButton("I'll keep trying", null).create().show();
@@ -745,12 +765,22 @@ public class MainActivity extends AppCompatActivity implements
 
     public void setFinalPoints(final int boardPoints){
         int tempScore = playerScore;
+        if(boardPoints>0)
+            startPointAnimation(boardPoints,"-");
         playerScore = tempScore - boardPoints;
         if (countDownInd!=0)
             countDownTimer.cancel();
         mScore.setText(String.valueOf(playerScore));
-        int res = PreferenceUtilities.newScoreSend(this, playerScore, countDownInd);
-        dialogEndGame(res);
+        final int res = PreferenceUtilities.newScoreSend(this, playerScore, countDownInd);
+        Handler myHandler= new Handler();
+        myHandler.postDelayed(new Runnable(){
+            @Override
+            public void run()
+            {
+                dialogEndGame(res);
+            }
+        }, 1250);
+
     }
 
     public void dialogEndGame(final int res) {
@@ -860,7 +890,8 @@ if(highScoreScreenSlideDialog!=null) {
             tempScore = tempScore + builder_size;
         }
 
-        for (int i = 0; i < builder_size; i++) {
+        startPointAnimation(tempScore,"+");
+        for (int i = 0; i < builder_size; i++) { //add to word array
             newWord.add(i, builder.get(i));
             theWord= theWord + builder.get(i).getLetter_name();
             if (builderLetterTypes.get(i)[0] == 0) {
@@ -869,15 +900,9 @@ if(highScoreScreenSlideDialog!=null) {
             }
             if (builderLetterTypes.get(i)[0] == 1) {
                 tempMyWordsLetters.add(builderLetterTypes.get(i)[1]); //save word indexes
-
             }
         }
-
-
-      //  wordList.add(new  Word(wordList.size(), theWord)); //add new word to end of list
-
-
-        //SORT templettertypes and remove from board accordingly - start removing from end
+     //SORT templettertypes and remove from board accordingly - start removing from end
         Collections.sort(tempBoardLetters);
         for (int i = tempBoardLetters.size() - 1; i >= 0; i--) {
             int toRemove = tempBoardLetters.get(i);
@@ -1141,6 +1166,7 @@ if(highScoreScreenSlideDialog!=null) {
                 if (countDownInd!=0) {
                     if (lettersLeft > 0) {
                         addLetterToBoard(false);
+                        startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss),"-");
                         playerScore = playerScore - 1;
                         mScore.setText(String.valueOf(playerScore));
                     } else if (lettersLeft == 0) {
@@ -1207,6 +1233,14 @@ if(highScoreScreenSlideDialog!=null) {
         return (int) (dpValue * scale + 0.5f);
     }
 
+    public void startPointAnimation(int score, String plusOrMinus){
+        pointsAnimation.setText(plusOrMinus+ String.valueOf(score));
+        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.animation);
+        animation.reset();
+        pointsAnimation.setY(mBuilderRecView.getY());
+        pointsAnimation.startAnimation(animation);
+        pointsAnimation.setVisibility(View.INVISIBLE);
+    }
 }
 
 

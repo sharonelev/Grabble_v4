@@ -86,19 +86,19 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.mLetter.setTextSize(35);
                 holder.mLetterValue.setTextSize(20);
             }*/
-            if (numOfTiles <= 11 ){ //TODO control tile size and have the text be auto-fit
+            if (numOfTiles <= 10 ){
                // holder.itemView.getLayoutParams().width = 90;//130
                 //holder.itemView.getLayoutParams().height = 120;//140
                 holder.mLetter.setTextSize (28);
                 holder.mLetterValue.setTextSize(10);
             }
-            else if (numOfTiles == 12) {
+            else if (numOfTiles == 11) {
                // holder.itemView.getLayoutParams().width = 75;//130
                 //holder.itemView.getLayoutParams().height = 100;//140
                 holder.mLetter.setTextSize(25);
                 holder.mLetterValue.setTextSize(8);
             }
-            else if ( numOfTiles >= 13) {
+            else if ( numOfTiles >= 12) {
                 //holder.itemView.getLayoutParams().width = 65;//130
                 //holder.itemView.getLayoutParams().height = 90;//140
                 holder.mLetter.setTextSize(22);
