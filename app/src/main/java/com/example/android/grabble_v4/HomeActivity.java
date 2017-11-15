@@ -8,8 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
-
 import com.example.android.grabble_v4.data.SingleLetter;
 
 import java.util.ArrayList;
@@ -21,12 +21,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private List<SingleLetter> mList = new ArrayList<>();
     RecyclerView recyclerView;
     BoardAdapter mWelcomeAdapter;
-    private SingleLetter letterT =new SingleLetter("T",1,0);
+    private SingleLetter letterT =new SingleLetter("T",2,0);
     private SingleLetter letterI =new SingleLetter("I",1,0);
-    private SingleLetter letterL =new SingleLetter("L",1,0);
+    private SingleLetter letterL =new SingleLetter("L",2,0);
     private SingleLetter letterE= new SingleLetter("E",1,0);
-    private SingleLetter letterS =new SingleLetter("S",1,0);
+    private SingleLetter letterS =new SingleLetter("S",2,0);
    // private SingleLetter letterE =new SingleLetter("E",1,0);
+    //public static int deviceHeight=2560;//default
 
     Handler myHandler= new Handler();
    /* Runnable screenRun =new Runnable() {
@@ -99,7 +100,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager WelcomeLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(WelcomeLayoutManager);
         mList.add(letterI);
-
+  //      deviceHeight=measurments.getHeight(this);
         mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView);
         recyclerView.setAdapter(mWelcomeAdapter);
         recyclerView.setEnabled(false);

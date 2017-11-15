@@ -39,6 +39,8 @@ dependencies {
     compile 'com.github.krtkush:LinearTimer:v2.1.1'
     testCompile 'junit:junit:4.12'
     compile 'com.pacioianu.david:ink-page-indicator:1.2.0'
+    compile 'com.orhanobut:hawk:2.0.1'
+
 
 
 

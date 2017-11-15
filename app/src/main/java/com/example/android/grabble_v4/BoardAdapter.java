@@ -75,7 +75,9 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.itemView.setElevation((float) 25);
+        }
         int numOfTiles = mBoard.size();
         if(recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) {
            /* if(numOfTiles<=7){
@@ -84,7 +86,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.mLetter.setTextSize(35);
                 holder.mLetterValue.setTextSize(20);
             }*/
-            if (numOfTiles <= 11 ){
+            if (numOfTiles <= 11 ){ //TODO control tile size and have the text be auto-fit
                // holder.itemView.getLayoutParams().width = 90;//130
                 //holder.itemView.getLayoutParams().height = 120;//140
                 holder.mLetter.setTextSize (28);

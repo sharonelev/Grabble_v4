@@ -17,10 +17,12 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ import com.example.android.grabble_v4.data.SendFeedback;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.Word;
+import com.orhanobut.hawk.Hawk;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -54,8 +57,7 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
         myWordsAdapter.ListWordClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
-
+        SharedPreferences.OnSharedPreferenceChangeListener{
     //RecyclerView elements
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
     LinearLayoutManager BuilderLayoutManager;
     StaggeredGridLayoutManager myWordsStaggeredManager;
 
+    HighScoreScreenSlideDialog highScoreScreenSlideDialog;
     //global values
     int playerScore;
     int lettersLeft;
@@ -93,6 +96,13 @@ public class MainActivity extends AppCompatActivity implements
     CountDownTimer countDownTimer = null;
     TextView countDownView;
 
+
+    //Device specs
+    public static final String DEVICE_HEIGHT = "Device_Height_px";
+    public static final String DEVICE_WIDTH = "Device_Width_px";
+    public int deviceHeight;
+    public int deviceWidth;
+
     //others
     public final static int RESULT_CODE = 123;
 
@@ -106,6 +116,19 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Intent homeScreen = getIntent();
         Log.i("lifecycleEvent","onCreate");
+        Hawk.init(this).build();
+
+        if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
+            //save device metrics:
+            DisplayMetrics metrics = getDeviceMetrics(this);
+            Hawk.put(DEVICE_HEIGHT, metrics.heightPixels);
+            Hawk.put(DEVICE_WIDTH,  metrics.widthPixels);
+        }
+        else
+            {
+            deviceHeight = Hawk.get(DEVICE_HEIGHT);
+            deviceWidth  = Hawk.get(DEVICE_WIDTH);
+        }
 
         int gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
         fromResume=false;
@@ -146,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements
 
         //HockeyApp
         checkForUpdates();
+
+
 
     }
 
@@ -226,13 +251,15 @@ public class MainActivity extends AppCompatActivity implements
 
         BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
-        myWordsStaggeredManager = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
+        myWordsStaggeredManager = new StaggeredGridLayoutManager(setSpanForStaggered(), StaggeredGridLayoutManager.HORIZONTAL);
         myWordsStaggeredManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
         //setspancount??
         //  BuilderLayoutManager.setAutoMeasureEnabled(false);
         mMyWordsRecView.setLayoutManager(myWordsStaggeredManager);
         mBoardRecView.setLayoutManager(gridLayoutManager);
         mBuilderRecView.setLayoutManager(BuilderLayoutManager);
+
+        mBoardRecView.getLayoutParams().height = setHeightForRV();
 
         builderLetterTypes.clear();
         bag.clear();
@@ -271,6 +298,29 @@ public class MainActivity extends AppCompatActivity implements
         mWordsAdapter = new myWordsAdapter(this, myWords, this);
         mMyWordsRecView.setAdapter(mWordsAdapter);
 
+    }
+
+    private int setSpanForStaggered() {
+
+        //if(deviceHeight<1500)
+          //return  3;
+        if (deviceHeight<1750)
+            return 4;
+        else return 5;
+    }
+
+    private int setHeightForRV() {
+      if(deviceHeight<1500)
+          return dpToPx(this,60);
+       if (deviceHeight<1750)
+            return  dpToPx(this,80);
+        else return  dpToPx(this,100);
+    }
+
+    private int setTilesInRVrow(){
+        //get width
+        //divide
+        return 0;
     }
 
     public void addLetterToBoard(boolean newGame) {
@@ -533,6 +583,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+
+
     public class WordValidator extends AsyncTask<URL, Void, String>
 
     {
@@ -560,14 +612,29 @@ public class MainActivity extends AppCompatActivity implements
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             return wordValidateResults;
         }
 
         @Override
         protected void onPostExecute(String wordValidateResults) {
+            if(wordValidateResults==null){
+                Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
+                setEnableAll(true);
+                pBar.setVisibility(View.INVISIBLE);
+                return;
+            }
+
             super.onPostExecute(wordValidateResults);
+
             pBar.setVisibility(View.INVISIBLE);
             String valid = null;
+
+            if(wordValidateResults.equals("timeout")){
+                Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
+                setEnableAll(true);
+                return;
+            }
             try {
                 valid = parseWordResult(wordValidateResults);
             } catch (IOException e) {
@@ -575,7 +642,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d("valid", "did not get valid result");
             }
 
-            valid="1"; //TODO REMVOE AFTER TESTING
+           valid="1"; //TODO REMVOE AFTER TESTING
             {
 
                 if (valid.equals("0")) {
@@ -595,6 +662,9 @@ public class MainActivity extends AppCompatActivity implements
                     else {
                         afterDialogSuccess(tempScore);
                     }
+                } else  if(valid.equals("")){
+                    Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
+                    setEnableAll(true);
                 }
             }
         }
@@ -607,7 +677,7 @@ public class MainActivity extends AppCompatActivity implements
         if (lettersLeft == 0) {
             noLettersInBag();
         }
-        if (board.isEmpty()) {
+        if (board.isEmpty() && builder.isEmpty()) {
             setFinalPoints(0);
         }
         setEnableAll(true);
@@ -683,7 +753,14 @@ public class MainActivity extends AppCompatActivity implements
         dialogEndGame(res);
     }
 
-    public void dialogEndGame(int res) {
+    public void dialogEndGame(final int res) {
+
+if(highScoreScreenSlideDialog!=null) {
+    if (highScoreScreenSlideDialog.isVisible()) {
+        //   Log.i("end game dialog", "high score visible");
+        highScoreScreenSlideDialog.dismiss();  //close high score dialog if end game dialog
+    }
+}
         String msg = "";
 
         if (res == 1) {
@@ -700,26 +777,30 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i) {
                         newGame();
                     }
-                }).setNegativeButton(R.string.share_move, new DialogInterface.OnClickListener() {
+                }).setNegativeButton("BACK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                getLetterButtonToNewGame();
+            }
+        })
+             /*   .setNegativeButton(R.string.share_move, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 shareScore(playerScore);
                 getLetterButtonToNewGame();
             }
-        }).setPositiveButton("HIGH SCORES", new DialogInterface.OnClickListener() {
+        })*/
+                .setPositiveButton("HIGH SCORES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 getLetterButtonToNewGame();
-                Class destinationActivity =HighScoreActivity.class;
-                Intent intent = new Intent(MainActivity.this, destinationActivity);
-                intent.putExtra("gameType",countDownInd);
-                startActivityForResult(intent, RESULT_CODE);
+               openHighScoreDialog();
             }
         })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
-                      getLetterButtonToNewGame();
+                      dialogEndGame(res);
                     }
                 }).create().show();
     }
@@ -822,6 +903,7 @@ public class MainActivity extends AppCompatActivity implements
         myWords.add(newWord); //always added to end
         mWordsAdapter.notifyDataSetChanged();
         myWordsStaggeredManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+
        // int getIndex= myWords.indexOf(newWord);
         Word addWord = new Word( theWord);
         wordList.add(addWord);
@@ -918,12 +1000,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.high_score_in_menu:
-
-                //destinationActivity = HighScoreActivity.class;
-               destinationActivity = HighScoreScreenSlide.class;
-                Intent highscore_intent = new Intent(context, destinationActivity);
-                highscore_intent.putExtra("gameType", countDownInd);
-                startActivityForResult(highscore_intent, RESULT_CODE);
+            openHighScoreDialog();
                 return true;
 
             case R.id.send_feedback:
@@ -1019,6 +1096,11 @@ public class MainActivity extends AppCompatActivity implements
         for (SingleLetter letter : board) {
             reduceScore = reduceScore + letter.getLetter_value();
         }
+        for(int i=0; i<builder.size();i++){
+            if(builderLetterTypes.get(i)[0]==0){//from board
+                reduceScore = reduceScore + builder.get(i).getLetter_value();
+            }
+        }
 
         return reduceScore;
     }
@@ -1093,6 +1175,38 @@ public class MainActivity extends AppCompatActivity implements
                 .setText(textToShare)
                 .startChooser();
     }
+
+
+    public void openHighScoreDialog(){
+
+        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.crateInstance(countDownInd);
+        highScoreScreenSlideDialog.show(getSupportFragmentManager(),"Dialog Fragment");
+    }
+
+    public static DisplayMetrics getDeviceMetrics(Context context){
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+       windowManager.getDefaultDisplay().getMetrics(metrics);
+        return metrics;
+    }
+
+    //TODO CHANGE to get metrics once!
+    public static int getScreenHeightInPx(DisplayMetrics metrics) {
+        return metrics.heightPixels;
+    }
+
+    public static int getScreenWidthInPx(Context context) {
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+        return metrics.widthPixels;
+
+    }
+    public static int dpToPx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
 }
 
 

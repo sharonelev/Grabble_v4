@@ -11,6 +11,8 @@
         android:id="@+id/each_word"
         android:padding="1dp"
         android:scrollbars="horizontal"
+        android:overScrollMode="never"
+
         ></android.support.v7.widget.RecyclerView>
 
 

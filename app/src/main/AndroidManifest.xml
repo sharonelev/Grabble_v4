@@ -37,18 +37,7 @@
                 android:value=".MainActivity" />
         </activity>
 
-        <activity
-            android:name=".HighScoreActivity"
-            android:label="@string/title_activity_high_score"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
-        <activity
-            android:name=".HighScoreScreenSlide"
-            android:label="@string/title_speedy_activity_high_score"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
-        <activity
-            android:name=".HighScoreModerateActivity"
-            android:label="@string/title_moderate_activity_high_score"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+
         <activity android:name=".SettingsActivity"
             android:label="Settings"
             android:parentActivityName=".MainActivity">

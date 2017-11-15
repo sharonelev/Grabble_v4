@@ -1,109 +1,89 @@
-<!-- fragment_screen_slide_page.xml -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content"
+android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="wrap_content"
-        android:paddingRight="22dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:background="@drawable/border_score"
         android:id="@+id/high_score_activity_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
         tools:context="com.example.android.grabble_v4.HighScoreActivity">
 
         <TextView
             android:id="@+id/high_score_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:gravity="center_horizontal|top"
+            android:paddingTop="10dp"
+            app:layout_constraintLeft_toLeftOf="@id/high_score_activity_layout"
+            app:layout_constraintTop_toTopOf="@id/high_score_activity_layout"
             android:text="@string/classic_high_score"
-            android:textColor="#000000" />
+            android:textColor="@color/colorPrimary"
+            android:shadowColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="25sp"
+
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginRight="0dp"
+            app:layout_constraintRight_toRightOf="parent" />
 
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/high_score_activity_layout"
+            app:layout_constraintTop_toBottomOf="@id/high_score_title"
+            android:id="@+id/column_titles"
+            android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            android:paddingBottom="10dp">
+            android:layout_marginRight="0dp"
+            app:layout_constraintRight_toRightOf="parent">
 
             <TextView
                 android:id="@+id/Date_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DATE"
-                android:textColor="#000000"
                 android:paddingLeft="5dp"
                 android:paddingRight="110dp"
-                />
+                android:text="DATE"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="#000000" />
 
             <TextView
                 android:id="@+id/score_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/Date_title"
+                android:textStyle="bold"
+                android:textSize="20dp"
                 android:gravity="right|fill_horizontal|end"
                 android:paddingRight="5dp"
                 android:text="SCORE"
-                android:layout_toRightOf="@id/Date_title"
                 android:textColor="#000000" />
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:layout_width="wrap_content"
-            android:layout_height="125dp"
-            android:paddingLeft="10dp"
             android:id="@+id/score_list_view"
-            android:paddingBottom="10dp">
-        </android.support.v7.widget.RecyclerView>
-
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal">
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:layout_marginBottom="10dp"
-                android:text="BACK"
-                android:layout_gravity="left"
-                android:clickable="true"
-                android:id="@+id/back_to_game_in_high_score"
-                android:textColor="@color/colorAccent"
-                android:background="#ffffff"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:layout_marginBottom="10dp"
-                android:clickable="true"
-                android:text="NEW GAME"
-                android:layout_gravity="right"
-                android:id="@+id/new_game_in_high_score"
-                android:textColor="@color/colorAccent"
-                android:background="#ffffff"/>
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:paddingBottom="10dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toBottomOf="@id/column_titles"
+            app:layout_constraintLeft_toLeftOf="@id/high_score_activity_layout"
+            android:paddingLeft="10dp"
+            android:layout_marginRight="0dp"
+            app:layout_constraintRight_toRightOf="parent"></android.support.v7.widget.RecyclerView>
 
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal|bottom"
-            android:paddingBottom="10dp">
-
-
-        </LinearLayout>
-
-
-    </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </ScrollView>

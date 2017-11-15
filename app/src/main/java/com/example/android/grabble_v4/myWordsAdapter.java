@@ -72,7 +72,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
       //  holder.itemView.setLayoutParams(new StaggeredGridLayoutManager.LayoutParams(StaggeredGridLayoutManager.LayoutParams.FILL_PARENT,
         //        StaggeredGridLayoutManager.LayoutParams.WRAP_CONTENT));
-        holder.itemView.getLayoutParams().width=holder.mList.size()*100+(holder.mList.size()-1)*20+50;
+        holder.itemView.getLayoutParams().width=holder.mList.size()*100+(holder.mList.size()-1)*20+100;
     }
 
     @Override
