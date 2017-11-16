@@ -17,10 +17,9 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-  //  final static String BASE_URL_CHK_WORD="http://www.wordgamedictionary.com/api/v1/references/scrabble/";
+
   final static String BASE_URL_CHK_WORD="http://www.wordgamedictionary.com/api/v1/references/scrabble/";
     final static String KEY = "key";
-    //final static String API_CHK_WORD = "2.6319805885208397e2j9"; // WRONG
     final static String API_CHK_WORD = "2.6319805885208397e29";
     final static String BASE_URL_OXFORD ="https://od-api.oxforddictionaries.com/api/v1";
 

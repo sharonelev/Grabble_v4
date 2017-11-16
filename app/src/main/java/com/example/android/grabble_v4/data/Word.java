@@ -13,11 +13,12 @@ public class Word {
         theWord=w;
     }
     public Word(String w){
+
         theWord=w;
     }
 
-
     public int getOrder_num() {
+
         return order_num;
     }
 
@@ -26,10 +27,12 @@ public class Word {
     }
 
     public void setOrder_num(int order_num) {
+
         this.order_num = order_num;
     }
 
     public void setTheWord(String theWord) {
+
         this.theWord = theWord;
     }
 }

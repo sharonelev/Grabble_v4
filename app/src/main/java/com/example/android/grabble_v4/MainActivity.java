@@ -58,11 +58,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
         myWordsAdapter.ListWordClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener{
+
     //RecyclerView elements
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
@@ -79,18 +81,20 @@ public class MainActivity extends AppCompatActivity implements
     GridLayoutManager gridLayoutManager;
     LinearLayoutManager BuilderLayoutManager;
     StaggeredGridLayoutManager myWordsStaggeredManager;
-
     HighScoreScreenSlideDialog highScoreScreenSlideDialog;
     //global values
     int playerScore;
     int lettersLeft;
+    int gameType;
     int game_limit;  //including 4 from start//
-    public boolean showCorrectPopUp;
-    public boolean showWrongPopUp;
     int countDownInd; //0 = classic. 1=moderate. 2=speedy.
     long toEndTimer = 0;
     boolean initalizeTimers;
-
+    //preferences
+    public boolean showCorrectPopUp;
+    public boolean showWrongPopUp;
+    public boolean shakeToGetLetter;
+    public boolean animatePoints;
     //UI elements
     ProgressBar pBar;
     TextView mScore;
@@ -101,51 +105,37 @@ public class MainActivity extends AppCompatActivity implements
     CountDownTimer countDownTimer = null;
     TextView countDownView;
     TextView pointsAnimation;
-
-    // The following are used for the shake detection
+    // Shake detection
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private ShakeDetector mShakeDetector;
-
     //Device specs
     public static final String DEVICE_HEIGHT = "Device_Height_px";
     public static final String DEVICE_WIDTH = "Device_Width_px";
     public int deviceHeight;
     public int deviceWidth;
-
     //add letter to board sources
     public static final String NEW_GAME = "new_game";
     public static final String MODERATE_GET_LETTER = "moderate_mid_timer";
     public static final String TIME_UP = "time_up";
     public static final String CLASSIC_GET_LETTER = "get_letter";
     public static final String AFTER_PLAYED_WORD = "after_played_word";
-
     //others
     public final static int RESULT_CODE = 123;
 
+
+    // LIFE CYCLE EVENTS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //initializations
+        Log.i("lifecycleEvent","onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent homeScreen = getIntent();
-        Log.i("lifecycleEvent","onCreate");
-        Hawk.init(this).build();
         shakeDetectorInit();
-
-        if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
-            //save device metrics:
-            DisplayMetrics metrics = getDeviceMetrics(this);
-            Hawk.put(DEVICE_HEIGHT, metrics.heightPixels);
-            Hawk.put(DEVICE_WIDTH,  metrics.widthPixels);
-        }
-        else
-            {
-            deviceHeight = Hawk.get(DEVICE_HEIGHT);
-            deviceWidth  = Hawk.get(DEVICE_WIDTH);
-        }
-
-        int gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
+        setDeviceDimensions();
+        gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
         initalizeTimers=false;
 
         switch (gameType) {
@@ -157,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.button_speedy_game:
                 countDownInd = 2;
-
                 break;
         }
 
@@ -174,9 +163,10 @@ public class MainActivity extends AppCompatActivity implements
         mBoardRecView = (RecyclerView) findViewById(R.id.scrabble_letter_list);
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
-        pointsAnimation = (TextView) findViewById(R.id.points_textview);
 
-        setDivider();
+        //Others
+        setDivider(); //dividers to builder RV
+        pointsAnimation = (TextView) findViewById(R.id.points_textview);
 
         //Shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -189,63 +179,58 @@ public class MainActivity extends AppCompatActivity implements
         //HockeyApp
         checkForUpdates();
 
-
-
     }
 
     @Override
     public void onResume() {
-        super.onResume();
         Log.i("lifecycleEvent","onResume");
-
-        //in case a game with timer was stopped and resumed
-        long prevTimer= getIntent().getLongExtra("timer",0);
+        super.onResume();
+        long prevTimer= getIntent().getLongExtra("timer",0); //in case a game with timer was stopped and resumed
         if(prevTimer>0 && countDownInd!=0) {
             initalizeTimers=true;
             createTimer(prevTimer);
-
         }
         getIntent().putExtra("timer",0);
         if(mSensorManager!=null)
             mSensorManager.registerListener(mShakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
         //HockeyApp
         checkForCrashes();
-
     }
 
     @Override
     public void onPause() {
+        Log.i("lifecycleEvent","onPause");
         mSensorManager.unregisterListener(mShakeDetector);
         super.onPause();
+        //Hockey App
         unregisterManagers();
-        Log.i("lifecycleEvent","onPause");
     }
 
     @Override
     public void onStop() {
+        Log.i("lifecycleEvent","onStop");
         super.onStop();
-        unregisterManagers();
-
-        //in case a game with timer was stopped
-        if(countDownInd!=0) {
+        if(countDownInd!=0) {        //in case a game with timer was stopped
             countDownTimer.cancel();
             getIntent().putExtra("timer", toEndTimer);
         }
-        Log.i("lifecycleEvent","onStop");
-
+        //Hockey App
+        unregisterManagers();
     }
 
     @Override
     public void onDestroy() {
+        Log.i("lifecycleEvent","onDestroy");
         super.onDestroy();
+        //Hockey App
         unregisterManagers();
         /** Cleanup the shared preference listener **/
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
-        Log.i("lifecycleEvent","onDestroy");
     }
 
 
+    // CORE GAME METHODS
     public void newGame() {
         //create bag
         game_limit = getResources().getInteger(R.integer.tiles_in_game);
@@ -264,28 +249,24 @@ public class MainActivity extends AppCompatActivity implements
                 createTimer(getResources().getInteger(R.integer.timer_initial_moderate));}
             else    { //countDownInd==2
                 createTimer(getResources().getInteger(R.integer.timer_initial_speedy));}
-
             enableCountDown(true);
             setTimerSize();
-
-
         }
 
+        //Create managers
         BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
         myWordsStaggeredManager = new StaggeredGridLayoutManager(setSpanForStaggered(), StaggeredGridLayoutManager.HORIZONTAL);
         myWordsStaggeredManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-        //setspancount??
-        //  BuilderLayoutManager.setAutoMeasureEnabled(false);
+        //set managers
         mMyWordsRecView.setLayoutManager(myWordsStaggeredManager);
         mBoardRecView.setLayoutManager(gridLayoutManager);
         mBuilderRecView.setLayoutManager(BuilderLayoutManager);
-
+        //changes per device metrics
         mBoardRecView.getLayoutParams().height = setHeightForRV();
-
+        //element setups
         builderLetterTypes.clear();
         bag.clear();
-
         if (board.size() > 0) {
             board.clear();
             mBoardAdapter.notifyDataSetChanged();
@@ -298,19 +279,16 @@ public class MainActivity extends AppCompatActivity implements
             myWords.clear();
             mWordsAdapter.notifyDataSetChanged();
         }
-
         LetterBag.createScrabbleSet(bag);
         for (int i = 0; i < 4; i++) {
             addLetterToBoard(NEW_GAME);
         }
-
-
         getLetter.setText(getResources().getString(R.string.get_letter));
         mTiles.setText(String.valueOf(lettersLeft));
-
         playerScore = 0;
         mScore.setText(String.valueOf(playerScore));
 
+        //Create and set adapters
         mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
         mBoardRecView.setAdapter(mBoardAdapter);
 
@@ -322,37 +300,10 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private int setSpanForStaggered() {
-
-        //if(deviceHeight<1500)
-          //return  3;
-        if (deviceHeight<1750)
-            return 4;
-        else return 5;
-    }
-
-    private int setHeightForRV() {
-      if(deviceHeight<1500)
-           return dpToPx(this,60);
-      else if (deviceHeight<1750)
-           return  dpToPx(this,80);
-      else return  dpToPx(this,100);
-
-    }
-
-    private void setTimerSize(){
-        if(deviceHeight<1500)
-            countDownView.setTextSize(22);
-        else if (deviceHeight<1750)
-            countDownView.setTextSize(28);
-        else return;
-    }
-
     public void addLetterToBoard(String src){//(boolean newGame, boolean midTimer) {
         if (lettersLeft == 0) {
             return;
         }
-
         RandomSelector randomSelector = new RandomSelector(bag);
         SingleLetter selectedLetter;
         selectedLetter = randomSelector.getRandom();
@@ -387,7 +338,6 @@ public class MainActivity extends AppCompatActivity implements
             else
                 countDownTimer.start(); //start timer for new tile
         }
-
         if (lettersLeft == 0) {
             noLettersInBag();
         }
@@ -586,22 +536,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pop_up_correct_key))) {
-            if (countDownInd==0)
-                showCorrectPopUp = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
-            else showCorrectPopUp = false;
-        } else if (key.equals(getString(R.string.pop_up_wrong_key))) {
-            if (countDownInd==0)
-                showWrongPopUp = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.popup_default)));
-            else
-                showWrongPopUp = false;
-        }
-
-    }
-
-
 
 
     public class WordValidator extends AsyncTask<URL, Void, String>
@@ -661,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d("valid", "did not get valid result");
             }
 
-           valid="1"; //TODO REMVOE AFTER TESTING
+         //  valid="1"; //TODO REMVOE AFTER TESTING
             {
 
                 if (valid.equals("0")) {
@@ -762,27 +696,7 @@ public class MainActivity extends AppCompatActivity implements
                 }).setNegativeButton("I'll keep trying", null).create().show();
     }
 
-    public void setFinalPoints(final int boardPoints){
-        int tempScore = playerScore;
-        if(boardPoints>0)
-            startPointAnimation(boardPoints,"-");
-        playerScore = tempScore - boardPoints;
-        if (countDownInd!=0)
-            countDownTimer.cancel();
-        mScore.setText(String.valueOf(playerScore));
-        final int res = PreferenceUtilities.newScoreSend(this, playerScore, countDownInd);
-        Handler myHandler= new Handler();
-        getLetter.setEnabled(false);
-        setEnableAll(false);
-        myHandler.postDelayed(new Runnable(){
-            @Override
-            public void run()
-            {
-                dialogEndGame(res);
-            }
-        }, 1250);
 
-    }
 
     public void dialogEndGame(final int res) {
 
@@ -839,7 +753,8 @@ if(highScoreScreenSlideDialog!=null) {
     public void getLetterButtonToNewGame(){
         setEnableAll(false);
         getLetter.setText(R.string.new_game);
-        getLetter.setEnabled(true);}
+        getLetter.setEnabled(true);
+    }
 
 
     public void dialogCorrectWord(String word, final int score) {
@@ -972,11 +887,10 @@ if(highScoreScreenSlideDialog!=null) {
             e.printStackTrace();
         }
         return valid;
-
     }
 
+    //CORE ASSISTING METHODS
     public void noLettersInBag() {
-
         if (getLetter.getText() == getResources().getString(R.string.end_game)) {
             //not the first time counter became 0
             //RESUME counter
@@ -988,67 +902,77 @@ if(highScoreScreenSlideDialog!=null) {
         Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
         return;
     }
+    public void onGetLetter() {
+        if (getLetter.getText().equals(getString(R.string.get_letter))) {
+
+            if (countDownInd != 0) {
+                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
+                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
+                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if(countDownInd==1)//moderate mode
+            {
+                addLetterToBoard(MODERATE_GET_LETTER);
+                initalizeTimers=false;
+            }
+            else
+                addLetterToBoard(CLASSIC_GET_LETTER);
+
+            startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
+            mBoardAdapter.notifyDataSetChanged();
+            playerScore--; //reduce a point for each tile the user adds
+            mScore.setText(String.valueOf(playerScore));
+
+        }
+    }
+
+    public void setFinalPoints(final int boardPoints){
+        int tempScore = playerScore;
+        if(boardPoints>0)
+            startPointAnimation(boardPoints,"-");
+        playerScore = tempScore - boardPoints;
+        if (countDownInd!=0)
+            countDownTimer.cancel();
+        mScore.setText(String.valueOf(playerScore));
+        final int res = PreferenceUtilities.newScoreSend(this, playerScore, countDownInd);
+        Handler myHandler= new Handler();
+        getLetter.setEnabled(false);
+        setEnableAll(false);
+        myHandler.postDelayed(new Runnable(){
+            @Override
+            public void run()
+            {
+                dialogEndGame(res);
+            }
+        }, 1250);
+
+    }
+    public int reduceScoreEndGame() {
+        int reduceScore = 0;
+
+        for (SingleLetter letter : board) {
+            reduceScore = reduceScore + letter.getLetter_value();
+        }
+        for(int i=0; i<builder.size();i++){
+            if(builderLetterTypes.get(i)[0]==0){//from board
+                reduceScore = reduceScore + builder.get(i).getLetter_value();
+            }
+        }
+
+        return reduceScore;
+    }
 
     public int[] placer(int letterOrigin, int wordPlace, int letterPlace) {
         int[] series = {letterOrigin, wordPlace, letterPlace};//0: 0= from board 1 = from mywords, 1: word index, 2: letter index
         return series;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.new_game, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        Context context = MainActivity.this;
-        Class destinationActivity;
-
-        switch (item.getItemId()) {
-
-            case R.id.new_game_button:
-                newGame();
-                return true;
-
-            case R.id.home_screen:
-
-                destinationActivity = HomeActivity.class;
-                Intent home_intent = new Intent(context, destinationActivity);
-                startActivity(home_intent);
-                return true;
-
-            case  R.id.instructions_menu:
-                destinationActivity = Instructions.class;
-                Intent instructions_intent = new Intent(context, destinationActivity);
-                startActivity(instructions_intent);
-                return true;
-
-            case R.id.high_score_in_menu:
-            openHighScoreDialog();
-                return true;
-
-            case R.id.send_feedback:
-                destinationActivity = SendFeedback.class;
-                Intent feedback_intent = new Intent(context, destinationActivity);
-                startActivity(feedback_intent);
-                return true;
-
-            case R.id.settings:
-                destinationActivity = SettingsActivity.class;
-                Intent settings_intent = new Intent(context, destinationActivity);
-                startActivity(settings_intent);
-                return true;
-
-        } //switch
-
-        return super.onOptionsItemSelected(item); //if not action_search
-    }
-
-
     private void setEnableAll(boolean state) {
-
         if (countDownInd==2) {
             getLetter.setEnabled(false); //never possible in speedy mode
         } else
@@ -1066,12 +990,59 @@ if(highScoreScreenSlideDialog!=null) {
 
                 myWordsAdapter.WordViewHolder wordView = (myWordsAdapter.WordViewHolder)mMyWordsRecView.findViewHolderForLayoutPosition(i);
                 if(wordView!=null)
-                wordView.mySetEnabled(state);
+                    wordView.mySetEnabled(state);
 
             }
         }
     }
 
+
+
+    //MENU METHODS
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.new_game, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Context context = MainActivity.this;
+        Class destinationActivity;
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.new_game_button:
+                newGame();
+                return true;
+            case R.id.home_screen:
+                destinationActivity = HomeActivity.class;
+                intent = new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+            case  R.id.instructions_menu:
+                destinationActivity = Instructions.class;
+                intent = new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+            case R.id.high_score_in_menu:
+            openHighScoreDialog();
+                return true;
+            case R.id.send_feedback:
+                destinationActivity = SendFeedback.class;
+                intent = new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+            case R.id.settings:
+                destinationActivity = SettingsActivity.class;
+                intent= new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+        } //switch
+        return super.onOptionsItemSelected(item); //if not action_search
+    }
+
+
+    //HOCKEY APP
     private void checkForCrashes() {
         CrashManager.register(this);
     }
@@ -1085,14 +1056,7 @@ if(highScoreScreenSlideDialog!=null) {
         UpdateManager.unregister();
     }
 
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString("message", "This is my message to be reloaded");
-        super.onSaveInstanceState(outState);
-    }
-
-
+    //HIGH SCORE FRAGMENT METHODS
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -1101,13 +1065,21 @@ if(highScoreScreenSlideDialog!=null) {
                 newGame();
         }
     }
+    public void openHighScoreDialog(){
 
+        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.crateInstance(countDownInd);
+        highScoreScreenSlideDialog.show(getSupportFragmentManager(),"Dialog Fragment");
+    }
+
+    //SHARED PREFERENCES METHODS
     private void setupSharedPreferences() {
         // Get all of the values from shared preferences to set it up
         SharedPreferences sharedPreferences = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        shakeToGetLetter = sharedPreferences.getBoolean(getString(R.string.shake_key), getResources().getBoolean(R.bool.preferences_default_true));
+        animatePoints= sharedPreferences.getBoolean(getString(R.string.animate_key), getResources().getBoolean(R.bool.preferences_default_true));
         if (countDownInd==0) {
-            showCorrectPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_correct_key), getResources().getBoolean(R.bool.popup_default));
-            showWrongPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_wrong_key), getResources().getBoolean(R.bool.popup_default));
+            showCorrectPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_correct_key), getResources().getBoolean(R.bool.preferences_default_true));
+            showWrongPopUp = sharedPreferences.getBoolean(getString(R.string.pop_up_wrong_key), getResources().getBoolean(R.bool.preferences_default_true));
         } else {
             showCorrectPopUp = false;
             showWrongPopUp = false;
@@ -1115,22 +1087,27 @@ if(highScoreScreenSlideDialog!=null) {
         // Register the listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
-    public int reduceScoreEndGame() {
-        int reduceScore = 0;
-
-        for (SingleLetter letter : board) {
-            reduceScore = reduceScore + letter.getLetter_value();
+        if (key.equals(getString(R.string.pop_up_correct_key))) {
+            if (countDownInd==0)
+                showCorrectPopUp = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.preferences_default_true)));
+            else showCorrectPopUp = false;
+        } else if (key.equals(getString(R.string.pop_up_wrong_key))) {
+            if (countDownInd==0)
+                showWrongPopUp = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.preferences_default_true)));
+            else
+                showWrongPopUp = false;
+        } else if (key.equals(getString(R.string.shake_key))) {
+            shakeToGetLetter = (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.preferences_default_true)));
+        } else if (key.equals(getString(R.string.animate_key))) {
+            animatePoints =(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.preferences_default_true)));
         }
-        for(int i=0; i<builder.size();i++){
-            if(builderLetterTypes.get(i)[0]==0){//from board
-                reduceScore = reduceScore + builder.get(i).getLetter_value();
-            }
-        }
-
-        return reduceScore;
     }
 
+
+    //TIMER METHODS
     public void enableCountDown(boolean enable) {
 
         if (enable) {
@@ -1179,16 +1156,10 @@ if(highScoreScreenSlideDialog!=null) {
         }.start();
     }
 
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
-        startActivity(new Intent(MainActivity.this, HomeActivity.class));
-        finish();
-
-    }
 
 
+    //FEATURES
+    //////SHARE
     public void shareScore(int score){
         String mimeType ="text/plain";
         String title = getString(R.string.share_score_title);
@@ -1203,46 +1174,19 @@ if(highScoreScreenSlideDialog!=null) {
                 .startChooser();
     }
 
-
-    public void openHighScoreDialog(){
-
-        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.crateInstance(countDownInd);
-        highScoreScreenSlideDialog.show(getSupportFragmentManager(),"Dialog Fragment");
-    }
-
-    public static DisplayMetrics getDeviceMetrics(Context context){
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-       windowManager.getDefaultDisplay().getMetrics(metrics);
-        return metrics;
-    }
-
-    //TODO CHANGE to get metrics once!
-    public static int getScreenHeightInPx(DisplayMetrics metrics) {
-        return metrics.heightPixels;
-    }
-
-    public static int getScreenWidthInPx(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(metrics);
-        return metrics.widthPixels;
-
-    }
-    public static int dpToPx(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
+   //////ANIMATION
     public void startPointAnimation(int score, String plusOrMinus){
-        pointsAnimation.setText(plusOrMinus+ String.valueOf(score));
-        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.animation);
-        animation.reset();
-        pointsAnimation.setY(mBuilderRecView.getY());
-        pointsAnimation.startAnimation(animation);
-        pointsAnimation.setVisibility(View.INVISIBLE);
+        if(animatePoints) {
+            pointsAnimation.setText(plusOrMinus + String.valueOf(score));
+            final Animation animation = AnimationUtils.loadAnimation(this, R.anim.animation);
+            animation.reset();
+            pointsAnimation.setY(mBuilderRecView.getY());
+            pointsAnimation.startAnimation(animation);
+            pointsAnimation.setVisibility(View.INVISIBLE);
+        }
     }
 
+    //////SHAKER
     public void shakeDetectorInit(){
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager
@@ -1263,39 +1207,15 @@ if(highScoreScreenSlideDialog!=null) {
     }
 
     public void handleShakeEvent(){
-
-        onGetLetter();
-        Log.i("fruit","shake");
-    }
-
-    public void onGetLetter() {
-        if (getLetter.getText().equals(getString(R.string.get_letter))) {
-
-            if (countDownInd != 0) {
-                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
-                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
-                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            if(countDownInd==1)//moderate mode
-            {
-                addLetterToBoard(MODERATE_GET_LETTER);
-                initalizeTimers=false;
-            }
-            else
-            addLetterToBoard(CLASSIC_GET_LETTER);
-
-            startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
-            mBoardAdapter.notifyDataSetChanged();
-            playerScore--; //reduce a point for each tile the user adds
-            mScore.setText(String.valueOf(playerScore));
-
+        if(shakeToGetLetter) {
+            onGetLetter();
+            Log.i("fruit", "shake");
         }
     }
+
+
+
+    //DEVICE METRICS and UI METHODS
 
     public void setDivider(){
         DividerItemDecoration divider;
@@ -1308,6 +1228,67 @@ if(highScoreScreenSlideDialog!=null) {
             divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_l));
         mBuilderRecView.addItemDecoration(divider);
     }
+    public static DisplayMetrics getDeviceMetrics(Context context){
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+        return metrics;
+    }
+
+    public static int dpToPx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+    public void setDeviceDimensions(){
+        Hawk.init(this).build();
+        if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
+            //save device metrics:
+            DisplayMetrics metrics = getDeviceMetrics(this);
+            Hawk.put(DEVICE_HEIGHT, metrics.heightPixels);
+            Hawk.put(DEVICE_WIDTH,  metrics.widthPixels);
+        }
+        else
+        {
+            deviceHeight = Hawk.get(DEVICE_HEIGHT);
+            deviceWidth  = Hawk.get(DEVICE_WIDTH);
+        }
+    }
+
+    private int setSpanForStaggered() {
+        //if(deviceHeight<1500)
+        //return  3;
+        if (deviceHeight<1750)
+            return 4;
+        else return 5;
+    }
+
+    private int setHeightForRV() {
+        if(deviceHeight<1500)
+            return dpToPx(this,60);
+        else if (deviceHeight<1750)
+            return  dpToPx(this,80);
+        else return  dpToPx(this,100);
+    }
+
+    private void setTimerSize(){
+        if(deviceHeight<1500)
+            countDownView.setTextSize(22);
+        else if (deviceHeight<1750)
+            countDownView.setTextSize(28);
+        else return;
+    }
+
+
+    //OTHERS
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+        finish();
+
+    }
+
 }
 
 

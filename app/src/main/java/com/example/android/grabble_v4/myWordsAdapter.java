@@ -66,16 +66,10 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
        holder.mList.addAll(myWords.get(position));
         holder.mBoardAdapter.notifyDataSetChanged();
         holder.isEnabled=true;
-        //mBoardAdapter notify change is on all letters in the word
-
-      //  holder.itemView.setLayoutParams(new StaggeredGridLayoutManager.LayoutParams(StaggeredGridLayoutManager.LayoutParams.FILL_PARENT,
-        //        StaggeredGridLayoutManager.LayoutParams.WRAP_CONTENT));
         int screenWidth = Hawk.get(MainActivity.DEVICE_WIDTH);
         int tileSize =(int) screenWidth/11;
         holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
-        //holder.itemView.setBackgroundColor(Color.RED);
-                // ((100*1.25)*holder.mList.size()+75);
-                //holder.mList.size()*100+(holder.mList.size()-1)*20+100;
+
     }
 
     @Override
@@ -92,7 +86,6 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
 
         public void mySetEnabled(boolean state){
-  //          eachWordRecView.setEnabled(state);
             isEnabled= state;
         }
 
@@ -104,10 +97,8 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
             setDivider();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
-
-            eachWordRecView.setLayoutManager(wordLayoutManager); //this prevents onClick to work!!
+            eachWordRecView.setLayoutManager(wordLayoutManager);
             mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView);
-
             eachWordRecView.setAdapter(mBoardAdapter);
 
         }
@@ -126,6 +117,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             }
        }
 
+       //add dividers between letters according to screen width
         public void setDivider(){
             int deviceWidth =Hawk.get(MainActivity.DEVICE_WIDTH);
             DividerItemDecoration divider;

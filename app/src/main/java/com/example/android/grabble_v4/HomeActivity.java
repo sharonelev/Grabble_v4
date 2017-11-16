@@ -26,23 +26,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private SingleLetter letterL =new SingleLetter("L",2,0);
     private SingleLetter letterE= new SingleLetter("E",1,0);
     private SingleLetter letterS =new SingleLetter("S",2,0);
-   // private SingleLetter letterE =new SingleLetter("E",1,0);
-    //public static int deviceHeight=2560;//default
-
     Handler myHandler= new Handler();
-   /* Runnable screenRun =new Runnable() {
-        @Override
-        public void run() {
-            endActivity();
-        }
-    };*/
 
-
+    //runnable per tile
     Runnable addI = new Runnable() {
         @Override
         public void run() {
-            //     mList.clear();
-            //    mWelcomeAdapter.notifyDataSetChanged();
             mList.set(0,letterI);
             mWelcomeAdapter.notifyDataSetChanged();
         }
@@ -100,11 +89,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager WelcomeLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(WelcomeLayoutManager);
         mList.add(letterI);
-  //      deviceHeight=measurments.getHeight(this);
         mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView);
         recyclerView.setAdapter(mWelcomeAdapter);
         recyclerView.setEnabled(false);
-   //     myHandler.postDelayed(screenRun,SPLASH_TIME_OUT);
         myHandler.postDelayed(addI,LETTER_TIME_OUT);
         myHandler.postDelayed(addS,LETTER_TIME_OUT*2);
         myHandler.postDelayed(addT ,LETTER_TIME_OUT*3);
@@ -114,8 +101,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        //SKIP tapped
-
+        //game choice
         switch (view.getId()) {
             case R.id.button_classic_game:
                 myHandler.removeCallbacksAndMessages(null);
@@ -132,7 +118,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
-
 
     public void endActivity(int gameType) {
         Intent homeIntent = new Intent(HomeActivity.this, MainActivity.class);

@@ -212,6 +212,7 @@
         android:paddingBottom="20dp"
         android:id="@+id/points_textview"
         android:text=""
+        android:textColor="#494949"
         android:fontFamily="sans-serif-condensed"
         android:layout_gravity="center_horizontal"
         android:textStyle="bold"

@@ -39,18 +39,12 @@ public class HighScoreFragment extends Fragment implements View.OnClickListener 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.high_score_scroll_view, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.high_score_scroll_view, container, false);
         int countDownInd = getArguments().getInt("gameType");
         mTitle = (TextView) rootView.findViewById(R.id.high_score_title);
         activityView = (View) rootView.findViewById(R.id.high_score_activity_layout);
         mTitle = (TextView) rootView.findViewById(R.id.high_score_title);
         scoresRecyclerView = (RecyclerView) rootView.findViewById(R.id.score_list_view);
-  ///      newGameButton = (Button) rootView.findViewById(R.id.new_game_in_high_score);
-//        newGameButton.setOnClickListener(this);
-     //   backButton = (Button) rootView.findViewById(R.id.back_to_game_in_high_score);
-       // backButton.setOnClickListener(this);
-
         setContent(countDownInd, rootView);
 
             return rootView;

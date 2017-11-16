@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <bool name="popup_default">true</bool>
-    <bool name="timer_default">false</bool>
+    <bool name="preferences_default_true">true</bool>
+
 </resources>

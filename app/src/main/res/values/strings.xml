@@ -1,32 +1,42 @@
 <resources>
+    <!--titles-->
     <string name="app_name">Tiles</string>
+    <string name="made_by">brought to you by SHA</string>
+    <string name="classic_high_score">My Classic Mode High Scores</string>
+    <string name="speedy_high_score">My Speedy Mode High Scores</string>
+    <string name="moderate_high_score">My Moderate Mode High Scores</string>
+    <string name="no_high_score">No High Scores Yet</string>
+    <string name="welcome">Let"'"s play</string>
+
+    <!--instructions-->
     <string name="instructions">Make 3 or more letter words by using letters from the board on top and from words you already created. A new word must contain at least one letter from the board. When reusing a word from your list you must use all of its letters. You may use several words to make a new one. Pluralising an existing word by only adding the letter "s" to the end is invalid.</string>
     <string name="score_instructions">After playing a word you will receive points according to the letter values in your word. If you reuse an existing word, you get to keep the points you got for the original word. 7 letter words or more will grant you with bonus points- 1 per letter! Requesting a tile from the bag or if your time runs up (on the speedy and monerate modes) will reduce a point from your score. At the end of the game you will lose points for the tiles left on the board according to their value.</string>
-    <string name="welcome">Let"'"s play</string>
+
+    <!--buttons-->
     <string name="get_letter">Get Letter</string>
     <string name="end_game">END GAME</string>
     <string name="share_move">SHARE</string>
+    <string name="new_game">NEW GAME</string>
+    <string name="classic_game">Classic Game</string>
+    <string name="moderate_game">Moderate Game</string>
+    <string name="speedy_game">Speedy Game</string>
+
+
+    <!--share-->
     <string name="share_score_title">"TILES"</string>
     <string name="share_score_1">"Check out my new High Score! I just made "</string>
     <string name="share_score_2">" points on TILES!"</string>
-    <string name="new_game">NEW GAME</string>
-    <string name="title_activity_high_score">HighScoreActivity</string>
-    <string name="title_speedy_activity_high_score">HighScoreSpeedyActivity</string>
-    <string name="title_moderate_activity_high_score">HighScoreModerateActivity</string>
+
+    <!-- preferences-->
+    <string name="animate_key">animate_key</string>
+    <string name="animate_label">Show points animation</string>
+    <string name="shake_key">shake_key</string>
+    <string name="shake_label">Shake to get letter</string>
     <string name="prefs_true">Shown</string>
     <string name="prefs_false">Hidden</string>
     <string name="pop_up_correct_key">pop_up_correct</string>
     <string name="pop_up_correct_label">Pop-up for correct word</string>
     <string name="pop_up_wrong_key">pop_up_wrong</string>
     <string name="pop_up_wrong_label">Pop-up for wrong word</string>
-    <string name="timer_pref_key">timer_key</string>
-    <string name="timer_pref_label">Timer- this will restart the game</string>
-    <string name="classic_game">Classic Game</string>
-    <string name="moderate_game">Moderate Game</string>
-    <string name="speedy_game">Speedy Game</string>
-    <string name="made_by">brought to you by SHA</string>
-    <string name="classic_high_score">My Classic Mode High Scores</string>
-    <string name="speedy_high_score">My Speedy Mode High Scores</string>
-    <string name="moderate_high_score">My Moderate Mode High Scores</string>
-    <string name="no_high_score">No High Scores Yet</string>
+
 </resources>

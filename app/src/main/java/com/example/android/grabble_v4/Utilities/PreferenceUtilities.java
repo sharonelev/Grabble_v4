@@ -29,7 +29,6 @@ import java.util.List;
 
 public class PreferenceUtilities {
 
-    // public static final String NEW_HIGH_SCORE = "new-high-score";
     public static final String HIGH_SCORE_LIST = "high-score-list";
     public static final String HIGH_SCORE_SPEEDY_LIST = "high-score-speedy-list";
     public static final String HIGH_SCORE_MODERATE_LIST = "high-score-moderate-list";

@@ -50,25 +50,21 @@ public static HighScoreScreenSlideDialog crateInstance(int gameType){
     return highScoreScreenSlideDialog;
 }
     public void onResume()
-    {
+    { //set size
         super.onResume();
         int screenHeight = Hawk.get(MainActivity.DEVICE_HEIGHT);
-
         Window window = getDialog().getWindow();
         window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT, (int) (screenHeight/1.5));
-        //window.setGravity(Gravity.CENTER);
-        //TODO:
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         View rootview = inflater.inflate(R.layout.high_score_view_pager,container,true);
         InkPageIndicator inkPageIndicator = (InkPageIndicator) rootview.findViewById(R.id.ink_indicator);
         mPager = (ViewPager) rootview.findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
         countDownInd=getArguments().getInt("gameType");
-  //      clickDialogInterface=getArguments().getParcelable("cdi");
         mPager.setAdapter(mPagerAdapter);
         inkPageIndicator.setViewPager(mPager);
         inkPageIndicator.bringToFront();
@@ -77,7 +73,6 @@ public static HighScoreScreenSlideDialog crateInstance(int gameType){
         newGameButton = (Button) rootview.findViewById(R.id.new_game_in_high_score);
         backButton.setOnClickListener(this);
         newGameButton.setOnClickListener(this);
-
         return rootview;
     }
 
@@ -88,13 +83,11 @@ public static HighScoreScreenSlideDialog crateInstance(int gameType){
         Log.i("dialog","any btn");
         switch (view.getId()) {
             case R.id.new_game_in_high_score:
-
                 Log.i("dialog", "new_game");
                 MainActivity mainActivity = (MainActivity) getActivity();
                 mainActivity.newGame();
         }
         getDialog().dismiss();
-
         }
 
     public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter{
