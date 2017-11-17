@@ -28,6 +28,7 @@ public class HighScoreScreenSlideDialog extends DialogFragment implements OnClic
      * The number of pages (wizard steps) to show in this demo.
      */
     private static final int NUM_PAGES = 3 ;
+    private static final String GAME_TYPE= "gameType";
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
@@ -42,10 +43,11 @@ public class HighScoreScreenSlideDialog extends DialogFragment implements OnClic
      */
     private PagerAdapter mPagerAdapter;
 
-public static HighScoreScreenSlideDialog crateInstance(int gameType){
+public static HighScoreScreenSlideDialog createInstance(int gameType){
+
     HighScoreScreenSlideDialog highScoreScreenSlideDialog = new HighScoreScreenSlideDialog();
     Bundle bundle = new Bundle();
-    bundle.putInt("gameType",gameType);
+    bundle.putInt(GAME_TYPE,gameType);
     highScoreScreenSlideDialog.setArguments(bundle);
     return highScoreScreenSlideDialog;
 }
@@ -64,7 +66,7 @@ public static HighScoreScreenSlideDialog crateInstance(int gameType){
         InkPageIndicator inkPageIndicator = (InkPageIndicator) rootview.findViewById(R.id.ink_indicator);
         mPager = (ViewPager) rootview.findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
-        countDownInd=getArguments().getInt("gameType");
+        countDownInd=getArguments().getInt(GAME_TYPE);
         mPager.setAdapter(mPagerAdapter);
         inkPageIndicator.setViewPager(mPager);
         inkPageIndicator.bringToFront();
@@ -101,7 +103,7 @@ public static HighScoreScreenSlideDialog crateInstance(int gameType){
         public Fragment getItem(int position) { //use position
             HighScoreFragment fragment = new HighScoreFragment();
             bundle=new Bundle();
-            bundle.putInt("gameType",position);
+            bundle.putInt(GAME_TYPE,position);
             fragment.setArguments(bundle);
             return fragment;
 

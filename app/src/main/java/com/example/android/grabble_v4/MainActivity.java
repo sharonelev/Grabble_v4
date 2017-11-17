@@ -24,16 +24,23 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.daasuu.bl.ArrowDirection;
+import com.daasuu.bl.BubbleLayout;
+import com.example.android.grabble_v4.Utilities.BubbleInstructions;
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
@@ -58,12 +65,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static android.view.View.GONE;
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+
 
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
         myWordsAdapter.ListWordClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        SharedPreferences.OnSharedPreferenceChangeListener
+{
 
     //RecyclerView elements
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
@@ -82,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements
     LinearLayoutManager BuilderLayoutManager;
     StaggeredGridLayoutManager myWordsStaggeredManager;
     HighScoreScreenSlideDialog highScoreScreenSlideDialog;
+
     //global values
     int playerScore;
     int lettersLeft;
@@ -122,6 +134,11 @@ public class MainActivity extends AppCompatActivity implements
     public static final String AFTER_PLAYED_WORD = "after_played_word";
     //others
     public final static int RESULT_CODE = 123;
+    //first time bubble instructions
+    public BubbleLayout bubbleLayout;
+    public TextView bubbleText;
+    public TextView bubbleX;
+
 
 
     // LIFE CYCLE EVENTS
@@ -150,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
 
-
         //UI elements initialization
         getLetter = (Button) findViewById(R.id.get_letter);
         playWord = (Button) findViewById(R.id.send_word);
@@ -175,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //game initialization
         newGame();
-
+        showBubbles();
         //HockeyApp
         checkForUpdates();
 
@@ -535,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
     }
-
 
 
     public class WordValidator extends AsyncTask<URL, Void, String>
@@ -1067,7 +1082,7 @@ if(highScoreScreenSlideDialog!=null) {
     }
     public void openHighScoreDialog(){
 
-        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.crateInstance(countDownInd);
+        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.createInstance(countDownInd);
         highScoreScreenSlideDialog.show(getSupportFragmentManager(),"Dialog Fragment");
     }
 
@@ -1119,7 +1134,7 @@ if(highScoreScreenSlideDialog!=null) {
         } else {
             getLetter.setEnabled(true);
             //gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
-            countDownView.setVisibility(View.GONE);
+            countDownView.setVisibility(GONE);
             if (countDownTimer != null)
                 countDownTimer.cancel();
         }
@@ -1288,6 +1303,76 @@ if(highScoreScreenSlideDialog!=null) {
         finish();
 
     }
+
+    //BUBBLE INSTRUCTIONS
+    //save in Hawk - did the user already have instructions - for 3 modes. have ifs for all 7 scenarios
+
+    //Create bubbles with design:
+
+    public void showBubbles(){
+
+//TODO add timer instructions for speedy and mod. make ifs if already saw each mode or other mode. start timer only after last dismiss.
+        final String bubble1= getString(R.string.bubble_on_board);
+        final String bubble2= getString(R.string.bubble_on_myWords);
+        final String bubble3= getString(R.string.classic_moderate_bubble_on_GetLetter);
+        final String bubble4= getString(R.string.bubble_to_score);
+        //1) bubble on board
+        bubbleLayout = (BubbleLayout)findViewById(R.id.bubble_layout);
+        bubbleLayout.setX(deviceWidth/2);
+        bubbleLayout.setY(mBoardRecView.getY());
+        bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
+        bubbleText = (TextView) findViewById(R.id.instruction_bubble);
+        bubbleText.setText(bubble1);
+        bubbleX = (TextView)findViewById(R.id.bubble_quit);
+
+        bubbleX.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String currentText = String.valueOf(bubbleText.getText());
+               if(currentText.equals(bubble1)){
+                    Log.i("onclick", "bubble");
+                   bubbleLayout.setArrowDirection(ArrowDirection.TOP);
+                    bubbleLayout.setX(mMyWordsRecView.getX()+20);
+                    bubbleLayout.setY(mMyWordsRecView.getY()+100);
+                    bubbleText.setText(bubble2);
+                }
+                else if(currentText.equals(bubble2)){
+                   Log.i("onclick", "bubble");
+                   bubbleLayout.setX(deviceWidth/2);
+                   bubbleLayout.setY(getLetter.getY()+50);
+                   bubbleText.setText(bubble3);
+
+               }
+               else if(currentText.equals(bubble3)){
+                   Log.i("onclick", "bubble");
+                   bubbleLayout.setX(mScore.getX());
+                   bubbleLayout.setY(mMyWordsRecView.getY());
+                   bubbleLayout.setForegroundGravity(Gravity.BOTTOM);
+                   bubbleText.setText(bubble4);
+                   bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
+
+               }
+               else if(currentText.equals(bubble4)){
+                Hawk.put("classic_brief",true);
+                bubbleLayout.setVisibility(GONE);
+               }
+
+            }
+        });
+
+       /* Handler myHandler= new Handler();
+        final BubbleInstructions bubbleInstructions = new BubbleInstructions().createInstance(getString(R.string.bubble_on_board),200,-550,"LEFT");
+        bubbleInstructions.show(getSupportFragmentManager(),"Dialog Fragment");*/
+
+    }
+
+
+
+    //bubble on myWords - or reuse words you already made
+    //classic and moderate bubble on GetLetter - if you're stuck you can get a letter and lose a point
+    //speedy bubble to timer - Every 5 seconds you will get a letter and lose a point, unless you make a word quicker
+    //moderate bubble to timer -Every 15 seconds you will get a letter and lose a point, unless you make a word
+    //bubble to score - 7 letter words and up will give you more points
 
 }
 
