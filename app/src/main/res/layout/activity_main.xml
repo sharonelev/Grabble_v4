@@ -26,9 +26,8 @@
             android:layout_centerHorizontal="true"
             android:background="@drawable/timer_border"
             android:gravity="center"
-            android:padding="12dp"
-
-            android:text="15"
+            android:padding="10dp"
+            android:text=""
             android:textColor="#fcb851"
             android:textSize="35sp"
             android:textStyle="bold"
@@ -113,7 +112,8 @@
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttons"
-            android:layout_marginTop="-1dp" />
+            android:layout_marginTop="-1dp"
+            />
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -228,10 +228,11 @@
         android:layout_marginTop="12dp"
         android:padding="8dp"
         app:bl_arrowDirection="top"
+        android:visibility="gone"
         app:bl_arrowHeight="16dp"
         app:bl_arrowPosition="12dp"
         app:bl_arrowWidth="16dp"
-        app:bl_bubbleColor="@android:color/holo_blue_light"
+        app:bl_bubbleColor="@color/colorInitial"
         app:bl_cornersRadius="16dp">
         <LinearLayout
             android:layout_width="wrap_content"
@@ -243,6 +244,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="18sp"
+            android:padding="5dp"
+            android:fontFamily="sans-serif-condensed"
             android:text="@string/bubble_on_myWords"
             />
         <TextView

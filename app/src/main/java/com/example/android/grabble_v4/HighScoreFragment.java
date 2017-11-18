@@ -61,8 +61,8 @@ public class HighScoreFragment extends Fragment implements View.OnClickListener 
     public void onClick(View view) {
         if (view.getId() == R.id.new_game_in_high_score) {
             Intent homeIntent = new Intent(getActivity(), MainActivity.class);
-            homeIntent.putExtra("Button_tapped", R.string.new_game);
-            getActivity().setResult(MainActivity.RESULT_CODE, homeIntent);
+            homeIntent.putExtra(MainActivity.BUTTON_TAPPED, R.string.new_game);
+            getActivity().setResult(MainActivity.RESULT_CODE_HIGH_SCORE_FRAGMENT, homeIntent);
             getActivity().finish();
 
         }

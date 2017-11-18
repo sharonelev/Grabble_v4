@@ -35,6 +35,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     int countDownInd; //0 = classic. 1=moderate. 2=speedy.
     long toEndTimer = 0;
     boolean initalizeTimers;
+    RelativeLayout scoreRelativeLayout;
     //preferences
     public boolean showCorrectPopUp;
     public boolean showWrongPopUp;
@@ -132,12 +134,16 @@ public class MainActivity extends AppCompatActivity implements
     public static final String TIME_UP = "time_up";
     public static final String CLASSIC_GET_LETTER = "get_letter";
     public static final String AFTER_PLAYED_WORD = "after_played_word";
-    //others
-    public final static int RESULT_CODE = 123;
+    //results from other activities
+    public final static int RESULT_CODE_HIGH_SCORE_FRAGMENT = 123;
+    public final static int RESULT_CODE_INSTRUCTIONS = 456;
+    public final static String BUTTON_TAPPED = "Button_tapped";
     //first time bubble instructions
     public BubbleLayout bubbleLayout;
     public TextView bubbleText;
     public TextView bubbleX;
+    public final static String SAW_BUBBLE_TOUR = "saw_bubble_tour";
+    public boolean showingBubblesFlag=false;
 
 
 
@@ -174,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements
         pBar = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mScore = (TextView) findViewById(R.id.score);
         mTiles = (TextView) findViewById(R.id.tiles_left);
+        scoreRelativeLayout = (RelativeLayout)findViewById(R.id.bottom_relative_layout);
         countDownView = (TextView) findViewById(R.id.linearTimer);
         //RecycleView reference
         mBoardRecView = (RecyclerView) findViewById(R.id.scrabble_letter_list);
@@ -191,7 +198,10 @@ public class MainActivity extends AppCompatActivity implements
 
         //game initialization
         newGame();
-        showBubbles();
+        boolean saw_bubbles=Hawk.get(SAW_BUBBLE_TOUR,false);
+        if(!saw_bubbles)
+            showBubbles();
+
         //HockeyApp
         checkForUpdates();
 
@@ -262,9 +272,14 @@ public class MainActivity extends AppCompatActivity implements
             gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
 
             if(countDownInd==1){
-                createTimer(getResources().getInteger(R.integer.timer_initial_moderate));}
+                createTimer(getResources().getInteger(R.integer.timer_initial_moderate));
+                countDownView.setText(getString(R.string.moderate_seconds));
+                }
             else    { //countDownInd==2
-                createTimer(getResources().getInteger(R.integer.timer_initial_speedy));}
+                createTimer(getResources().getInteger(R.integer.timer_initial_speedy));
+                countDownView.setText(getString(R.string.speedy_seconds));
+            }
+            //countdownind 1 and 2:
             enableCountDown(true);
             setTimerSize();
         }
@@ -365,6 +380,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onClick(View view) {
 
         switch (view.getId()) {
+            //TODO REMOVE AFTER TESTING and clickable in xml
+            case R.id.my_words_title:
+                showBubbles();
+                break;
+
             case R.id.get_letter: //get letter or end game or new game
                 if (getLetter.getText().equals(getResources().getString(R.string.new_game))) {
                     newGame();
@@ -987,6 +1007,7 @@ if(highScoreScreenSlideDialog!=null) {
         return series;
     }
 
+
     private void setEnableAll(boolean state) {
         if (countDownInd==2) {
             getLetter.setEnabled(false); //never possible in speedy mode
@@ -1037,7 +1058,7 @@ if(highScoreScreenSlideDialog!=null) {
             case  R.id.instructions_menu:
                 destinationActivity = Instructions.class;
                 intent = new Intent(context, destinationActivity);
-                startActivity(intent);
+                startActivityForResult(intent,RESULT_CODE_INSTRUCTIONS);
                 return true;
             case R.id.high_score_in_menu:
             openHighScoreDialog();
@@ -1071,13 +1092,19 @@ if(highScoreScreenSlideDialog!=null) {
         UpdateManager.unregister();
     }
 
-    //HIGH SCORE FRAGMENT METHODS
+    //GET RESULT
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_CODE && resultCode == RESULT_CODE) {
-            if (data.getIntExtra("Button_tapped", 0) == (R.string.new_game))
+        if (requestCode == RESULT_CODE_HIGH_SCORE_FRAGMENT && resultCode == RESULT_CODE_HIGH_SCORE_FRAGMENT) {
+            if (data.getIntExtra(BUTTON_TAPPED, 0) == (R.string.new_game))
                 newGame();
+        }
+        if (requestCode == RESULT_CODE_INSTRUCTIONS && resultCode == RESULT_CODE_INSTRUCTIONS) {
+            if(data.getIntExtra(BUTTON_TAPPED, 0)==(R.string.show_bbl_instructions)) {
+                showBubbles();
+
+            }
         }
     }
     public void openHighScoreDialog(){
@@ -1129,11 +1156,11 @@ if(highScoreScreenSlideDialog!=null) {
             countDownView.setVisibility(View.VISIBLE);
             if(countDownInd==2)
             {getLetter.setEnabled(false);}
+            //if(Hawk.get()) -- better off having func in bubble method
             countDownTimer.start();
-            //gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
+
         } else {
             getLetter.setEnabled(true);
-            //gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
             countDownView.setVisibility(GONE);
             if (countDownTimer != null)
                 countDownTimer.cancel();
@@ -1168,7 +1195,9 @@ if(highScoreScreenSlideDialog!=null) {
                     }
                 }
             }
-        }.start();
+        };
+        if(!showingBubblesFlag)
+            countDownTimer.start();
     }
 
 
@@ -1287,7 +1316,7 @@ if(highScoreScreenSlideDialog!=null) {
 
     private void setTimerSize(){
         if(deviceHeight<1500)
-            countDownView.setTextSize(22);
+            countDownView.setTextSize(26);
         else if (deviceHeight<1750)
             countDownView.setTextSize(28);
         else return;
@@ -1311,68 +1340,107 @@ if(highScoreScreenSlideDialog!=null) {
 
     public void showBubbles(){
 
+        showingBubblesFlag = true;
+        Log.i("method","show bubbles");
+        if(countDownInd!=0){
+            countDownTimer.cancel();
+        }
+        setEnableAll(false);
+
 //TODO add timer instructions for speedy and mod. make ifs if already saw each mode or other mode. start timer only after last dismiss.
         final String bubble1= getString(R.string.bubble_on_board);
         final String bubble2= getString(R.string.bubble_on_myWords);
         final String bubble3= getString(R.string.classic_moderate_bubble_on_GetLetter);
+        final String bubble3_1= getString(R.string.speedy_bubble_to_timer);
+        final String bubble3_2= getString(R.string.moderate_bubble_to_timer);
         final String bubble4= getString(R.string.bubble_to_score);
-        //1) bubble on board
+        final String bubble5= getString(R.string.bubble_final);
+
+        // bubble1 on board
         bubbleLayout = (BubbleLayout)findViewById(R.id.bubble_layout);
         bubbleLayout.setX(deviceWidth/2);
-        bubbleLayout.setY(mBoardRecView.getY());
+        bubbleLayout.setY(mBoardRecView.getY()-15);
         bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
         bubbleText = (TextView) findViewById(R.id.instruction_bubble);
         bubbleText.setText(bubble1);
+        bubbleText.setTextSize(18);
+        bubbleLayout.setVisibility(View.VISIBLE);
         bubbleX = (TextView)findViewById(R.id.bubble_quit);
-
         bubbleX.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String currentText = String.valueOf(bubbleText.getText());
                if(currentText.equals(bubble1)){
-                    Log.i("onclick", "bubble");
+                    Log.i("onclick", "bubble1");
                    bubbleLayout.setArrowDirection(ArrowDirection.TOP);
                     bubbleLayout.setX(mMyWordsRecView.getX()+20);
                     bubbleLayout.setY(mMyWordsRecView.getY()+100);
                     bubbleText.setText(bubble2);
                 }
-                else if(currentText.equals(bubble2)){
-                   Log.i("onclick", "bubble");
-                   bubbleLayout.setX(deviceWidth/2);
-                   bubbleLayout.setY(getLetter.getY()+50);
-                   bubbleText.setText(bubble3);
+
+               else if(currentText.equals(bubble2)){
+                   if(countDownInd<2) { //moderate or classic
+                       Log.i("onclick", "bubble3");
+                       bubbleLayout.setX(deviceWidth/2);
+                       bubbleLayout.setY(mBoardRecView.getY()+10);
+                      // bubbleLayout.setForegroundGravity(Gravity.BOTTOM);
+                       bubbleText.setText(bubble3);
+                       bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
+                   }
+                   else if(countDownInd==2){
+                       Log.i("onclick", "bubble3");
+                       bubbleText.setText(bubble3_1);
+                       bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
+                       bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
+                       bubbleLayout.setY(mBoardRecView.getY()+10);
+
+                   }
 
                }
-               else if(currentText.equals(bubble3)){
-                   Log.i("onclick", "bubble");
-                   bubbleLayout.setX(mScore.getX());
-                   bubbleLayout.setY(mMyWordsRecView.getY());
-                   bubbleLayout.setForegroundGravity(Gravity.BOTTOM);
+               else if(countDownInd==1 && currentText.equals(bubble3)){
+                    Log.i("onclick", "bubble3");
+                    bubbleText.setText(bubble3_2);
+                    bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
+                   bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
+                   bubbleLayout.setY(mBoardRecView.getY()+10);
+                }
+
+
+               else if((currentText.equals(bubble3) && countDownInd==0)|| currentText.equals(bubble3_1) || currentText.equals(bubble3_2)){
+                   Log.i("onclick", "bubble3 or 3_1 or 3_2");
                    bubbleText.setText(bubble4);
+                   bubbleLayout.setX(mMyWordsRecView.getX()+20);
+                   bubbleLayout.setY(scoreRelativeLayout.getY()-bubbleLayout.getHeight());
                    bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
 
+               } else if(currentText.equals(bubble4)){
+                   Log.i("onclick", "bubble4");
+                   bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
+                   //bubbleLayout.setX();
+                   bubbleLayout.setY(deviceHeight/2);
+                   bubbleText.setTextSize(50);
+                   bubbleLayout.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
+                   bubbleText.setText(bubble5);
                }
-               else if(currentText.equals(bubble4)){
-                Hawk.put("classic_brief",true);
+
+               else if(currentText.equals(bubble5)){
+                   Log.i("onclick", "bubble5");
+                Hawk.put(SAW_BUBBLE_TOUR,true);
                 bubbleLayout.setVisibility(GONE);
+                   if(countDownInd!=0) {
+                       countDownTimer.start();
+                   }
+                showingBubblesFlag=false;
+                setEnableAll(true);
+
                }
 
             }
         });
 
-       /* Handler myHandler= new Handler();
-        final BubbleInstructions bubbleInstructions = new BubbleInstructions().createInstance(getString(R.string.bubble_on_board),200,-550,"LEFT");
-        bubbleInstructions.show(getSupportFragmentManager(),"Dialog Fragment");*/
 
     }
 
-
-
-    //bubble on myWords - or reuse words you already made
-    //classic and moderate bubble on GetLetter - if you're stuck you can get a letter and lose a point
-    //speedy bubble to timer - Every 5 seconds you will get a letter and lose a point, unless you make a word quicker
-    //moderate bubble to timer -Every 15 seconds you will get a letter and lose a point, unless you make a word
-    //bubble to score - 7 letter words and up will give you more points
 
 }
 

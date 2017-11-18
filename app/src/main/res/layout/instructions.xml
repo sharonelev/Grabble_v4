@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp">
 <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="Tiles Instructions:"
+    android:text="TILES Instructions:"
     android:id="@+id/instructions_title"
     android:textStyle="bold"/>
     <TextView
@@ -30,5 +32,33 @@
         android:text="@string/score_instructions"
         android:id="@+id/score_instructions_text"
         />
+    <!--INSTRUCTION BUBBLES-->
+    <com.daasuu.bl.BubbleLayout
+        android:id="@+id/bubble_layout_instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:padding="8dp"
+        app:bl_arrowDirection="bottom"
+        app:bl_arrowHeight="16dp"
+        app:bl_arrowPosition="12dp"
+        android:layout_gravity="center_horizontal"
+        app:bl_arrowWidth="16dp"
+        android:clickable="true"
+        android:onClick="onClick"
+        app:bl_bubbleColor="@color/colorInitial"
+        app:bl_cornersRadius="16dp">
+
+            <TextView
+                android:id="@+id/get_bbl_instructions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:padding="5dp"
+                android:fontFamily="sans-serif-condensed"
+                android:text="@string/show_bbl_instructions"
+                />
+    </com.daasuu.bl.BubbleLayout>
 
 </LinearLayout>
