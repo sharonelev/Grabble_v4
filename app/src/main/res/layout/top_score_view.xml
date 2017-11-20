@@ -9,7 +9,7 @@
         android:id="@+id/date_time_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:textColor="#000000"
         android:paddingRight="35dp"
         android:paddingLeft="5dp"/>
 
@@ -17,6 +17,8 @@
         android:id="@+id/score_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#000000"
         android:textAlignment="center"
         android:paddingRight="15dp"/>
 </LinearLayout>

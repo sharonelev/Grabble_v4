@@ -47,7 +47,6 @@ public class HighScoreAdapter extends RecyclerView.Adapter<HighScoreAdapter.Scor
         int score = highScoreList.get(position).getScore();
         String dateTime = highScoreList.get(position).getScoreDate();
 
-
         holder.mDateTime.setText(dateTime);
         holder.mScore.setText(String.valueOf(score));
         holder.itemView.setBackgroundColor(Color.TRANSPARENT);

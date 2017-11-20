@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -74,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
         myWordsAdapter.ListWordClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        BoardAdapter.TileDimensions
 {
 
     //RecyclerView elements
@@ -104,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements
     long toEndTimer = 0;
     boolean initalizeTimers;
     RelativeLayout scoreRelativeLayout;
+    AsyncTask<URL, Void, String> checkWord;
     //preferences
     public boolean showCorrectPopUp;
     public boolean showWrongPopUp;
@@ -126,8 +130,15 @@ public class MainActivity extends AppCompatActivity implements
     //Device specs
     public static final String DEVICE_HEIGHT = "Device_Height_px";
     public static final String DEVICE_WIDTH = "Device_Width_px";
+    public static final String MYWORDS_HEIGHT = "my_words_height_px";
+    public static final String TILE_HEIGHT = "tile_height";
+    public static final String TILE_WIDTH = "tile_width";
     public int deviceHeight;
     public int deviceWidth;
+    public float myWordsHeight;
+    public int boardHeight;
+    public static int boardTileWidth;
+    public static  int boardTileHeight;
     //add letter to board sources
     public static final String NEW_GAME = "new_game";
     public static final String MODERATE_GET_LETTER = "moderate_mid_timer";
@@ -157,7 +168,8 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Intent homeScreen = getIntent();
         shakeDetectorInit();
-        setDeviceDimensions();
+
+
         gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
         initalizeTimers=false;
 
@@ -186,18 +198,26 @@ public class MainActivity extends AppCompatActivity implements
         mBoardRecView = (RecyclerView) findViewById(R.id.scrabble_letter_list);
         mBuilderRecView = (RecyclerView) findViewById(R.id.word_builder_list);
         mMyWordsRecView = (RecyclerView) findViewById(R.id.myWordsRecyclerView);
-
-        //Others
-        setDivider(); //dividers to builder RV
         pointsAnimation = (TextView) findViewById(R.id.points_textview);
+
+        //UI size adjustments
+        Hawk.init(this).build();
+        setDeviceDimensions();
+
+
+        setDivider(); //dividers to builder RV
+
 
         //Shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         setupSharedPreferences();
 
+
+
         //game initialization
         newGame();
+
         boolean saw_bubbles=Hawk.get(SAW_BUBBLE_TOUR,false);
         if(!saw_bubbles)
             showBubbles();
@@ -206,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements
         checkForUpdates();
 
     }
+
+
 
     @Override
     public void onResume() {
@@ -227,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onPause() {
         Log.i("lifecycleEvent","onPause");
         mSensorManager.unregisterListener(mShakeDetector);
+        stopWhileWordValidator();
         super.onPause();
         //Hockey App
         unregisterManagers();
@@ -236,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onStop() {
         Log.i("lifecycleEvent","onStop");
         super.onStop();
+        stopWhileWordValidator();
         if(countDownInd!=0) {        //in case a game with timer was stopped
             countDownTimer.cancel();
             getIntent().putExtra("timer", toEndTimer);
@@ -247,12 +271,24 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onDestroy() {
         Log.i("lifecycleEvent","onDestroy");
+        stopWhileWordValidator();
         super.onDestroy();
         //Hockey App
         unregisterManagers();
         /** Cleanup the shared preference listener **/
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    public void stopWhileWordValidator(){
+
+        if(checkWord!=null)
+            if(checkWord.getStatus().equals(AsyncTask.Status.RUNNING)){
+                checkWord.cancel(true);
+                pBar.setVisibility(View.INVISIBLE);
+                setEnableAll(true);
+                Log.i("onstop_pause_destroy","canceled async");
+            }
     }
 
 
@@ -287,14 +323,16 @@ public class MainActivity extends AppCompatActivity implements
         //Create managers
         BuilderLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         BuilderLayoutManager.setAutoMeasureEnabled(true);
-        myWordsStaggeredManager = new StaggeredGridLayoutManager(setSpanForStaggered(), StaggeredGridLayoutManager.HORIZONTAL);
-        myWordsStaggeredManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-        //set managers
-        mMyWordsRecView.setLayoutManager(myWordsStaggeredManager);
-        mBoardRecView.setLayoutManager(gridLayoutManager);
         mBuilderRecView.setLayoutManager(BuilderLayoutManager);
-        //changes per device metrics
-        mBoardRecView.getLayoutParams().height = setHeightForRV();
+
+        mBoardRecView.setLayoutManager(gridLayoutManager);
+        mBoardRecView.getLayoutParams().height = boardHeight;
+
+        myWordsStaggeredManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL); //4 as default
+                setSpanForStaggered();
+        myWordsStaggeredManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+               mMyWordsRecView.setLayoutManager(myWordsStaggeredManager);
+
         //element setups
         builderLetterTypes.clear();
         bag.clear();
@@ -320,10 +358,10 @@ public class MainActivity extends AppCompatActivity implements
         mScore.setText(String.valueOf(playerScore));
 
         //Create and set adapters
-        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list);
+        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list,this);
         mBoardRecView.setAdapter(mBoardAdapter);
 
-        mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list);
+        mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,null);
         mBuilderRecView.setAdapter(mBuilderAdapter);
 
         mWordsAdapter = new myWordsAdapter(this, myWords, this);
@@ -335,6 +373,17 @@ public class MainActivity extends AppCompatActivity implements
         if (lettersLeft == 0) {
             return;
         }
+
+        if (countDownInd != 0) {
+            if (board.size() == getBoardRows() * (getResources().getInteger(R.integer.tiles_on_board))) {
+                Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (board.size() == getBoardRows() * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
+                Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         RandomSelector randomSelector = new RandomSelector(bag);
         SingleLetter selectedLetter;
         selectedLetter = randomSelector.getRandom();
@@ -372,6 +421,7 @@ public class MainActivity extends AppCompatActivity implements
         if (lettersLeft == 0) {
             noLettersInBag();
         }
+
         return;
     }
 
@@ -380,10 +430,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onClick(View view) {
 
         switch (view.getId()) {
-            //TODO REMOVE AFTER TESTING and clickable in xml
-            case R.id.my_words_title:
-                showBubbles();
-                break;
 
             case R.id.get_letter: //get letter or end game or new game
                 if (getLetter.getText().equals(getResources().getString(R.string.new_game))) {
@@ -452,14 +498,6 @@ public class MainActivity extends AppCompatActivity implements
                 {
                    String wordToCheck=  wordList.get(wordToCheckIndex).getTheWord();
                     if((wordToCheck+"S").equals(spellCheckWord)){
-                  /*  if (builder.get(lastLetterIndex).getLetter_name().equals("S")) {
-                        for (i = 0; i < builderLetterTypes.size() - 1; i++) {
-                            if (builderLetterTypes.get(i)[0] == 0)
-                                break; //another letter is from board
-                            if (builderLetterTypes.get(i)[2] != i)
-                                break; //letter index in a different order
-                        }
-                        if (i == builderLetterTypes.size() - 1)//go to end without breaking*/
                         {
                             Toast.makeText(this, "You can't only pluralise a word", Toast.LENGTH_SHORT).show();
                             break;
@@ -487,12 +525,17 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
 
+                //TEST 6 - has internet connection
+                if(!isOnline()){
+                    Toast.makeText(this, "No internet connection, try again later", Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 //if TEST 1- 5 ARE ALL GOOD:
                 setEnableAll(false);
 
                 //WORD VALIDATOR
                 URL wordSearchURL = NetworkUtils.buildUrlCheckWord(spellCheckWord);
-                new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
+                checkWord= new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
                 break;
 
             case R.id.clear_word:
@@ -571,6 +614,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
     }
+
+
 
 
     public class WordValidator extends AsyncTask<URL, Void, String>
@@ -925,6 +970,13 @@ if(highScoreScreenSlideDialog!=null) {
     }
 
     //CORE ASSISTING METHODS
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        boolean returnOnline = (netInfo != null && netInfo.isConnected());
+        return returnOnline;
+
+    }
     public void noLettersInBag() {
         if (getLetter.getText() == getResources().getString(R.string.end_game)) {
             //not the first time counter became 0
@@ -937,23 +989,14 @@ if(highScoreScreenSlideDialog!=null) {
         Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
         return;
     }
-    public void onGetLetter() {
+    public void onGetLetter() { //tapped get letter
         if (getLetter.getText().equals(getString(R.string.get_letter))) {
-
-            if (countDownInd != 0) {
-                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board))) {
-                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                if (board.size() == 2 * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
-                    Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-                }
-            }
 
             if(countDownInd==1)//moderate mode
             {
-                addLetterToBoard(MODERATE_GET_LETTER);
                 initalizeTimers=false;
+                addLetterToBoard(MODERATE_GET_LETTER);
+
             }
             else
                 addLetterToBoard(CLASSIC_GET_LETTER);
@@ -1054,6 +1097,7 @@ if(highScoreScreenSlideDialog!=null) {
                 destinationActivity = HomeActivity.class;
                 intent = new Intent(context, destinationActivity);
                 startActivity(intent);
+                finish();
                 return true;
             case  R.id.instructions_menu:
                 destinationActivity = Instructions.class;
@@ -1227,6 +1271,7 @@ if(highScoreScreenSlideDialog!=null) {
             pointsAnimation.setY(mBuilderRecView.getY());
             pointsAnimation.startAnimation(animation);
             pointsAnimation.setVisibility(View.INVISIBLE);
+            pointsAnimation.bringToFront();
         }
     }
 
@@ -1251,7 +1296,7 @@ if(highScoreScreenSlideDialog!=null) {
     }
 
     public void handleShakeEvent(){
-        if(shakeToGetLetter) {
+        if(shakeToGetLetter && countDownInd!=2) {
             onGetLetter();
             Log.i("fruit", "shake");
         }
@@ -1264,10 +1309,11 @@ if(highScoreScreenSlideDialog!=null) {
     public void setDivider(){
         DividerItemDecoration divider;
         divider= new DividerItemDecoration(mBuilderRecView.getContext(),DividerItemDecoration.HORIZONTAL);
-        if(deviceWidth<800)
+       // if(dpToPx(this,deviceWidth)<800)
+        if(deviceWidth<400)
+      //      divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_s));
+       // else if(dpToPx(this,deviceWidth)<1000)
             divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_s));
-        else if(deviceWidth<1000)
-            divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_m));
         else
             divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_l));
         mBuilderRecView.addItemDecoration(divider);
@@ -1283,41 +1329,113 @@ if(highScoreScreenSlideDialog!=null) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+    public static int pxToDp(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+
+    @Override
+    public void getTileDimensions(int tileWidth, int tileHeight) {
+        boardTileHeight=tileHeight;
+        boardTileWidth=tileWidth;
+        setSpanForStaggered(); //after getting tile dimensions
+    }
+
+    private void getMyWordsHeight() {
+
+        if(!Hawk.contains(MYWORDS_HEIGHT))
+        {
+            mMyWordsRecView.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @SuppressWarnings("deprecation")
+                        @Override
+                        public void onGlobalLayout() {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                mMyWordsRecView.getViewTreeObserver()
+                                        .removeOnGlobalLayoutListener(this);
+                            } else {
+                                mMyWordsRecView.getViewTreeObserver()
+                                        .removeGlobalOnLayoutListener(this);
+                            }
+
+                            float tempMyWordsHeight = pxToDp(getBaseContext(), mMyWordsRecView.getMeasuredHeight());
+                            Hawk.put(MYWORDS_HEIGHT, tempMyWordsHeight);
+                            myWordsHeight=tempMyWordsHeight; //dp
+                            if(myWordsHeight>0)
+                            {
+                                setSpanForStaggered();
+                            }
+                        }
+                    });
+        }
+        else
+            myWordsHeight=Hawk.get(MYWORDS_HEIGHT);
+
+
+    }
+
     public void setDeviceDimensions(){
-        Hawk.init(this).build();
+
+        Hawk.delete(DEVICE_HEIGHT);//TODO REMOVE AFTER TESTING
+        Hawk.delete(DEVICE_WIDTH); //TODO REMOVE AFTER TESTING
+       // Hawk.delete(MYWORDS_HEIGHT); //TODO REMOVE AFTER TESTING
+
         if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
             //save device metrics:
             DisplayMetrics metrics = getDeviceMetrics(this);
-            Hawk.put(DEVICE_HEIGHT, metrics.heightPixels);
-            Hawk.put(DEVICE_WIDTH,  metrics.widthPixels);
+            Hawk.put(DEVICE_HEIGHT, pxToDp(this,metrics.heightPixels));
+            Hawk.put(DEVICE_WIDTH,  pxToDp(this,metrics.widthPixels));
+            deviceHeight = Hawk.get(DEVICE_HEIGHT);
+            deviceWidth  = Hawk.get(DEVICE_WIDTH);
         }
         else
         {
             deviceHeight = Hawk.get(DEVICE_HEIGHT);
             deviceWidth  = Hawk.get(DEVICE_WIDTH);
         }
+        setHeightForRV();
+        getMyWordsHeight();
     }
 
-    private int setSpanForStaggered() {
-        //if(deviceHeight<1500)
-        //return  3;
-        if (deviceHeight<1750)
+    private void setSpanForStaggered() {
+
+        if(Hawk.contains(MainActivity.TILE_HEIGHT) && Hawk.contains(MainActivity.TILE_WIDTH))
+        {
+            boardTileHeight = Hawk.get(TILE_HEIGHT);
+            boardTileWidth = Hawk.get(TILE_WIDTH);
+        }
+
+        if(myWordsHeight>0 && boardTileHeight>0) {
+        //    int j = dpToPx(getBaseContext(),myWordsHeight);
+            int tileHeightDp = pxToDp(this,boardTileHeight);
+            int spans = (int) Math.floor(myWordsHeight / tileHeightDp);
+            myWordsStaggeredManager.setSpanCount(spans);
+
+        }
+        return;
+  //  return
+     /*   if (deviceHeight<1750)
             return 4;
-        else return 5;
+        else return 5;*/
     }
 
-    private int setHeightForRV() {
-        if(deviceHeight<1500)
-            return dpToPx(this,60);
-        else if (deviceHeight<1750)
-            return  dpToPx(this,80);
-        else return  dpToPx(this,100);
+    private void setHeightForRV() {
+        if(deviceHeight<550) //check with nexus4
+           boardHeight= dpToPx(this,60); //enough for 1 tile
+        else if (deviceHeight<600)
+            boardHeight=  dpToPx(this,80); //1.5 tiles
+        else boardHeight=  dpToPx(this,100); //2 tiles
     }
 
+    private int getBoardRows() {
+     if (deviceHeight<600)
+            return  1;
+        else return 2;
+    }
     private void setTimerSize(){
-        if(deviceHeight<1500)
+        if(deviceHeight<550)
             countDownView.setTextSize(26);
-        else if (deviceHeight<1750)
+        else if (deviceHeight<600)
             countDownView.setTextSize(28);
         else return;
     }
@@ -1328,8 +1446,9 @@ if(highScoreScreenSlideDialog!=null) {
     public void onBackPressed()
     {
         super.onBackPressed();
-        startActivity(new Intent(MainActivity.this, HomeActivity.class));
         finish();
+        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+        return;
 
     }
 
@@ -1347,7 +1466,6 @@ if(highScoreScreenSlideDialog!=null) {
         }
         setEnableAll(false);
 
-//TODO add timer instructions for speedy and mod. make ifs if already saw each mode or other mode. start timer only after last dismiss.
         final String bubble1= getString(R.string.bubble_on_board);
         final String bubble2= getString(R.string.bubble_on_myWords);
         final String bubble3= getString(R.string.classic_moderate_bubble_on_GetLetter);
@@ -1358,14 +1476,17 @@ if(highScoreScreenSlideDialog!=null) {
 
         // bubble1 on board
         bubbleLayout = (BubbleLayout)findViewById(R.id.bubble_layout);
-        bubbleLayout.setX(deviceWidth/2);
-        bubbleLayout.setY(mBoardRecView.getY()-15);
         bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
         bubbleText = (TextView) findViewById(R.id.instruction_bubble);
         bubbleText.setText(bubble1);
         bubbleText.setTextSize(18);
+        bubbleLayout.setForegroundGravity(Gravity.NO_GRAVITY);
+
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleX = (TextView)findViewById(R.id.bubble_quit);
+        bubbleLayout.setX(deviceWidth/2-bubbleLayout.getWidth()/2);
+        bubbleLayout.setY(mBoardRecView.getY()-10);
+        bubbleLayout.bringToFront();
         bubbleX.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1417,7 +1538,7 @@ if(highScoreScreenSlideDialog!=null) {
                    Log.i("onclick", "bubble4");
                    bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
                    //bubbleLayout.setX();
-                   bubbleLayout.setY(deviceHeight/2);
+                   bubbleLayout.setY(dpToPx(getBaseContext(),deviceHeight/2));
                    bubbleText.setTextSize(50);
                    bubbleLayout.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
                    bubbleText.setText(bubble5);

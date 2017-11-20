@@ -89,7 +89,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager WelcomeLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(WelcomeLayoutManager);
         mList.add(letterI);
-        mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView);
+        mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView, null);
         recyclerView.setAdapter(mWelcomeAdapter);
         recyclerView.setEnabled(false);
         myHandler.postDelayed(addI,LETTER_TIME_OUT);

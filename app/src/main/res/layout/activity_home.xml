@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical"
-    android:background="@drawable/tile_pattern"
+    android:background="@drawable/bg7"
     android:foregroundGravity="center_horizontal|center"
     android:orientation="vertical"
     tools:context="com.example.android.grabble_v4.HomeActivity">
@@ -17,7 +17,7 @@
         android:layout_height="47dp"
         android:layout_marginLeft="0dp"
         android:text="@string/welcome"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/gray_title"
         android:textSize="40dp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="@id/rootView"

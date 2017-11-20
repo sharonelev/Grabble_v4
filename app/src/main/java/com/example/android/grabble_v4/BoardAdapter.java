@@ -13,10 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.grabble_v4.data.SingleLetter;
+import com.orhanobut.hawk.Hawk;
 
 import java.util.List;
 
@@ -32,27 +34,67 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     LetterClickListener mOnClickListener;
     int recyclerViewId;
     Context mContext;
+    int mTileWidth;
+    int mTileHeight;
+    TileDimensions tileDimensions;
 
 
     public interface LetterClickListener {
         void onLetterClick(int view_id, int clickedItemIndex);
     }
 
-    public BoardAdapter(Context context, List<SingleLetter> list, LetterClickListener listener, int recycler_id){
+    public interface TileDimensions{
+        void getTileDimensions(int tileWidth, int tileHeight);
+    }
+
+    public BoardAdapter(Context context, List<SingleLetter> list, LetterClickListener listener, int recycler_id, TileDimensions td){
         mBoard = list;
-      mOnClickListener =listener;
+        mOnClickListener =listener;
         recyclerViewId=recycler_id;
         mContext=context;
+        tileDimensions=td;
     };
+
+
     @Override
-    public LetterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public LetterViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
+        Hawk.init(mContext).build();
         Context context = parent.getContext();
         int layoutIdForListItem = R.layout.letter_on_board_view;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
-        View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
+        final View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         LetterViewHolder viewHolder = new LetterViewHolder(view);
+        if(tileDimensions!=null)
+            if(!Hawk.contains(MainActivity.TILE_HEIGHT) || !Hawk.contains(MainActivity.TILE_WIDTH))
+                    getTileDimensionsInit(view);
         return viewHolder;
+    }
+
+    private void getTileDimensionsInit(final View view) {
+         {
+            ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+            if (viewTreeObserver.isAlive()) {
+                viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            view.getViewTreeObserver()
+                                    .removeOnGlobalLayoutListener(this);
+                        } else {
+                            view.getViewTreeObserver()
+                                    .removeGlobalOnLayoutListener(this);
+                        }
+                        mTileHeight = view.getMeasuredHeight();
+                        mTileWidth = view.getMeasuredWidth();
+                        Hawk.put(MainActivity.TILE_HEIGHT,mTileHeight);
+                        Hawk.put(MainActivity.TILE_WIDTH,mTileWidth);
+                        tileDimensions.getTileDimensions(mTileWidth, mTileHeight);
+
+                    }
+                });
+            }
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -79,7 +121,8 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             if (numOfTiles <= 10 ){
                 holder.mLetter.setTextSize (28);
                 holder.mLetterValue.setTextSize(10);
-
+                holder.itemView.getLayoutParams().width=MainActivity.boardTileWidth;
+                holder.itemView.getLayoutParams().height=MainActivity.boardTileHeight;
             }
             else if (numOfTiles == 11) {
                 holder.mLetter.setTextSize(25);
@@ -102,9 +145,10 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.mLetterValue.setVisibility(View.VISIBLE);
                 holder.itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border));
                 holder.clickable(holder.itemView,1);
-
-
             }
+
+
+
     }
 
     @Override

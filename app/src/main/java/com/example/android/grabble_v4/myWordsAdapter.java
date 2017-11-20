@@ -66,8 +66,14 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
        holder.mList.addAll(myWords.get(position));
         holder.mBoardAdapter.notifyDataSetChanged();
         holder.isEnabled=true;
-        int screenWidth = Hawk.get(MainActivity.DEVICE_WIDTH);
-        int tileSize =(int) screenWidth/11;
+        int screenWidthDP=Hawk.get(MainActivity.DEVICE_WIDTH);
+        int screenWidthPX = MainActivity.dpToPx(mContext,screenWidthDP);
+        int tileSize;
+        //tile size incluudes spaces
+        if(screenWidthDP<400)
+            tileSize=(int) screenWidthPX/10;
+        else
+            tileSize=(int) screenWidthPX/11;
         holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
 
     }
@@ -98,7 +104,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             setDivider();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             eachWordRecView.setLayoutManager(wordLayoutManager);
-            mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView);
+            mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView,null);
             eachWordRecView.setAdapter(mBoardAdapter);
 
         }
@@ -119,13 +125,15 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
        //add dividers between letters according to screen width
         public void setDivider(){
-            int deviceWidth =Hawk.get(MainActivity.DEVICE_WIDTH);
+            int deviceWidthDP =Hawk.get(MainActivity.DEVICE_WIDTH);
+           //int deviceWidthPX = MainActivity.dpToPx(mContext,deviceWidthDP);
             DividerItemDecoration divider;
             divider= new DividerItemDecoration(eachWordRecView.getContext(),DividerItemDecoration.HORIZONTAL);
-            if(deviceWidth<800)
+           /* if(deviceWidthDP<400)
                 divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_s));
-            else if(deviceWidth<1000)
-                divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_m));
+            else */
+                if(deviceWidthDP<400)
+                divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_s));
             else
                 divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_l));
             eachWordRecView.addItemDecoration(divider);

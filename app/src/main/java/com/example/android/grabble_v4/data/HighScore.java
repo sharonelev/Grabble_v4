@@ -17,7 +17,7 @@ public class HighScore{
 
     public HighScore(int score){
         highScore=score;
-        scoreDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+        scoreDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(Calendar.getInstance().getTime());
     }
     public int getScore(){
         return highScore;
