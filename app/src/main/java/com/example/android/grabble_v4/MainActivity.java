@@ -1376,8 +1376,8 @@ if(highScoreScreenSlideDialog!=null) {
 
     public void setDeviceDimensions(){
 
-        Hawk.delete(DEVICE_HEIGHT);//TODO REMOVE AFTER TESTING
-        Hawk.delete(DEVICE_WIDTH); //TODO REMOVE AFTER TESTING
+        //Hawk.delete(DEVICE_HEIGHT);//TODO REMOVE AFTER TESTING
+        //Hawk.delete(DEVICE_WIDTH); //TODO REMOVE AFTER TESTING
        // Hawk.delete(MYWORDS_HEIGHT); //TODO REMOVE AFTER TESTING
 
         if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
