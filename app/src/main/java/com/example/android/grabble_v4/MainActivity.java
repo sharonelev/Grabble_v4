@@ -348,6 +348,9 @@ public class MainActivity extends AppCompatActivity implements
             myWords.clear();
             mWordsAdapter.notifyDataSetChanged();
         }
+        if(wordList.size()>0){
+            wordList.clear();
+        }
         LetterBag.createScrabbleSet(bag);
         for (int i = 0; i < 4; i++) {
             addLetterToBoard(NEW_GAME);
@@ -490,20 +493,30 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 //TEST 3 - only  pluralised
+
                 int i = 0;
                 int lastLetterIndex = builderLetterTypes.size() - 1;
-                int wordToCheckIndex =  builderLetterTypes.get(0)[1]; //first letter word index
-
-                if (builderLetterTypes.get(lastLetterIndex)[0] == 0 && builderLetterTypes.get(0)[0]==1)//last letter from board (0) and first letter from words
-                {
-                   String wordToCheck=  wordList.get(wordToCheckIndex).getTheWord();
-                    if((wordToCheck+"S").equals(spellCheckWord)){
-                        {
-                            Toast.makeText(this, "You can't only pluralise a word", Toast.LENGTH_SHORT).show();
+                if(builder.get(lastLetterIndex).getLetter_name()=="S") {
+                    int wordToCheckIndex = -1;
+                    while (i < builder.size()) {
+                        if (builderLetterTypes.get(i)[0] == 1) { //1=my words
+                            wordToCheckIndex = builderLetterTypes.get(i)[1]; // letter from mywords word index
                             break;
+                        }
+                        i++;
+                    }
+
+                    if (wordToCheckIndex > -1) {
+                        String wordToCheck = wordList.get(wordToCheckIndex).getTheWord();
+                        if ((wordToCheck + "S").equals(spellCheckWord)) {
+                            {
+                                Toast.makeText(this, "You can't only pluralise a word", Toast.LENGTH_SHORT).show();
+                                break;
+                            }
                         }
                     }
                 }
+
 
                 //TEST 4 - must add letters to existing word
                 int fromWordsCounter = 0;
