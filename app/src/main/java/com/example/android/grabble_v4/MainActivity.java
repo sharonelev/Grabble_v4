@@ -1484,7 +1484,7 @@ if(highScoreScreenSlideDialog!=null) {
 
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleX = (TextView)findViewById(R.id.bubble_quit);
-        bubbleLayout.setX(deviceWidth/2-bubbleLayout.getWidth()/2);
+        bubbleLayout.setX(boardTileWidth*5);
         bubbleLayout.setY(mBoardRecView.getY()-10);
         bubbleLayout.bringToFront();
         bubbleX.setOnClickListener(new View.OnClickListener() {

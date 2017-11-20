@@ -127,10 +127,14 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
             else if (numOfTiles == 11) {
                 holder.mLetter.setTextSize(25);
                 holder.mLetterValue.setTextSize(8);
+                holder.itemView.getLayoutParams().width=holder.itemView.getLayoutParams().WRAP_CONTENT;
+                holder.itemView.getLayoutParams().height=holder.itemView.getLayoutParams().WRAP_CONTENT;
             }
             else if ( numOfTiles >= 12) {
                 holder.mLetter.setTextSize(22);
                 holder.mLetterValue.setTextSize(7);
+                holder.itemView.getLayoutParams().width=holder.itemView.getLayoutParams().WRAP_CONTENT;
+                holder.itemView.getLayoutParams().height=holder.itemView.getLayoutParams().WRAP_CONTENT;
             }
         }
 
