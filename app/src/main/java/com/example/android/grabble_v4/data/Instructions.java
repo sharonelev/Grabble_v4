@@ -16,11 +16,13 @@ import com.example.android.grabble_v4.R;
 
 public class Instructions extends AppCompatActivity implements View.OnClickListener{
     /* Field to store our TextView */
-
+TextView bbl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.instructions);
+        bbl= (TextView) findViewById(R.id.get_bbl_instructions);
+        bbl.setText(R.string.show_bbl_instructions);
 
         /* Typical usage of findViewById... */
         //  mDisplayText = (TextView) findViewById(R.id.tv_display);

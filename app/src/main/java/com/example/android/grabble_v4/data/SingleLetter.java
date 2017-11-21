@@ -53,6 +53,9 @@ public class SingleLetter{
         this.letter_probability=letter_probability-1;
     }
 
+    public void increase_letter_probability(){
+        this.letter_probability=letter_probability+1;
+    }
 
 
 }

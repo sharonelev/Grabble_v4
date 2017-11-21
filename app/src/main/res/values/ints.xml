@@ -6,6 +6,7 @@
     <integer name="timer_initial_speedy">6000</integer>
     <integer name="timer_initial_moderate">16000</integer>
     <integer name="get_letter_points_loss">1</integer>
+    <integer name="tiles_start_replace">16</integer>
     
 
 </resources>

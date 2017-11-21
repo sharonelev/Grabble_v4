@@ -25,7 +25,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private SingleLetter letterI =new SingleLetter("I",1,0);
     private SingleLetter letterL =new SingleLetter("L",2,0);
     private SingleLetter letterE= new SingleLetter("E",1,0);
-    private SingleLetter letterS =new SingleLetter("S",2,0);
+    private SingleLetter letterS =new SingleLetter("S",1,0);
     Handler myHandler= new Handler();
 
     //runnable per tile

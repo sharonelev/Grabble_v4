@@ -9,11 +9,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -198,6 +201,20 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 Log.i("Board adpater", "onClick "+clickedPosition);
                 mOnClickListener.onLetterClick(recyclerViewId, clickedPosition);
             }
+        }
+
+        public String getLetterName(){
+            return (String) mLetter.getText();
+        }
+
+
+        public void dissolveAnimation(){
+            Log.i("animation_position",String.valueOf(getAdapterPosition()));
+            Log.i("board_size",String.valueOf(mBoard.size()));
+            final Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.animation);
+            animation.reset();
+            //itemView.setAnimation(animation);
+            itemView.startAnimation(animation);
         }
     }
 }

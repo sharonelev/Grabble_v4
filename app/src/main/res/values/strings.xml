@@ -2,11 +2,14 @@
         <!--titles-->
         <string name="app_name">Tiles</string>
         <string name="made_by">brought to you by SHA</string>
+        <string name="welcome">Let"'"s play</string>
+
+        <!--High Scores-->
         <string name="classic_high_score">My Classic Mode High Scores</string>
         <string name="speedy_high_score">My Speedy Mode High Scores</string>
         <string name="moderate_high_score">My Moderate Mode High Scores</string>
-        <string name="no_high_score">No High Scores Yet</string>
-        <string name="welcome">Let"'"s play</string>
+        <string name="no_high_score">No High Scores</string>
+
 
         <!--instructions-->
         <string name="instructions">Make 3 or more letter words by using letters from the board on top and from words you already created. A new word must contain at least one letter from the board. When reusing a word from your list you must use all of its letters. You may use several words to make a new one. Pluralising an existing word by only adding the letter "s" to the end is invalid.</string>
@@ -18,7 +21,7 @@
         <string name="moderate_bubble_to_timer">Every 15 seconds you \nwill get a letter \nand lose a point, \nunless you make a word</string>
         <string name="bubble_to_score">7 letter words and up \nwill give you more \npoints</string>
         <string name="bubble_final">GOOD LUCK</string>
-        <string name="show_bbl_instructions">Show bubble\ninstructions</string>
+        <string name="show_bbl_instructions"><u>Show bubble\ninstructions</u></string>
 
         <!--buttons-->
         <string name="get_letter">Get Letter</string>

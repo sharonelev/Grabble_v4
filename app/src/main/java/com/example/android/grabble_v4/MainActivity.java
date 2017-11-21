@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -66,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import static android.view.View.GONE;
@@ -106,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements
     int countDownInd; //0 = classic. 1=moderate. 2=speedy.
     long toEndTimer = 0;
     boolean initalizeTimers;
+    boolean replaceFlag=false;
     RelativeLayout scoreRelativeLayout;
     AsyncTask<URL, Void, String> checkWord;
     //preferences
@@ -297,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements
         //create bag
         game_limit = getResources().getInteger(R.integer.tiles_in_game);
         lettersLeft = game_limit;
-
+        replaceFlag=false;
         setEnableAll(true);
 
         if(countDownInd==0) {
@@ -377,26 +381,22 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        if (countDownInd != 0) {
-            if (board.size() == getBoardRows() * (getResources().getInteger(R.integer.tiles_on_board))) {
-                Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
+        if(board.size()==getResources().getInteger(R.integer.tiles_start_replace))
+        {
+            replaceTile();
+               }
+        else {
+            RandomSelector randomSelector = new RandomSelector(bag);
+            SingleLetter selectedLetter;
+            selectedLetter = randomSelector.getRandom();
+            //reduce from bag
+            for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
+                if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
+                    bag.get(j).reduce_letter_probability();
+                }
             }
-        } else {
-            if (board.size() == getBoardRows() * (getResources().getInteger(R.integer.tiles_on_board_no_timer))) {
-                Toast.makeText(getApplicationContext(), "The board is full, scroll to see more letters", Toast.LENGTH_SHORT).show();
-            }
+            board.add(selectedLetter);
         }
-
-        RandomSelector randomSelector = new RandomSelector(bag);
-        SingleLetter selectedLetter;
-        selectedLetter = randomSelector.getRandom();
-        //reduce from bag
-        for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
-            if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
-                bag.get(j).reduce_letter_probability();
-            }
-        }
-        board.add(selectedLetter);
         lettersLeft--;
         mTiles.setText(String.valueOf(lettersLeft));
 
@@ -510,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements
                         String wordToCheck = wordList.get(wordToCheckIndex).getTheWord();
                         if ((wordToCheck + "S").equals(spellCheckWord)) {
                             {
-                                Toast.makeText(this, "You can't only pluralise a word", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "You can't pluralise a word", Toast.LENGTH_SHORT).show();
                                 break;
                             }
                         }
@@ -1009,13 +1009,15 @@ if(highScoreScreenSlideDialog!=null) {
             {
                 initalizeTimers=false;
                 addLetterToBoard(MODERATE_GET_LETTER);
-
             }
             else
                 addLetterToBoard(CLASSIC_GET_LETTER);
 
             startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
-            mBoardAdapter.notifyDataSetChanged();
+          if(!replaceFlag) {
+              mBoardAdapter.notifyDataSetChanged();
+              replaceFlag = false;
+          }
             playerScore--; //reduce a point for each tile the user adds
             mScore.setText(String.valueOf(playerScore));
 
@@ -1087,8 +1089,6 @@ if(highScoreScreenSlideDialog!=null) {
             }
         }
     }
-
-
 
     //MENU METHODS
     @Override
@@ -1388,10 +1388,14 @@ if(highScoreScreenSlideDialog!=null) {
     }
 
     public void setDeviceDimensions(){
+//TODO REMOVE AFTER TESTING:
+/*        Hawk.delete(DEVICE_HEIGHT);
+        Hawk.delete(DEVICE_WIDTH);
+        Hawk.delete(MYWORDS_HEIGHT);
+        Hawk.delete(SAW_BUBBLE_TOUR);
+        Hawk.delete(TILE_WIDTH);
+        Hawk.delete(TILE_HEIGHT);*/
 
-        //Hawk.delete(DEVICE_HEIGHT);//TODO REMOVE AFTER TESTING
-        //Hawk.delete(DEVICE_WIDTH); //TODO REMOVE AFTER TESTING
-       // Hawk.delete(MYWORDS_HEIGHT); //TODO REMOVE AFTER TESTING
 
         if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
             //save device metrics:
@@ -1497,8 +1501,11 @@ if(highScoreScreenSlideDialog!=null) {
 
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleX = (TextView)findViewById(R.id.bubble_quit);
+        if(boardTileWidth>0)
         bubbleLayout.setX(boardTileWidth*5);
-        bubbleLayout.setY(mBoardRecView.getY()-10);
+        else
+            bubbleLayout.setX(deviceWidth-bubbleLayout.getWidth());
+        bubbleLayout.setY(0-10);
         bubbleLayout.bringToFront();
         bubbleX.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1571,11 +1578,103 @@ if(highScoreScreenSlideDialog!=null) {
 
             }
         });
-
-
     }
 
 
+    public void replaceTile(){
+
+        AlphaAnimation anim = new AlphaAnimation(1.0f, 0.0f);
+        anim.setDuration(750);
+        Toast.makeText(getApplicationContext(), "You have reached the tile limit on board. Letters will be replaced randomly.", Toast.LENGTH_SHORT).show();
+        final Handler myHandler= new Handler();
+        Random rand = new Random();
+        final SingleLetter letterToReplace;
+        final int toRemove = rand.nextInt(getResources().getInteger(R.integer.tiles_start_replace));
+        Log.i("letter_remove",String.valueOf(toRemove));
+
+
+        if(board.get(toRemove).getLetter_name().equals("")){
+            int i;
+        for (i=0; i<builderLetterTypes.size(); i++) //find the tile on the board
+            {
+            if(builderLetterTypes.get(i)[0]==0
+                    && builderLetterTypes.get(i)[2]==toRemove) {//from board and letter index from board equals toRemove
+                break;
+                }
+            }
+            letterToReplace= builder.get(i);
+            View letterView = mBuilderRecView.getChildAt(i);
+            replaceFlag=true;
+            letterView.startAnimation(anim);
+            final int builderRemove=i;
+            anim.setAnimationListener(new Animation.AnimationListener() {
+                public void onAnimationStart(Animation a) {}
+                public void onAnimationRepeat(Animation a) {}
+                public void onAnimationEnd(Animation a) {
+                    myHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            board.remove(toRemove);    //replaces place holder
+                            builder.remove(builderRemove);
+                            builderLetterTypes.remove(builderRemove);
+                            addReplacer(letterToReplace, toRemove);
+                            mBuilderAdapter.notifyDataSetChanged();
+                            mBoardAdapter.notifyDataSetChanged();
+                        }
+                    }, 10); //wait until animation ends
+                }
+            });
+
+        } else
+
+            {
+            letterToReplace = board.get(toRemove);
+            View letterView = mBoardRecView.getChildAt(toRemove);
+                replaceFlag=true;
+
+            letterView.startAnimation(anim);
+    anim.setAnimationListener(new Animation.AnimationListener(){
+    public void onAnimationStart(Animation a){}
+    public void onAnimationRepeat(Animation a){}
+    public void onAnimationEnd(Animation a){
+        myHandler.postDelayed(new Runnable(){
+            @Override
+            public void run()
+            {
+                board.remove(toRemove); //replaces tile
+                addReplacer(letterToReplace,toRemove);
+                mBoardAdapter.notifyDataSetChanged();
+            }
+        }, 10);//wait until animation ends
+    }
+
+});
+
+
+        }
+
+
+    }
+    private void addReplacer(SingleLetter oldLetter, int replaceIndex) {
+        RandomSelector randomSelector = new RandomSelector(bag);
+        SingleLetter selectedLetter;
+        selectedLetter = randomSelector.getRandom();
+        while (selectedLetter.getLetter_name().equals(oldLetter.getLetter_name()))
+            selectedLetter = randomSelector.getRandom();
+        board.add(replaceIndex, selectedLetter);
+        //reduce new letter from bag
+        for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
+            if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
+                bag.get(j).reduce_letter_probability();
+            }
+        }
+        //increase old letter in bag
+        for (int j = 0; j < bag.size(); j++) { //find letter to increase probability from bag
+            if (bag.get(j).letter_name.equals(oldLetter.letter_name)) {
+                bag.get(j).increase_letter_probability();
+            }
+        }
+    }
 }
 
 
