@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -49,6 +52,7 @@ import com.example.android.grabble_v4.Utilities.BubbleInstructions;
 import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
+import com.example.android.grabble_v4.data.DictionaryDbHelper;
 import com.example.android.grabble_v4.data.Instructions;
 import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.SendFeedback;
@@ -112,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements
     boolean replaceFlag=false;
     RelativeLayout scoreRelativeLayout;
     AsyncTask<URL, Void, String> checkWord;
+    public SQLiteDatabase dictionaryDb;
+    DictionaryDbHelper dbHelper;
+
     //preferences
     public boolean showCorrectPopUp;
     public boolean showWrongPopUp;
@@ -172,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Intent homeScreen = getIntent();
         shakeDetectorInit();
+        //dbHelper = new DictionaryDbHelper(this);
+        attachDB();
 
 
         gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
@@ -549,6 +558,12 @@ public class MainActivity extends AppCompatActivity implements
                 //WORD VALIDATOR
                 URL wordSearchURL = NetworkUtils.buildUrlCheckWord(spellCheckWord);
                 checkWord= new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
+                if(wordInDictionary(spellCheckWord)){
+                    Toast.makeText(this,"word is valid- sql",Toast.LENGTH_LONG).show();
+                }
+                else
+                    Toast.makeText(this,"word is not valid- sql",Toast.LENGTH_LONG).show();
+
                 break;
 
             case R.id.clear_word:
@@ -650,8 +665,13 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         protected String doInBackground(URL... params) {
-            URL searchUrl = params[0];
+
+            boolean valid;
+
+
             String wordValidateResults = null;
+
+            URL searchUrl = params[0];
             try {
                 wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
 
@@ -945,6 +965,43 @@ if(highScoreScreenSlideDialog!=null) {
         mScore.setText(String.valueOf(playerScore));
     }
 
+public void attachDB(){
+        dbHelper = new DictionaryDbHelper(this);
+        try {
+            dbHelper.createDataBase();
+
+        } catch (IOException ioe) {
+
+            throw new Error("Unable to create database");
+        }
+
+        try {
+            dbHelper.openDataBase();
+           // dbHelper.get_table();
+
+        }catch(SQLException sqle){
+
+            throw sqle;
+        }
+
+    //dictionaryDb = dbHelper.getReadableDatabase();
+    //Cursor c = dictionaryDb.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+    //Log.i("table names",c.getString(0));
+/*    Cursor cursor=dictionaryDb.query(
+            "dict_3_letter_words",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+    );*/
+
+    }
+
+    public boolean wordInDictionary(String word){
+       return dbHelper.check_word(word);
+    }
 
     public String parseWordResult(String xmlString) throws IOException {
 
@@ -1015,7 +1072,7 @@ if(highScoreScreenSlideDialog!=null) {
 
             startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
           if(!replaceFlag) {
-              mBoardAdapter.notifyDataSetChanged();
+              mBoardAdapter.notifyDataSetChanged(); //if replace flag notify occurs in runnable
               replaceFlag = false;
           }
             playerScore--; //reduce a point for each tile the user adds
