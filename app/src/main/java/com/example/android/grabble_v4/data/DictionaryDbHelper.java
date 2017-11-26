@@ -128,21 +128,12 @@ public class DictionaryDbHelper extends SQLiteOpenHelper {
         boolean valid=false;
 
         int numberOfLetters = word.length();
+        if(numberOfLetters>14)
+            numberOfLetters=15; //table includes 15 and more letter words
         String TABLE_NAME = "dict_"+numberOfLetters+"_letter_words";
         String[] COLUMN_NAME={"word"};
-        String[] to_search = new String[] { word };
-        // dictionaryDb = dbHelper.getReadableDatabase();
 
        Cursor cursor = dictionaryDB.rawQuery("SELECT word FROM "+ TABLE_NAME + " WHERE word = ? COLLATE NOCASE", new String[] { word });
-   /*     Cursor cursor=dictionaryDB.query(
-                TABLE_NAME,
-                COLUMN_NAME,
-                "word=?",
-                new String[] { word },
-                null,
-                null,
-                null
-        );*/
 
         String value="";
         if (cursor.moveToFirst()){

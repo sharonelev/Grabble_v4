@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
@@ -40,7 +38,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -48,8 +45,6 @@ import android.widget.Toast;
 
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
-import com.example.android.grabble_v4.Utilities.BubbleInstructions;
-import com.example.android.grabble_v4.Utilities.NetworkUtils;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
 import com.example.android.grabble_v4.data.DictionaryDbHelper;
@@ -67,7 +62,6 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -76,7 +70,6 @@ import java.util.Random;
 import java.util.Set;
 
 import static android.view.View.GONE;
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -115,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements
     boolean initalizeTimers;
     boolean replaceFlag=false;
     RelativeLayout scoreRelativeLayout;
-    AsyncTask<URL, Void, String> checkWord;
+    AsyncTask<String, Void, Boolean> checkWord;
     public SQLiteDatabase dictionaryDb;
     DictionaryDbHelper dbHelper;
 
@@ -300,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements
                 checkWord.cancel(true);
                 pBar.setVisibility(View.INVISIBLE);
                 setEnableAll(true);
-                Log.i("onstop_pause_destroy","canceled async");
+                Log.i("on_stop_pause_destroy","canceled async");
             }
     }
 
@@ -556,13 +549,9 @@ public class MainActivity extends AppCompatActivity implements
                 setEnableAll(false);
 
                 //WORD VALIDATOR
-                URL wordSearchURL = NetworkUtils.buildUrlCheckWord(spellCheckWord);
-                checkWord= new WordValidator(spellCheckWord, addScore).execute(wordSearchURL);
-                if(wordInDictionary(spellCheckWord)){
-                    Toast.makeText(this,"word is valid- sql",Toast.LENGTH_LONG).show();
-                }
-                else
-                    Toast.makeText(this,"word is not valid- sql",Toast.LENGTH_LONG).show();
+               // URL wordSearchURL = NetworkUtils.buildUrlCheckWord(spellCheckWord);
+                checkWord= new WordValidator(addScore).execute(spellCheckWord);
+
 
                 break;
 
@@ -645,81 +634,54 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-    public class WordValidator extends AsyncTask<URL, Void, String>
-
+     public class WordValidator extends AsyncTask<String, Void, Boolean>
     {
         String checkWord;
         int tempScore;
 
-        public WordValidator(String aWord, int tempAddScore) {
-            checkWord = aWord;
+        public WordValidator(int tempAddScore) {
+           // checkWord = aWord;
             tempScore = tempAddScore;
         }
+
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             pBar.setVisibility(View.VISIBLE); //progress bar
         }
-
         @Override
-        protected String doInBackground(URL... params) {
+        protected Boolean doInBackground(String... strings) {
 
-            boolean valid;
-
-
-            String wordValidateResults = null;
-
-            URL searchUrl = params[0];
-            try {
-                wordValidateResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return wordValidateResults;
+            checkWord=strings[0];
+            return dbHelper.check_word(checkWord);
         }
 
         @Override
-        protected void onPostExecute(String wordValidateResults) {
-            if(wordValidateResults==null){
+        protected void onPostExecute(Boolean valid) {
+            if(valid==null){
                 Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
                 setEnableAll(true);
                 pBar.setVisibility(View.INVISIBLE);
                 return;
             }
 
-            super.onPostExecute(wordValidateResults);
+            super.onPostExecute(valid);
 
             pBar.setVisibility(View.INVISIBLE);
-            String valid = null;
 
-            if(wordValidateResults.equals("timeout")){
-                Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
-                setEnableAll(true);
-                return;
-            }
-            try {
-                valid = parseWordResult(wordValidateResults);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d("valid", "did not get valid result");
-            }
 
          //  valid="1"; //TODO REMVOE AFTER TESTING
-            {
 
-                if (valid.equals("0")) {
-                    // wordReview.setText(wordValidateResults);
+
+                if (!valid) {
                     if (showWrongPopUp)
                         dialogWrongWord(checkWord);
                     else {
                         Toast.makeText(getApplicationContext(), checkWord + " is not a valid word", Toast.LENGTH_LONG).show();
                         setEnableAll(true);
                     }
-                } else if (valid.equals("1")) {
+                } else if (valid) {
                     if (countDownInd != 0) {
                         countDownTimer.cancel();
                     }
@@ -728,11 +690,8 @@ public class MainActivity extends AppCompatActivity implements
                     else {
                         afterDialogSuccess(tempScore);
                     }
-                } else  if(valid.equals("")){
-                    Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
-                    setEnableAll(true);
                 }
-            }
+
         }
     }
 
@@ -779,6 +738,91 @@ public class MainActivity extends AppCompatActivity implements
         mBuilderAdapter.notifyDataSetChanged();
         mWordsAdapter.notifyDataSetChanged();
     }
+
+
+    public void replaceTile(){
+
+        //AlphaAnimation anim = new AlphaAnimation(1.0f, 0.0f);
+        final Animation anim = AnimationUtils.loadAnimation(this, R.anim.animation_shrink);
+        //anim.setDuration(200);
+        Toast.makeText(getApplicationContext(), "You have reached the tile limit on board. Letters will be replaced randomly.", Toast.LENGTH_SHORT).show();
+        final Handler myHandler= new Handler();
+        Random rand = new Random();
+        final SingleLetter letterToReplace;
+        final int toRemove = rand.nextInt(getResources().getInteger(R.integer.tiles_start_replace));
+        final boolean onBuilder;
+        final int builderRemove;
+        final View letterView;
+        Log.i("letter_remove",String.valueOf(toRemove));
+        setEnableAll(false);
+
+        if(board.get(toRemove).getLetter_name().equals("")) {
+            int i;
+            for (i = 0; i < builderLetterTypes.size(); i++) //find the tile on the builder
+            {
+                if (builderLetterTypes.get(i)[0] == 0
+                        && builderLetterTypes.get(i)[2] == toRemove) {//from board and letter index from board equals toRemove
+                    break;
+                }
+            }
+            letterToReplace = builder.get(i);
+            letterView = mBuilderRecView.getChildAt(i);
+            builderRemove = i;
+            onBuilder=true;
+
+        } else {
+            builderRemove=0;
+            letterView = mBoardRecView.getChildAt(toRemove);
+            letterToReplace = board.get(toRemove);
+            onBuilder=false;
+        }
+
+        letterView.startAnimation(anim);
+        replaceFlag=true;
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation a) {}
+            public void onAnimationRepeat(Animation a) {}
+            public void onAnimationEnd(Animation a) {
+                myHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(onBuilder)
+                        {
+                            builder.remove(builderRemove);
+                            builderLetterTypes.remove(builderRemove);
+                            mBuilderAdapter.notifyDataSetChanged();
+                        }
+                        //for both cases:
+                        board.remove(toRemove);    //if on builder replaces place holder, otherwise removes tile
+                        addReplacer(letterToReplace, toRemove);
+                        mBoardAdapter.notifyDataSetChanged();
+                        setEnableAll(true);
+                    }
+                }, 5); //wait until animation ends/ otherwise causes bugs
+            }
+        });
+    }
+    private void addReplacer(SingleLetter oldLetter, int replaceIndex) {
+        RandomSelector randomSelector = new RandomSelector(bag);
+        SingleLetter selectedLetter;
+        selectedLetter = randomSelector.getRandom();
+        while (selectedLetter.getLetter_name().equals(oldLetter.getLetter_name()))
+            selectedLetter = randomSelector.getRandom();
+        board.add(replaceIndex, selectedLetter);
+        //reduce new letter from bag
+        for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
+            if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
+                bag.get(j).reduce_letter_probability();
+            }
+        }
+        //increase old letter in bag
+        for (int j = 0; j < bag.size(); j++) { //find letter to increase probability from bag
+            if (bag.get(j).letter_name.equals(oldLetter.letter_name)) {
+                bag.get(j).increase_letter_probability();
+            }
+        }
+    }
+
 
     public void dialogWrongWord(String word) {
         new AlertDialog.Builder(this).setTitle("TOO BAD")
@@ -984,24 +1028,9 @@ public void attachDB(){
             throw sqle;
         }
 
-    //dictionaryDb = dbHelper.getReadableDatabase();
-    //Cursor c = dictionaryDb.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-    //Log.i("table names",c.getString(0));
-/*    Cursor cursor=dictionaryDb.query(
-            "dict_3_letter_words",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-    );*/
-
     }
 
-    public boolean wordInDictionary(String word){
-       return dbHelper.check_word(word);
-    }
+
 
     public String parseWordResult(String xmlString) throws IOException {
 
@@ -1638,100 +1667,6 @@ public void attachDB(){
     }
 
 
-    public void replaceTile(){
-
-        AlphaAnimation anim = new AlphaAnimation(1.0f, 0.0f);
-        anim.setDuration(750);
-        Toast.makeText(getApplicationContext(), "You have reached the tile limit on board. Letters will be replaced randomly.", Toast.LENGTH_SHORT).show();
-        final Handler myHandler= new Handler();
-        Random rand = new Random();
-        final SingleLetter letterToReplace;
-        final int toRemove = rand.nextInt(getResources().getInteger(R.integer.tiles_start_replace));
-        Log.i("letter_remove",String.valueOf(toRemove));
-
-
-        if(board.get(toRemove).getLetter_name().equals("")){
-            int i;
-        for (i=0; i<builderLetterTypes.size(); i++) //find the tile on the board
-            {
-            if(builderLetterTypes.get(i)[0]==0
-                    && builderLetterTypes.get(i)[2]==toRemove) {//from board and letter index from board equals toRemove
-                break;
-                }
-            }
-            letterToReplace= builder.get(i);
-            View letterView = mBuilderRecView.getChildAt(i);
-            replaceFlag=true;
-            letterView.startAnimation(anim);
-            final int builderRemove=i;
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation a) {}
-                public void onAnimationRepeat(Animation a) {}
-                public void onAnimationEnd(Animation a) {
-                    myHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.remove(toRemove);    //replaces place holder
-                            builder.remove(builderRemove);
-                            builderLetterTypes.remove(builderRemove);
-                            addReplacer(letterToReplace, toRemove);
-                            mBuilderAdapter.notifyDataSetChanged();
-                            mBoardAdapter.notifyDataSetChanged();
-                        }
-                    }, 10); //wait until animation ends
-                }
-            });
-
-        } else
-
-            {
-            letterToReplace = board.get(toRemove);
-            View letterView = mBoardRecView.getChildAt(toRemove);
-                replaceFlag=true;
-
-            letterView.startAnimation(anim);
-    anim.setAnimationListener(new Animation.AnimationListener(){
-    public void onAnimationStart(Animation a){}
-    public void onAnimationRepeat(Animation a){}
-    public void onAnimationEnd(Animation a){
-        myHandler.postDelayed(new Runnable(){
-            @Override
-            public void run()
-            {
-                board.remove(toRemove); //replaces tile
-                addReplacer(letterToReplace,toRemove);
-                mBoardAdapter.notifyDataSetChanged();
-            }
-        }, 10);//wait until animation ends
-    }
-
-});
-
-
-        }
-
-
-    }
-    private void addReplacer(SingleLetter oldLetter, int replaceIndex) {
-        RandomSelector randomSelector = new RandomSelector(bag);
-        SingleLetter selectedLetter;
-        selectedLetter = randomSelector.getRandom();
-        while (selectedLetter.getLetter_name().equals(oldLetter.getLetter_name()))
-            selectedLetter = randomSelector.getRandom();
-        board.add(replaceIndex, selectedLetter);
-        //reduce new letter from bag
-        for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
-            if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
-                bag.get(j).reduce_letter_probability();
-            }
-        }
-        //increase old letter in bag
-        for (int j = 0; j < bag.size(); j++) { //find letter to increase probability from bag
-            if (bag.get(j).letter_name.equals(oldLetter.letter_name)) {
-                bag.get(j).increase_letter_probability();
-            }
-        }
-    }
 }
 
 
