@@ -114,7 +114,12 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
+
+        if(MainActivity.deviceWidth<600)
         holder.mLetterValue.setTextSize(10);
+        else
+            holder.mLetterValue.setTextSize(20);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.itemView.setElevation((float) 25);
         }
@@ -122,12 +127,13 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
 
         //shrink tiles for long words
-        if(recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) {
+        if((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView)&&MainActivity.deviceWidth<600) {
             if (numOfTiles <= 10 ){
-                holder.mLetter.setTextSize (28);
-                holder.mLetterValue.setTextSize(10);
-                holder.itemView.getLayoutParams().width=MainActivity.boardTileWidth;
-                holder.itemView.getLayoutParams().height=MainActivity.boardTileHeight;
+                    holder.mLetter.setTextSize(28);
+                    holder.mLetterValue.setTextSize(10);
+                    holder.itemView.getLayoutParams().width = MainActivity.boardTileWidth;
+                    holder.itemView.getLayoutParams().height = MainActivity.boardTileHeight;
+
             }
             else if (numOfTiles == 11) {
                 holder.mLetter.setTextSize(25);
@@ -146,8 +152,6 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         if(Integer.parseInt(holder.mLetterValue.getText().toString())>=10)
         {
             int currentTextSize = MainActivity.pxToSp(mContext, (int) holder.mLetterValue.getTextSize());
-            //int newCurrentTextSizecurrentTextSize);
-            //holder.mLetterValue.setTextSize(currentTextSize-1);
             holder.mLetterValue.setTextSize(currentTextSize-2);
         }
 

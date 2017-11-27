@@ -50,16 +50,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-        <TextView
-            android:id="@+id/instruction_bubble"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="@dimen/bubble_text_size"
-            android:padding="5dp"
-            android:fontFamily="sans-serif-condensed"
-            android:text="@string/bubble_on_myWords"
-            />
+                <TextView
+                    android:id="@+id/instruction_bubble"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textSize="@dimen/bubble_text_size"
+                    android:padding="5dp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/bubble_on_myWords"
+                    />
                 <TextView
                     android:id="@+id/go_to_instructions_page"
                     android:layout_width="wrap_content"
@@ -72,15 +72,15 @@
                     android:text="@string/go_to_instructions"
                     />
             </LinearLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="X"
-            android:clickable="true"
-            android:paddingLeft="5dp"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:id="@+id/bubble_quit"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X"
+                android:clickable="true"
+                android:paddingLeft="5dp"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:id="@+id/bubble_quit"/>
         </LinearLayout>
     </com.daasuu.bl.BubbleLayout>
 
@@ -111,6 +111,7 @@
         <Button
             android:id="@+id/get_letter"
             android:layout_width="0dp"
+            android:padding="20dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"
@@ -118,6 +119,7 @@
             android:gravity="center"
             android:onClick="onClick"
             android:text="@string/get_letter"
+            android:textSize="30sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/scrabble_letter_list" />
@@ -125,7 +127,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/word_builder_list"
             android:layout_width="0dp"
-            android:layout_height="55dp"
+            android:layout_height="110dp"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"
             android:overScrollMode="never"
@@ -153,6 +155,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textSize="30sp"
+                android:padding="20dp"
                 android:background="@drawable/button_border"
                 android:gravity="center"
                 android:onClick="onClick"
@@ -160,6 +164,7 @@
 
             <Button
                 android:id="@+id/clear_word"
+                android:padding="20dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/send_word"
@@ -167,6 +172,7 @@
                 android:background="@drawable/button_border"
                 android:gravity="center"
                 android:onClick="onClick"
+                android:textSize="30sp"
                 android:text="Clear Builder" />
         </LinearLayout>
 
@@ -174,15 +180,17 @@
             android:id="@+id/my_words_title"
             android:layout_width="395dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="1dp"
             android:layout_marginTop="-1dp"
             android:gravity="center"
             android:text="Your words:"
-            android:textSize="18dp"
+            android:textSize="36dp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttons" />
+            app:layout_constraintTop_toBottomOf="@+id/buttons"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="parent" />
 
         <RelativeLayout
             android:id="@+id/bottom_relative_layout"
@@ -202,7 +210,7 @@
                 android:paddingLeft="5dp"
                 android:text="Your Score:"
                 android:textColor="#000000"
-                android:textSize="20sp"
+                android:textSize="40sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -215,7 +223,7 @@
                 android:paddingLeft="10dp"
                 android:text="0"
                 android:textColor="#000000"
-                android:textSize="20sp" />
+                android:textSize="40sp" />
 
             <TextView
                 android:id="@+id/tiles_title"
@@ -225,7 +233,7 @@
                 android:paddingLeft="5dp"
                 android:text="Tiles Left:"
                 android:textColor="#000000"
-                android:textSize="20sp"
+                android:textSize="40sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -236,7 +244,7 @@
                 android:layout_toRightOf="@id/tiles_title"
                 android:paddingLeft="10dp"
                 android:textColor="#000000"
-                android:textSize="20sp" />
+                android:textSize="40sp" />
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
@@ -260,13 +268,14 @@
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="0dp"
             android:layout_marginTop="-18dp"
             android:foregroundGravity="left"
             android:overScrollMode="never"
             android:paddingBottom="1dp"
+            android:paddingLeft="8dp"
             android:scrollbars="vertical"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"

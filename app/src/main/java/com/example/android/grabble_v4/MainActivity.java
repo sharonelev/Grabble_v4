@@ -45,13 +45,13 @@ import android.widget.Toast;
 
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
-import com.example.android.grabble_v4.Utilities.CancelReviewListener;
-import com.example.android.grabble_v4.Utilities.NeverReviewListener;
-import com.example.android.grabble_v4.Utilities.NoStartReviewListener;
-import com.example.android.grabble_v4.Utilities.NotNowReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.CancelReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.NeverReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.NoStartReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.NotNowReviewListener;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
-import com.example.android.grabble_v4.Utilities.WhileDialogShows;
+import com.example.android.grabble_v4.Utilities.Interfaces.WhileDialogShows;
 import com.example.android.grabble_v4.Utilities.rateDialog;
 import com.example.android.grabble_v4.data.DictionaryDbHelper;
 import com.example.android.grabble_v4.data.Instructions;
@@ -75,7 +75,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
 
@@ -93,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements
     //RecyclerView elements
     List<SingleLetter> bag = new ArrayList<SingleLetter>();
     List<SingleLetter> board = new ArrayList<SingleLetter>();
-    List<SingleLetter> builder = new ArrayList<SingleLetter>();
+    List<SingleLetter> builder = new ArrayList<>();
     List<int[]> builderLetterTypes = new ArrayList<>();// 0=from board 1=from myWords
     List<List<SingleLetter>> myWords = new ArrayList<>();
     List<Word> wordList = new ArrayList<>();
@@ -148,8 +147,8 @@ public class MainActivity extends AppCompatActivity implements
     public static final String MYWORDS_HEIGHT = "my_words_height_px";
     public static final String TILE_HEIGHT = "tile_height";
     public static final String TILE_WIDTH = "tile_width";
-    public int deviceHeight;
-    public int deviceWidth;
+    public static int deviceHeight;
+    public static int deviceWidth;
     public float myWordsHeight;
     public int boardHeight;
     public static int boardTileWidth;
@@ -298,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onDestroy();
         //Hockey App
         unregisterManagers();
-        /** Cleanup the shared preference listener **/
+        // Cleanup the shared preference listener
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
     }
@@ -829,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void dialogWrongWord(String word) {
-        new AlertDialog.Builder(this).setTitle("TOO BAD")
+       AlertDialog dialog= new AlertDialog.Builder(this).setTitle("TOO BAD")
                 .setMessage(word + " is not a valid word. Try again!")
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
@@ -842,19 +841,24 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i) {
                         setEnableAll(true);
                     }
-                }).create().show();
+                }).show();
+        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
+        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
+
     }
 
     public void dialogEndGameSure(final int boardPoints) {
         getLetter.setEnabled(true);
-        new AlertDialog.Builder(this).setTitle("End Game")
+       AlertDialog dialog= new AlertDialog.Builder(this).setTitle("End Game")
                 .setMessage("Are you sure you want to end game? You will lose " + boardPoints + " for tiles left in the board")
                 .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         setFinalPoints(boardPoints);
                     }
-                }).setNegativeButton("I'll keep trying", null).create().show();
+                }).setNegativeButton("I'll keep trying", null).show();
+        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
+        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
     }
 
     public void dialogEndGame(final int res) {
@@ -874,7 +878,7 @@ if(highScoreScreenSlideDialog!=null) {
             msg = "Well done!";
         }
 
-        new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
+     AlertDialog dialog =  new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
                 .setMessage("Your Score: " + playerScore + "\n" + msg)
                 .setNegativeButton(R.string.new_game, new DialogInterface.OnClickListener() {
                     @Override
@@ -887,13 +891,6 @@ if(highScoreScreenSlideDialog!=null) {
                 getLetterButtonToNewGame();
             }
         })
-             /*   .setNegativeButton(R.string.share_move, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                shareScore(playerScore);
-                getLetterButtonToNewGame();
-            }
-        })*/
                 .setPositiveButton("HIGH SCORES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -906,7 +903,9 @@ if(highScoreScreenSlideDialog!=null) {
                     public void onCancel(DialogInterface dialogInterface) {
                       dialogEndGame(res);
                     }
-                }).create().show();
+                }).show();
+        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
+        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
     }
 
     public void getLetterButtonToNewGame(){
@@ -932,7 +931,7 @@ if(highScoreScreenSlideDialog!=null) {
         else
             wordLength=0;
 
-        new AlertDialog.Builder(this).setTitle("Hurray! +" + (score+wordLength) +" points!")
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Hurray! +" + (score+wordLength) +" points!")
                 .setMessage(word + " is great! Keep it up!" + extraScore + longScore)
                 .setNeutralButton("Oh Yeah!", new DialogInterface.OnClickListener() {
 
@@ -946,7 +945,9 @@ if(highScoreScreenSlideDialog!=null) {
                     public void onCancel(DialogInterface dialogInterface) {
                         afterDialogSuccess(score);
                     }
-                }).create().show();
+                }).show();
+        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
+        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
 
     }
 
@@ -1432,7 +1433,7 @@ if(highScoreScreenSlideDialog!=null) {
         bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
         bubbleText = (TextView) findViewById(R.id.instruction_bubble);
         bubbleText.setText(bubble1);
-        bubbleText.setTextSize(18);
+        bubbleText.setTextSize(getResources().getDimension(R.dimen.bubble_text_size));
         bubbleText.setPadding(5,5,5,5);
         bubbleLayout.setForegroundGravity(Gravity.NO_GRAVITY);
 
@@ -1441,15 +1442,16 @@ if(highScoreScreenSlideDialog!=null) {
         if(boardTileWidth>0)
             bubbleLayout.setX(boardTileWidth*5);
         else
-            bubbleLayout.setX(deviceWidth-bubbleLayout.getWidth());
-        bubbleLayout.setY(0-10);
+            bubbleLayout.setX(dpToPx(this, deviceWidth)/2);
+
+        bubbleLayout.setY(0+15);
         bubbleLayout.bringToFront();
 
 
         bubbleGoToInstructions= (TextView) findViewById(R.id.go_to_instructions_page);
         bubbleGoToInstructions.setVisibility(GONE);
 
-        bubbleX.setOnClickListener(new View.OnClickListener() {
+        bubbleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String currentText = String.valueOf(bubbleText.getText());
@@ -1501,7 +1503,7 @@ if(highScoreScreenSlideDialog!=null) {
                     bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
                     //bubbleLayout.setX();
                     bubbleLayout.setY(dpToPx(getBaseContext(),deviceHeight/2));
-                    bubbleText.setTextSize(50);
+                    bubbleText.setTextSize(getResources().getDimension(R.dimen.good_luck_bubble_text_size));
                     bubbleLayout.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
                     bubbleText.setText(bubble5);
                     bubbleGoToInstructions.setVisibility(View.VISIBLE);
@@ -1531,6 +1533,8 @@ if(highScoreScreenSlideDialog!=null) {
                     setEnableAll(true);
 
                 }
+
+
 
             }
         });
@@ -1682,13 +1686,18 @@ if(highScoreScreenSlideDialog!=null) {
     }
 
     public void setDeviceDimensions(){
+
 //TODO REMOVE AFTER TESTING:
-      /* Hawk.delete(DEVICE_HEIGHT);
+       Hawk.delete(DEVICE_HEIGHT);
         Hawk.delete(DEVICE_WIDTH);
         Hawk.delete(MYWORDS_HEIGHT);
         Hawk.delete(SAW_BUBBLE_TOUR);
         Hawk.delete(TILE_WIDTH);
-        Hawk.delete(TILE_HEIGHT);*/
+        Hawk.delete(TILE_HEIGHT);
+        SharedPreferences shared = this.getSharedPreferences(this.getPackageName(), 0);
+        SharedPreferences.Editor editor = shared.edit();
+        editor.putBoolean("disabled", true);
+////////////////TODO did you remove this???
 
 
         if(!Hawk.contains(DEVICE_WIDTH) || !Hawk.contains(DEVICE_HEIGHT)) { //first time for device
@@ -1696,8 +1705,8 @@ if(highScoreScreenSlideDialog!=null) {
             DisplayMetrics metrics = getDeviceMetrics(this);
             Hawk.put(DEVICE_HEIGHT, pxToDp(this,metrics.heightPixels));
             Hawk.put(DEVICE_WIDTH,  pxToDp(this,metrics.widthPixels));
-            deviceHeight = Hawk.get(DEVICE_HEIGHT);
-            deviceWidth  = Hawk.get(DEVICE_WIDTH);
+            deviceHeight = Hawk.get(DEVICE_HEIGHT); //dp
+            deviceWidth  = Hawk.get(DEVICE_WIDTH);  //dp
         }
         else
         {
@@ -1746,9 +1755,9 @@ if(highScoreScreenSlideDialog!=null) {
 
     private void setTimerSize(){
         if(deviceHeight<550)
-            countDownView.setTextSize(26);
+            countDownView.setTextSize(getResources().getDimension(R.dimen.timer_below_550));
         else if (deviceHeight<600)
-            countDownView.setTextSize(28);
+            countDownView.setTextSize(getResources().getDimension(R.dimen.timer_below_600));
         else return;
     }
 

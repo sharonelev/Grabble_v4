@@ -73,8 +73,10 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         //tile size incluudes spaces
         if(screenWidthDP<400)
             tileSize=(int) screenWidthPX/10;
-        else
+        else if(screenWidthDP<600)
             tileSize=(int) screenWidthPX/11;
+        else
+            tileSize=(int) screenWidthPX/12;
         //holder.itemView.setBackgroundColor(Color.RED); //For testing only
         holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
 

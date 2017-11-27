@@ -1,3 +1,19 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="bubble_text_size">5sp</dimen>
+    <dimen name="good_luck_bubble_text_size">20sp</dimen>
+    <dimen name="dialog_text_size">5sp</dimen>
+    <dimen name="menu_text_size">18sp</dimen>
+    <dimen name="timer_below_550">26pt</dimen>
+    <dimen name="timer_below_600">28pt</dimen>
+    <dimen name="timer_text_size">35sp</dimen>
+    <dimen name="high_score_title">25sp</dimen>
+    <dimen name="table_headers">20sp</dimen>
+    <dimen name="instructions_text_size">18sp</dimen>
+    <dimen name="button_text_size">15sp</dimen>
+    <dimen name="lets_play_text_size">40sp</dimen>
+    <dimen name="by_sha_text_size">15sp</dimen>
+    <dimen name="feedback_title">25sp</dimen>
+    <dimen name="edit_text">20sp</dimen>
+
 </resources>

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
@@ -16,8 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+
+import com.example.android.grabble_v4.R;
+import com.example.android.grabble_v4.Utilities.Interfaces.CancelReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.NeverReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.NoStartReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.NotNowReviewListener;
+import com.example.android.grabble_v4.Utilities.Interfaces.WhileDialogShows;
 
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
@@ -92,6 +97,7 @@ public class rateDialog implements DialogInterface.OnClickListener
             stars.getDrawable(1).setColorFilter(starColor, PorterDuff.Mode.SRC_ATOP);
             stars.getDrawable(2).setColorFilter(starColor, PorterDuff.Mode.SRC_ATOP);
                    }
+
         this.alertDialog = builder.setTitle(titleToAdd).setView(this.dialogView).setNegativeButton("Not Now", this).setPositiveButton("Ok", this).setNeutralButton("Never", this).setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
@@ -99,6 +105,7 @@ public class rateDialog implements DialogInterface.OnClickListener
                 cancelListener.onCancelReview();
             }
         }).create();
+
     }
 
     private void disable() {
@@ -135,6 +142,8 @@ public class rateDialog implements DialogInterface.OnClickListener
             this.whileDialogShows.onShowDialog();
             this.build();
             this.alertDialog.show();
+            TextView textView = (TextView) this.alertDialog.findViewById(android.R.id.message);
+            textView.setTextSize(context.getResources().getDimension(R.dimen.dialog_text_size));
         }
 
     }

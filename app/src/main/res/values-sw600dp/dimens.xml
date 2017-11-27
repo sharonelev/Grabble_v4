@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bubble_text_size">20sp</dimen>
+    <dimen name="good_luck_bubble_text_size">50sp</dimen>
+    <dimen name="dialog_text_size">20sp</dimen>
+    <dimen name="menu_text_size">10sp</dimen>
+    <dimen name="timer_text_size">70sp</dimen>
+    <dimen name="high_score_title">50sp</dimen>
+    <dimen name="table_headers">40sp</dimen>
+    <dimen name="instructions_text_size">36sp</dimen>
+    <dimen name="button_text_size">30sp</dimen>
+    <dimen name="lets_play_text_size">80sp</dimen>
+    <dimen name="by_sha_text_size">30sp</dimen>
+    <dimen name="feedback_title">50sp</dimen>
+    <dimen name="edit_text">40sp</dimen>
+</resources>

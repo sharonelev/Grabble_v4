@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="tiles_on_board">10</integer>
+    <integer name="tiles_on_board_no_timer">12</integer>
+
+</resources>

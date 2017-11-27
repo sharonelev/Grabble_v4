@@ -25,12 +25,13 @@
         android:hint="Let us know what's on your mind..."
         android:inputType="text"
         android:id="@+id/feedback_text"
-        android:textSize="20dp" />
+        android:textSize="@dimen/edit_text" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send"
+        android:textSize="@dimen/button_text_size"
         android:id="@+id/send_feeback_button"
         android:layout_gravity="right"
         android:onClick="onClick"/>
