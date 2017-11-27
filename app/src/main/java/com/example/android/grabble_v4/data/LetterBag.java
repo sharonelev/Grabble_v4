@@ -31,7 +31,7 @@ public class LetterBag {
         list.add(new SingleLetter("N",1,6));
         list.add(new SingleLetter("O",1,7));//8
         list.add(new SingleLetter("P",2,2));
-        list.add(new SingleLetter("Q",8,1));
+        list.add(new SingleLetter("Q",10,1));
         list.add(new SingleLetter("R",1,6));
         list.add(new SingleLetter("S",1,4));
         list.add(new SingleLetter("T",2,6));
@@ -40,7 +40,7 @@ public class LetterBag {
         list.add(new SingleLetter("W",4,2));
         list.add(new SingleLetter("X",8,1));
         list.add(new SingleLetter("Y",4,2));
-        list.add(new SingleLetter("Z",8,1));
+        list.add(new SingleLetter("Z",10,1));
 
         return list;
     }

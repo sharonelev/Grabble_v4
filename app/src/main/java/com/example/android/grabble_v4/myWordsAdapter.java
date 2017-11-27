@@ -1,6 +1,7 @@
 package com.example.android.grabble_v4;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuAdapter;
 import android.support.v7.widget.DividerItemDecoration;
@@ -74,6 +75,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             tileSize=(int) screenWidthPX/10;
         else
             tileSize=(int) screenWidthPX/11;
+        //holder.itemView.setBackgroundColor(Color.RED); //For testing only
         holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
 
     }

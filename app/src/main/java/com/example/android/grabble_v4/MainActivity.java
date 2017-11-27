@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
@@ -34,7 +35,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -45,8 +45,14 @@ import android.widget.Toast;
 
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
+import com.example.android.grabble_v4.Utilities.CancelReviewListener;
+import com.example.android.grabble_v4.Utilities.NeverReviewListener;
+import com.example.android.grabble_v4.Utilities.NoStartReviewListener;
+import com.example.android.grabble_v4.Utilities.NotNowReviewListener;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
+import com.example.android.grabble_v4.Utilities.WhileDialogShows;
+import com.example.android.grabble_v4.Utilities.rateDialog;
 import com.example.android.grabble_v4.data.DictionaryDbHelper;
 import com.example.android.grabble_v4.data.Instructions;
 import com.example.android.grabble_v4.data.LetterBag;
@@ -68,6 +74,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import angtrim.com.fivestarslibrary.FiveStarsDialog;
+import angtrim.com.fivestarslibrary.NegativeReviewListener;
+import angtrim.com.fivestarslibrary.ReviewListener;
 
 import static android.view.View.GONE;
 
@@ -111,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements
     AsyncTask<String, Void, Boolean> checkWord;
     public SQLiteDatabase dictionaryDb;
     DictionaryDbHelper dbHelper;
+    Toast toast;
 
     //preferences
     public boolean showCorrectPopUp;
@@ -157,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements
     public BubbleLayout bubbleLayout;
     public TextView bubbleText;
     public TextView bubbleX;
+    public TextView bubbleGoToInstructions;
     public final static String SAW_BUBBLE_TOUR = "saw_bubble_tour";
     public boolean showingBubblesFlag=false;
 
@@ -172,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Intent homeScreen = getIntent();
         shakeDetectorInit();
-        //dbHelper = new DictionaryDbHelper(this);
         attachDB();
 
 
@@ -190,6 +201,9 @@ public class MainActivity extends AppCompatActivity implements
                 countDownInd = 2;
                 break;
         }
+
+
+
 
         //UI elements initialization
         getLetter = (Button) findViewById(R.id.get_letter);
@@ -224,6 +238,11 @@ public class MainActivity extends AppCompatActivity implements
         //game initialization
         newGame();
 
+
+        //other features:
+        //rate dialog
+        rateApp();
+        //bubble tour
         boolean saw_bubbles=Hawk.get(SAW_BUBBLE_TOUR,false);
         if(!saw_bubbles)
             showBubbles();
@@ -233,14 +252,12 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-
-
     @Override
     public void onResume() {
         Log.i("lifecycleEvent","onResume");
         super.onResume();
         long prevTimer= getIntent().getLongExtra("timer",0); //in case a game with timer was stopped and resumed
-        if(prevTimer>0 && countDownInd!=0) {
+        if(prevTimer>0 && countDownInd!=0 && getLetter.getText()!=getString(R.string.new_game)) {
             initalizeTimers=true;
             createTimer(prevTimer);
         }
@@ -296,7 +313,6 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i("on_stop_pause_destroy","canceled async");
             }
     }
-
 
     // CORE GAME METHODS
     public void newGame() {
@@ -471,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 //TEST 1 - no word
                 if (spellCheckWord.equals("")) {
-                    Toast.makeText(this, "No word", Toast.LENGTH_SHORT).show();
+                    toastManager("No word");
                     break;
                 }
 
@@ -490,7 +506,8 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 if (wordBroken == 1) {//word rules don't comply
-                    Toast.makeText(this, "Can't use part of a word", Toast.LENGTH_SHORT).show();
+                    toastManager("Can't use part of a word");
+
                     break;
                 }
 
@@ -512,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements
                         String wordToCheck = wordList.get(wordToCheckIndex).getTheWord();
                         if ((wordToCheck + "S").equals(spellCheckWord)) {
                             {
-                                Toast.makeText(this, "You can't pluralise a word", Toast.LENGTH_SHORT).show();
+                                toastManager("You can't make a new word by just adding 'S'");
                                 break;
                             }
                         }
@@ -530,21 +547,22 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 if (fromWordsCounter == builderLetterTypes.size()) {
-                    Toast.makeText(this, "Must add letters from board as well", Toast.LENGTH_SHORT).show();
+                    toastManager("Must add letters from board as well");
                     break;
                 }
 
-                //TEST 5 - word must be 4+ letters
+                //TEST 5 - word must be 3+ letters
                 if (builder.size() < 3) {
-                    Toast.makeText(this, "word must be at least 3 letters long", Toast.LENGTH_SHORT).show();
+                    toastManager( "word must be at least 3 letters long");
                     break;
                 }
 
                 //TEST 6 - has internet connection
-                if(!isOnline()){
-                    Toast.makeText(this, "No internet connection, try again later", Toast.LENGTH_SHORT).show();
+               /* if(!isOnline()){
+                     toastManager( "No internet connection, try again later");\
                     break;
                 }
+                */
                 //if TEST 1- 5 ARE ALL GOOD:
                 setEnableAll(false);
 
@@ -561,17 +579,6 @@ public class MainActivity extends AppCompatActivity implements
 
         }
     }
-
-
-    //tiles left algortihm if not game limit
-  /*  public int tilesLeft(List<SingleLetter> list) {
-        int totalSum = 0;
-        for (SingleLetter item : list) {
-            totalSum = totalSum + item.letter_probability;
-        }
-        return totalSum;
-    }*/
-
 
     @Override
     public void onWordItemClick(int clickedWord, int clickedLetter) {
@@ -632,8 +639,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-
-
      public class WordValidator extends AsyncTask<String, Void, Boolean>
     {
         String checkWord;
@@ -653,14 +658,16 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         protected Boolean doInBackground(String... strings) {
 
-            checkWord=strings[0];
-            return dbHelper.check_word(checkWord);
+           checkWord=strings[0];
+           return  dbHelper.check_word(checkWord);
+
+
         }
 
         @Override
         protected void onPostExecute(Boolean valid) {
             if(valid==null){
-                Toast.makeText(getBaseContext(),"Something went wrong. Try again later.", Toast.LENGTH_LONG).show();
+                toastManager("Something went wrong. Try again later.");
                 setEnableAll(true);
                 pBar.setVisibility(View.INVISIBLE);
                 return;
@@ -678,7 +685,7 @@ public class MainActivity extends AppCompatActivity implements
                     if (showWrongPopUp)
                         dialogWrongWord(checkWord);
                     else {
-                        Toast.makeText(getApplicationContext(), checkWord + " is not a valid word", Toast.LENGTH_LONG).show();
+                        toastManager(checkWord + " is not a valid word");
                         setEnableAll(true);
                     }
                 } else if (valid) {
@@ -709,7 +716,6 @@ public class MainActivity extends AppCompatActivity implements
        return;
     }
 
-
     public void clearBuilder() {
         int builder_size = builder.size();
         for (int i = builder_size - 1; i >= 0; i--) {
@@ -739,13 +745,11 @@ public class MainActivity extends AppCompatActivity implements
         mWordsAdapter.notifyDataSetChanged();
     }
 
-
     public void replaceTile(){
 
-        //AlphaAnimation anim = new AlphaAnimation(1.0f, 0.0f);
-        final Animation anim = AnimationUtils.loadAnimation(this, R.anim.animation_shrink);
+       final Animation anim = AnimationUtils.loadAnimation(this, R.anim.animation_shrink);
         //anim.setDuration(200);
-        Toast.makeText(getApplicationContext(), "You have reached the tile limit on board. Letters will be replaced randomly.", Toast.LENGTH_SHORT).show();
+        toastManager("You have reached the tile limit on board. Letters will be replaced randomly.");
         final Handler myHandler= new Handler();
         Random rand = new Random();
         final SingleLetter letterToReplace;
@@ -802,6 +806,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
     }
+
     private void addReplacer(SingleLetter oldLetter, int replaceIndex) {
         RandomSelector randomSelector = new RandomSelector(bag);
         SingleLetter selectedLetter;
@@ -822,7 +827,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     }
-
 
     public void dialogWrongWord(String word) {
         new AlertDialog.Builder(this).setTitle("TOO BAD")
@@ -852,8 +856,6 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }).setNegativeButton("I'll keep trying", null).create().show();
     }
-
-
 
     public void dialogEndGame(final int res) {
 
@@ -912,7 +914,6 @@ if(highScoreScreenSlideDialog!=null) {
         getLetter.setText(R.string.new_game);
         getLetter.setEnabled(true);
     }
-
 
     public void dialogCorrectWord(String word, final int score) {
 
@@ -1009,7 +1010,7 @@ if(highScoreScreenSlideDialog!=null) {
         mScore.setText(String.valueOf(playerScore));
     }
 
-public void attachDB(){
+    public void attachDB(){
         dbHelper = new DictionaryDbHelper(this);
         try {
             dbHelper.createDataBase();
@@ -1030,8 +1031,7 @@ public void attachDB(){
 
     }
 
-
-
+    //API return call
     public String parseWordResult(String xmlString) throws IOException {
 
         InputStream stream = new ByteArrayInputStream(xmlString.getBytes());
@@ -1069,6 +1069,15 @@ public void attachDB(){
     }
 
     //CORE ASSISTING METHODS
+    public void toastManager(String txt){
+
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(this, txt, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -1076,6 +1085,7 @@ public void attachDB(){
         return returnOnline;
 
     }
+
     public void noLettersInBag() {
         if (getLetter.getText() == getResources().getString(R.string.end_game)) {
             //not the first time counter became 0
@@ -1085,9 +1095,10 @@ public void attachDB(){
             return;
         }
         getLetter.setText(getResources().getString(R.string.end_game));
-        Toast.makeText(getApplicationContext(), "No tiles lift in bag", Toast.LENGTH_LONG).show();
+        toastManager("No tiles lift in bag");
         return;
     }
+
     public void onGetLetter() { //tapped get letter
         if (getLetter.getText().equals(getString(R.string.get_letter))) {
 
@@ -1131,6 +1142,7 @@ public void attachDB(){
         }, 1250);
 
     }
+
     public int reduceScoreEndGame() {
         int reduceScore = 0;
 
@@ -1150,7 +1162,6 @@ public void attachDB(){
         int[] series = {letterOrigin, wordPlace, letterPlace};//0: 0= from board 1 = from mywords, 1: word index, 2: letter index
         return series;
     }
-
 
     private void setEnableAll(boolean state) {
         if (countDownInd==2) {
@@ -1220,7 +1231,11 @@ public void attachDB(){
         return super.onOptionsItemSelected(item); //if not action_search
     }
 
+    public void openHighScoreDialog(){
 
+        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.createInstance(countDownInd);
+        highScoreScreenSlideDialog.show(getSupportFragmentManager(),"Dialog Fragment");
+    }
     //HOCKEY APP
     private void checkForCrashes() {
         CrashManager.register(this);
@@ -1249,11 +1264,6 @@ public void attachDB(){
 
             }
         }
-    }
-    public void openHighScoreDialog(){
-
-        highScoreScreenSlideDialog = HighScoreScreenSlideDialog.createInstance(countDownInd);
-        highScoreScreenSlideDialog.show(getSupportFragmentManager(),"Dialog Fragment");
     }
 
     //SHARED PREFERENCES METHODS
@@ -1290,7 +1300,6 @@ public void attachDB(){
             animatePoints =(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.preferences_default_true)));
         }
     }
-
 
     //TIMER METHODS
     public void enableCountDown(boolean enable) {
@@ -1342,7 +1351,6 @@ public void attachDB(){
         if(!showingBubblesFlag)
             countDownTimer.start();
     }
-
 
 
     //FEATURES
@@ -1401,6 +1409,194 @@ public void attachDB(){
         }
     }
 
+    ///// INSTRUCTION BUBBLES
+    public void showBubbles(){
+
+        showingBubblesFlag = true;
+        Log.i("method","show bubbles");
+        if(countDownInd!=0){
+            countDownTimer.cancel();
+        }
+        setEnableAll(false);
+
+        final String bubble1= getString(R.string.bubble_on_board);
+        final String bubble2= getString(R.string.bubble_on_myWords);
+        final String bubble3= getString(R.string.classic_moderate_bubble_on_GetLetter);
+        final String bubble3_1= getString(R.string.speedy_bubble_to_timer);
+        final String bubble3_2= getString(R.string.moderate_bubble_to_timer);
+        final String bubble4= getString(R.string.bubble_to_score);
+        final String bubble5= getString(R.string.bubble_final);
+
+        // bubble1 on board
+        bubbleLayout = (BubbleLayout)findViewById(R.id.bubble_layout);
+        bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
+        bubbleText = (TextView) findViewById(R.id.instruction_bubble);
+        bubbleText.setText(bubble1);
+        bubbleText.setTextSize(18);
+        bubbleText.setPadding(5,5,5,5);
+        bubbleLayout.setForegroundGravity(Gravity.NO_GRAVITY);
+
+        bubbleLayout.setVisibility(View.VISIBLE);
+        bubbleX = (TextView)findViewById(R.id.bubble_quit);
+        if(boardTileWidth>0)
+            bubbleLayout.setX(boardTileWidth*5);
+        else
+            bubbleLayout.setX(deviceWidth-bubbleLayout.getWidth());
+        bubbleLayout.setY(0-10);
+        bubbleLayout.bringToFront();
+
+
+        bubbleGoToInstructions= (TextView) findViewById(R.id.go_to_instructions_page);
+        bubbleGoToInstructions.setVisibility(GONE);
+
+        bubbleX.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String currentText = String.valueOf(bubbleText.getText());
+                if(currentText.equals(bubble1)){
+                    Log.i("onclick", "bubble1");
+                    bubbleLayout.setArrowDirection(ArrowDirection.TOP);
+                    bubbleLayout.setX(mMyWordsRecView.getX()+20);
+                    bubbleLayout.setY(mMyWordsRecView.getY()+100);
+                    bubbleText.setText(bubble2);
+                }
+
+                else if(currentText.equals(bubble2)){
+                    if(countDownInd<2) { //moderate or classic
+                        Log.i("onclick", "bubble3");
+                        bubbleLayout.setX(deviceWidth/2);
+                        bubbleLayout.setY(mBoardRecView.getY()+10);
+                        // bubbleLayout.setForegroundGravity(Gravity.BOTTOM);
+                        bubbleText.setText(bubble3);
+                        bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
+                    }
+                    else if(countDownInd==2){
+                        Log.i("onclick", "bubble3");
+                        bubbleText.setText(bubble3_1);
+                        bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
+                        bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
+                        bubbleLayout.setY(mBoardRecView.getY()+10);
+
+                    }
+
+                }
+                else if(countDownInd==1 && currentText.equals(bubble3)){
+                    Log.i("onclick", "bubble3");
+                    bubbleText.setText(bubble3_2);
+                    bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
+                    bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
+                    bubbleLayout.setY(mBoardRecView.getY()+10);
+                }
+
+
+                else if((currentText.equals(bubble3) && countDownInd==0)|| currentText.equals(bubble3_1) || currentText.equals(bubble3_2)){
+                    Log.i("onclick", "bubble3 or 3_1 or 3_2");
+                    bubbleText.setText(bubble4);
+                    bubbleLayout.setX(mMyWordsRecView.getX()+20);
+                    bubbleLayout.setY(scoreRelativeLayout.getY()-bubbleLayout.getHeight());
+                    bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
+
+                } else if(currentText.equals(bubble4)){
+                    Log.i("onclick", "bubble4");
+                    bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
+                    //bubbleLayout.setX();
+                    bubbleLayout.setY(dpToPx(getBaseContext(),deviceHeight/2));
+                    bubbleText.setTextSize(50);
+                    bubbleLayout.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
+                    bubbleText.setText(bubble5);
+                    bubbleGoToInstructions.setVisibility(View.VISIBLE);
+                    bubbleText.setPadding(5,5,5,0);
+                    bubbleGoToInstructions.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Hawk.put(SAW_BUBBLE_TOUR,true);
+                            Intent intent = new Intent(MainActivity.this,  Instructions.class);
+                            startActivityForResult(intent,RESULT_CODE_INSTRUCTIONS);
+                            bubbleLayout.setVisibility(GONE);
+                            showingBubblesFlag=false;
+                            setEnableAll(true);
+                        }
+                    });
+
+                }
+
+                else if(currentText.equals(bubble5)){
+                    Log.i("onclick", "bubble5");
+                    Hawk.put(SAW_BUBBLE_TOUR,true);
+                    bubbleLayout.setVisibility(GONE);
+                    if(countDownInd!=0) {
+                        countDownTimer.start();
+                    }
+                    showingBubblesFlag=false;
+                    setEnableAll(true);
+
+                }
+
+            }
+        });
+    }
+
+    ///// RATE US DIALOG
+
+    public void rateApp() {
+        rateDialog fiveStarsDialog = new rateDialog(this, "sha17187@gmail.com");
+        fiveStarsDialog.setRateText("Your custom text")
+
+                .setTitle("Your custom title")
+                .setForceMode(false)
+                .setUpperBound(3) // Market opened if a rating >= 2 is selected
+                .setRateText(getString(R.string.rate_txt))
+                .setTitle(getString(R.string.rate_title))
+                .setNoStarsListener(new NoStartReviewListener() {
+                    @Override
+                    public void onOkNoStars() {
+                        toastManager("Please rate by tapping the stars");
+                        rateApp();
+                    }
+                })
+                .setWhileDialogListener(new WhileDialogShows() {
+                    @Override
+                    public void onShowDialog() {
+                        if(countDownInd!=0)
+                            countDownTimer.cancel();
+                    }
+                })
+                .setNegativeReviewListener(new NegativeReviewListener() {
+                    @Override
+                    public void onNegativeReview(int i) {
+                        Intent intent = new Intent(getApplicationContext(), SendFeedback.class);
+                        startActivity(intent);
+                        if(countDownInd!=0)
+                            countDownTimer.start();
+                    }
+                }).setReviewListener(new ReviewListener() {
+            @Override
+            public void onReview(int i) {
+                if(countDownInd!=0)
+                    countDownTimer.start();
+            }
+        }).setCancelReviewListener(new CancelReviewListener() {
+            @Override
+            public void onCancelReview() {
+                if(countDownInd!=0)
+                    countDownTimer.start();
+            }
+        }).setNotNowListener(new NotNowReviewListener() {
+            @Override
+            public void onNotNowReview() {
+                if(countDownInd!=0)
+                    countDownTimer.start();
+            }
+        }).setNeverReviewListener(new NeverReviewListener() {
+            @Override
+            public void onNeverReview() {
+                if(countDownInd!=0)
+                    countDownTimer.start();
+            }
+        })        .setColor(Color.rgb(255,215,0))
+                //   .setReviewListener((ReviewListener) this) // Used to listen for reviews (if you want to track them )
+                .showAfter(3);
+    }
 
 
     //DEVICE METRICS and UI METHODS
@@ -1417,6 +1613,7 @@ public void attachDB(){
             divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_l));
         mBuilderRecView.addItemDecoration(divider);
     }
+
     public static DisplayMetrics getDeviceMetrics(Context context){
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
@@ -1428,9 +1625,20 @@ public void attachDB(){
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
     public static int pxToDp(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
+    }
+
+    public static int pxToSp(Context context, float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
+
+    public static int spToPx(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
     }
 
     @Override
@@ -1475,7 +1683,7 @@ public void attachDB(){
 
     public void setDeviceDimensions(){
 //TODO REMOVE AFTER TESTING:
-/*        Hawk.delete(DEVICE_HEIGHT);
+      /* Hawk.delete(DEVICE_HEIGHT);
         Hawk.delete(DEVICE_WIDTH);
         Hawk.delete(MYWORDS_HEIGHT);
         Hawk.delete(SAW_BUBBLE_TOUR);
@@ -1535,6 +1743,7 @@ public void attachDB(){
             return  1;
         else return 2;
     }
+
     private void setTimerSize(){
         if(deviceHeight<550)
             countDownView.setTextSize(26);
@@ -1543,9 +1752,8 @@ public void attachDB(){
         else return;
     }
 
+    //RATE US
 
-    //OTHERS
-    @Override
     public void onBackPressed()
     {
         super.onBackPressed();
@@ -1555,116 +1763,9 @@ public void attachDB(){
 
     }
 
-    //BUBBLE INSTRUCTIONS
-    //save in Hawk - did the user already have instructions - for 3 modes. have ifs for all 7 scenarios
-
-    //Create bubbles with design:
-
-    public void showBubbles(){
-
-        showingBubblesFlag = true;
-        Log.i("method","show bubbles");
-        if(countDownInd!=0){
-            countDownTimer.cancel();
-        }
-        setEnableAll(false);
-
-        final String bubble1= getString(R.string.bubble_on_board);
-        final String bubble2= getString(R.string.bubble_on_myWords);
-        final String bubble3= getString(R.string.classic_moderate_bubble_on_GetLetter);
-        final String bubble3_1= getString(R.string.speedy_bubble_to_timer);
-        final String bubble3_2= getString(R.string.moderate_bubble_to_timer);
-        final String bubble4= getString(R.string.bubble_to_score);
-        final String bubble5= getString(R.string.bubble_final);
-
-        // bubble1 on board
-        bubbleLayout = (BubbleLayout)findViewById(R.id.bubble_layout);
-        bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
-        bubbleText = (TextView) findViewById(R.id.instruction_bubble);
-        bubbleText.setText(bubble1);
-        bubbleText.setTextSize(18);
-        bubbleLayout.setForegroundGravity(Gravity.NO_GRAVITY);
-
-        bubbleLayout.setVisibility(View.VISIBLE);
-        bubbleX = (TextView)findViewById(R.id.bubble_quit);
-        if(boardTileWidth>0)
-        bubbleLayout.setX(boardTileWidth*5);
-        else
-            bubbleLayout.setX(deviceWidth-bubbleLayout.getWidth());
-        bubbleLayout.setY(0-10);
-        bubbleLayout.bringToFront();
-        bubbleX.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String currentText = String.valueOf(bubbleText.getText());
-               if(currentText.equals(bubble1)){
-                    Log.i("onclick", "bubble1");
-                   bubbleLayout.setArrowDirection(ArrowDirection.TOP);
-                    bubbleLayout.setX(mMyWordsRecView.getX()+20);
-                    bubbleLayout.setY(mMyWordsRecView.getY()+100);
-                    bubbleText.setText(bubble2);
-                }
-
-               else if(currentText.equals(bubble2)){
-                   if(countDownInd<2) { //moderate or classic
-                       Log.i("onclick", "bubble3");
-                       bubbleLayout.setX(deviceWidth/2);
-                       bubbleLayout.setY(mBoardRecView.getY()+10);
-                      // bubbleLayout.setForegroundGravity(Gravity.BOTTOM);
-                       bubbleText.setText(bubble3);
-                       bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
-                   }
-                   else if(countDownInd==2){
-                       Log.i("onclick", "bubble3");
-                       bubbleText.setText(bubble3_1);
-                       bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
-                       bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
-                       bubbleLayout.setY(mBoardRecView.getY()+10);
-
-                   }
-
-               }
-               else if(countDownInd==1 && currentText.equals(bubble3)){
-                    Log.i("onclick", "bubble3");
-                    bubbleText.setText(bubble3_2);
-                    bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
-                   bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
-                   bubbleLayout.setY(mBoardRecView.getY()+10);
-                }
 
 
-               else if((currentText.equals(bubble3) && countDownInd==0)|| currentText.equals(bubble3_1) || currentText.equals(bubble3_2)){
-                   Log.i("onclick", "bubble3 or 3_1 or 3_2");
-                   bubbleText.setText(bubble4);
-                   bubbleLayout.setX(mMyWordsRecView.getX()+20);
-                   bubbleLayout.setY(scoreRelativeLayout.getY()-bubbleLayout.getHeight());
-                   bubbleLayout.setArrowDirection(ArrowDirection.BOTTOM);
 
-               } else if(currentText.equals(bubble4)){
-                   Log.i("onclick", "bubble4");
-                   bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
-                   //bubbleLayout.setX();
-                   bubbleLayout.setY(dpToPx(getBaseContext(),deviceHeight/2));
-                   bubbleText.setTextSize(50);
-                   bubbleLayout.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
-                   bubbleText.setText(bubble5);
-               }
-
-               else if(currentText.equals(bubble5)){
-                   Log.i("onclick", "bubble5");
-                Hawk.put(SAW_BUBBLE_TOUR,true);
-                bubbleLayout.setVisibility(GONE);
-                   if(countDownInd!=0) {
-                       countDownTimer.start();
-                   }
-                showingBubblesFlag=false;
-                setEnableAll(true);
-
-               }
-
-            }
-        });
-    }
 
 
 }

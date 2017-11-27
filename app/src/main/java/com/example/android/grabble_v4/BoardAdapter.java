@@ -114,10 +114,12 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
+        holder.mLetterValue.setTextSize(10);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.itemView.setElevation((float) 25);
         }
         int numOfTiles = mBoard.size();
+
 
         //shrink tiles for long words
         if(recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) {
@@ -139,6 +141,14 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.itemView.getLayoutParams().width=holder.itemView.getLayoutParams().WRAP_CONTENT;
                 holder.itemView.getLayoutParams().height=holder.itemView.getLayoutParams().WRAP_CONTENT;
             }
+        }
+
+        if(Integer.parseInt(holder.mLetterValue.getText().toString())>=10)
+        {
+            int currentTextSize = MainActivity.pxToSp(mContext, (int) holder.mLetterValue.getTextSize());
+            //int newCurrentTextSizecurrentTextSize);
+            //holder.mLetterValue.setTextSize(currentTextSize-1);
+            holder.mLetterValue.setTextSize(currentTextSize-2);
         }
 
         //handle blank placers

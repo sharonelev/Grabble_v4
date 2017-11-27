@@ -4,11 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.android.grabble_v4.MainActivity;
 import com.example.android.grabble_v4.R;
+import com.orhanobut.hawk.Hawk;
 
 /**
  * Created by user on 03/10/2017.
@@ -16,13 +20,16 @@ import com.example.android.grabble_v4.R;
 
 public class Instructions extends AppCompatActivity implements View.OnClickListener{
     /* Field to store our TextView */
-TextView bbl;
+    TextView bbl;
+    ScrollView instruction_scrollview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.instructions);
+        instruction_scrollview= (ScrollView)findViewById(R.id.inst_scroll);
         bbl= (TextView) findViewById(R.id.get_bbl_instructions);
         bbl.setText(R.string.show_bbl_instructions);
+
 
         /* Typical usage of findViewById... */
         //  mDisplayText = (TextView) findViewById(R.id.tv_display);
