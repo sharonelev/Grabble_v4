@@ -41,7 +41,6 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
     int mTileHeight;
     TileDimensions tileDimensions;
 
-
     public interface LetterClickListener {
         void onLetterClick(int view_id, int clickedItemIndex);
     }
@@ -115,45 +114,40 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
 
-        if(MainActivity.deviceWidth<600)
-        holder.mLetterValue.setTextSize(10);
-        else
-            holder.mLetterValue.setTextSize(20);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.itemView.setElevation((float) 25);
         }
         int numOfTiles = mBoard.size();
 
-
         //shrink tiles for long words
-        if((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView)&&MainActivity.deviceWidth<600) {
-            if (numOfTiles <= 10 ){
-                    holder.mLetter.setTextSize(28);
-                    holder.mLetterValue.setTextSize(10);
-                    holder.itemView.getLayoutParams().width = MainActivity.boardTileWidth;
-                    holder.itemView.getLayoutParams().height = MainActivity.boardTileHeight;
+        if(!((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) && numOfTiles>10)) {
 
-            }
-            else if (numOfTiles == 11) {
-                holder.mLetter.setTextSize(25);
-                holder.mLetterValue.setTextSize(8);
+            holder.mLetter.setTextSize(mContext.getResources().getDimension(R.dimen.letter_name));
+            holder.mLetterValue.setTextSize(mContext.getResources().getDimension(R.dimen.letter_points));
+            if(Integer.parseInt(holder.mLetterValue.getText().toString())>=10)
+            {holder.mLetterValue.setTextSize(mContext.getResources().getDimension(R.dimen.letter_points)-3);
+                holder.mLetterValue.setPadding(0,0,0,3);}
+            //holder.itemView.getLayoutParams().width = MainActivity.boardTileWidth;
+            //holder.itemView.getLayoutParams().height = MainActivity.boardTileHeight;
+
+        }
+             else if ((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) && numOfTiles >= 11) {
+                int defaultSizeForName= (int) mContext.getResources().getDimension(R.dimen.letter_name);
+                int defaultSizeForValue = (int) mContext.getResources().getDimension(R.dimen.letter_points);
+                holder.mLetter.setTextSize(defaultSizeForName-(numOfTiles-10)*3);
+                holder.mLetterValue.setTextSize(defaultSizeForValue-(numOfTiles-10)*2);
+                if(Integer.parseInt(holder.mLetterValue.getText().toString())>=10)
+                {holder.mLetterValue.setTextSize(defaultSizeForValue-(numOfTiles-10)*2-3);
+                holder.mLetterValue.setPadding(0,0,0,3);
+                }
                 holder.itemView.getLayoutParams().width=holder.itemView.getLayoutParams().WRAP_CONTENT;
                 holder.itemView.getLayoutParams().height=holder.itemView.getLayoutParams().WRAP_CONTENT;
             }
-            else if ( numOfTiles >= 12) {
-                holder.mLetter.setTextSize(22);
-                holder.mLetterValue.setTextSize(7);
-                holder.itemView.getLayoutParams().width=holder.itemView.getLayoutParams().WRAP_CONTENT;
-                holder.itemView.getLayoutParams().height=holder.itemView.getLayoutParams().WRAP_CONTENT;
-            }
-        }
 
-        if(Integer.parseInt(holder.mLetterValue.getText().toString())>=10)
-        {
-            int currentTextSize = MainActivity.pxToSp(mContext, (int) holder.mLetterValue.getTextSize());
-            holder.mLetterValue.setTextSize(currentTextSize-2);
-        }
+
+
+
+
 
         //handle blank placers
             if(name.equals("") ){
@@ -167,9 +161,6 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 holder.itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border));
                 holder.clickable(holder.itemView,1);
             }
-
-
-
     }
 
     @Override
@@ -216,19 +207,13 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
                 mOnClickListener.onLetterClick(recyclerViewId, clickedPosition);
             }
         }
+    }
 
-        public String getLetterName(){
-            return (String) mLetter.getText();
-        }
+    public void reduceTextSize( TextView textView, int reduceBy){
+
+            int currentTextSize = MainActivity.pxToSp(mContext, (int) textView.getTextSize());
+            textView.setTextSize(currentTextSize - reduceBy);
 
 
-        public void dissolveAnimation(){
-            Log.i("animation_position",String.valueOf(getAdapterPosition()));
-            Log.i("board_size",String.valueOf(mBoard.size()));
-            final Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.animation);
-            animation.reset();
-            //itemView.setAnimation(animation);
-            itemView.startAnimation(animation);
-        }
     }
 }

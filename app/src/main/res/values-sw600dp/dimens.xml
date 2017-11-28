@@ -3,6 +3,7 @@
     <dimen name="bubble_text_size">20sp</dimen>
     <dimen name="good_luck_bubble_text_size">50sp</dimen>
     <dimen name="dialog_text_size">20sp</dimen>
+    <dimen name="letter_points">20sp</dimen>
     <dimen name="menu_text_size">10sp</dimen>
     <dimen name="timer_text_size">70sp</dimen>
     <dimen name="high_score_title">50sp</dimen>

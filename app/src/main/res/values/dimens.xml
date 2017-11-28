@@ -4,6 +4,8 @@
     <dimen name="bubble_text_size">5sp</dimen>
     <dimen name="good_luck_bubble_text_size">20sp</dimen>
     <dimen name="dialog_text_size">5sp</dimen>
+    <dimen name="letter_points">4sp</dimen>
+    <dimen name="letter_name">8sp</dimen>
     <!--setting text in xml-->
     <dimen name="menu_text_size">18sp</dimen>
     <dimen name="timer_below_550">26pt</dimen>

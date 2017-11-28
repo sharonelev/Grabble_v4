@@ -599,7 +599,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        switch (recyler_id) { //from builder to board
+        switch (recyler_id) { //from board to builder
             case R.id.scrabble_letter_list: //board
                 builder.add(board.get(clickedItemIndex));
                 board.remove(clickedItemIndex);
@@ -614,12 +614,12 @@ public class MainActivity extends AppCompatActivity implements
                 int wordIndex = builderLetterTypes.get(clickedItemIndex)[1];
                 int letterIndex = builderLetterTypes.get(clickedItemIndex)[2];
                 switch (origin) {
-                    case 0: //from board
+                    case 0: //to board
                         board.remove(letterIndex);//remove place holder
                         board.add(letterIndex, builder.get(clickedItemIndex));
                         mBoardAdapter.notifyDataSetChanged();
                         break;
-                    case 1: //from myWords(wordplace.letterplace)
+                    case 1: //to myWords(wordplace.letterplace)
                         if (wordIndex < 0) {
                             Log.i("case word index=-1", "shouldn't get here");
                             break;
