@@ -1,8 +1,10 @@
 <resources>
-    <dimen name="fab_margin">16dp</dimen>
+
+    <!--setting text in code-->
     <dimen name="bubble_text_size">5sp</dimen>
     <dimen name="good_luck_bubble_text_size">20sp</dimen>
     <dimen name="dialog_text_size">5sp</dimen>
+    <!--setting text in xml-->
     <dimen name="menu_text_size">18sp</dimen>
     <dimen name="timer_below_550">26pt</dimen>
     <dimen name="timer_below_600">28pt</dimen>

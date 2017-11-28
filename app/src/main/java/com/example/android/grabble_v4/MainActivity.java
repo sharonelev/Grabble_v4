@@ -901,7 +901,7 @@ if(highScoreScreenSlideDialog!=null) {
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
-                      dialogEndGame(res);
+                        getLetterButtonToNewGame();
                     }
                 }).show();
         TextView textView = (TextView) dialog.findViewById(android.R.id.message);
@@ -1694,9 +1694,7 @@ if(highScoreScreenSlideDialog!=null) {
         Hawk.delete(SAW_BUBBLE_TOUR);
         Hawk.delete(TILE_WIDTH);
         Hawk.delete(TILE_HEIGHT);
-        SharedPreferences shared = this.getSharedPreferences(this.getPackageName(), 0);
-        SharedPreferences.Editor editor = shared.edit();
-        editor.putBoolean("disabled", true);
+
 ////////////////TODO did you remove this???
 
 

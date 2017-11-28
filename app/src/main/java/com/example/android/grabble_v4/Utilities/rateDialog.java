@@ -137,7 +137,7 @@ public class rateDialog implements DialogInterface.OnClickListener
 
     private void show() {
         boolean disabled = this.sharedPrefs.getBoolean("disabled", false);
-       if(!disabled)
+     //  if(!disabled) //TODO RETURN THIS AFTER TESTING!
         {
             this.whileDialogShows.onShowDialog();
             this.build();
