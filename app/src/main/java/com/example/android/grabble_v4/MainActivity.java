@@ -1159,7 +1159,6 @@ public class MainActivity extends AppCompatActivity implements
             startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
           if(!replaceFlag) { //if replace flag is false!
               mBoardAdapter.notifyDataSetChanged(); //if replace flag notify occurs in runnable
-
           }
           else
               replaceFlag = false; //for next time
@@ -1387,7 +1386,10 @@ public class MainActivity extends AppCompatActivity implements
                 if (countDownInd!=0) {
                     if (lettersLeft > 0) {
                         addLetterToBoard(TIME_UP);
-                        mBoardAdapter.notifyDataSetChanged();
+                        if(!replaceFlag)
+                            mBoardAdapter.notifyDataSetChanged();
+                        else
+                            replaceFlag=false;
                         startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss),"-");
                         playerScore = playerScore - 1;
                         mScore.setText(String.valueOf(playerScore));
@@ -1599,12 +1601,12 @@ public class MainActivity extends AppCompatActivity implements
     ///// RATE US DIALOG
 
     public void rateApp() {
-        rateDialog fiveStarsDialog = new rateDialog(this, "sha17187@gmail.com");
+        rateDialog fiveStarsDialog = new rateDialog(this, "apps.by.sha@gmail.com");
         fiveStarsDialog.setRateText("Your custom text")
 
                 .setTitle("Your custom title")
                 .setForceMode(false)
-                .setUpperBound(3) // Market opened if a rating >= 2 is selected
+                .setUpperBound(10) // Market opened if a rating >= 9 is selected
                 .setRateText(getString(R.string.rate_txt))
                 .setTitle(getString(R.string.rate_title))
                 .setNoStarsListener(new NoStartReviewListener() {

@@ -26,7 +26,7 @@ public class DictionaryDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     Context mContext;
     private SQLiteDatabase dictionaryDB;
-    public final static String DATABASE_PATH ="/data/data/com.example.android.grabble_v4/databases/";
+    public final static String DATABASE_PATH ="/data/data/com.sha.android.grabble/databases/";
 
     // Constructor
     public DictionaryDbHelper(Context context) {

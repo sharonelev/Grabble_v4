@@ -4,12 +4,12 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.example.android.grabble_v4"
+        applicationId "com.sha.android.grabble"
         manifestPlaceholders = [HOCKEYAPP_APP_ID: "9d075afcb26c4b0ab6a7dbc54826b63f"]
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "Amit"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

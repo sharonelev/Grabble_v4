@@ -12,6 +12,7 @@
     <dimen name="timer_text_size">60sp</dimen>
     -->
     <!--setting text in xml-->
+    <dimen name="timer_text_size">50sp</dimen>
     <dimen name="button_padding">35dp</dimen>
     <dimen name="button_width">600dp</dimen>
     <dimen name="menu_text_size">25sp</dimen>

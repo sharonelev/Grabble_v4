@@ -60,7 +60,7 @@ public class SendFeedback extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         Intent email = new Intent(Intent.ACTION_SEND);
-        String to="sha17187@gmail.com";
+        String to="apps.by.sha@gmail.com";
         String subject="Feedback from Grabble_v4 app";
         String message=feedback.getText().toString();
         email.putExtra(Intent.EXTRA_EMAIL, new String[]{ to});
@@ -92,5 +92,7 @@ public class SendFeedback extends AppCompatActivity implements View.OnClickListe
                         startActivity(main_intent);
                     }
                 }).create().show();
+
+
     }
 }
