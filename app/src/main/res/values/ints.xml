@@ -2,11 +2,27 @@
 <resources>
     <integer name="tiles_on_board">8</integer>
     <integer name="tiles_on_board_no_timer">10</integer>
-    <integer name="tiles_in_game">14</integer>
+    <!--TODO set tiles in game!-->
+    <integer name="tiles_in_game">44</integer>
     <integer name="timer_initial_speedy">6000</integer>
     <integer name="timer_initial_moderate">16000</integer>
     <integer name="get_letter_points_loss">1</integer>
     <integer name="tiles_start_replace">8</integer>
-    <!--TODO set tiles in game!-->
+    <integer name="reduce_text_size_letter">3</integer>
+    <integer name="reduce_text_size_points">2</integer>
+    <integer name="reduce_text_size_10_points">3</integer>
+    <integer name="num_of_tiles_to_reduce_from">10</integer>
+    <!--setting text size programatically-->
+    <integer name="bubble_text_size">18</integer>
+    <integer name="good_luck_bubble_text_size">50</integer>
+    <integer name="dialog_text_size">18</integer>
+    <integer name="dialog_title_text_size">20</integer>
+    <integer name="dialog_buttons_text_size">14</integer>
+    <integer name="letter_points">12</integer>
+    <integer name="toast_text_size">16</integer>
+    <integer name="letter_name">28</integer>
+    <integer name="timer_below_550">26</integer>
+    <integer name="timer_below_600">30</integer>
+
 
 </resources>

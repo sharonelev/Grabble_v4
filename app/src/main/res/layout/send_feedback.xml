@@ -15,7 +15,7 @@
         android:text="We'd love to hear from you!"
         android:textAlignment="center"
         android:textColor="#121111"
-        android:textSize="25dp" />
+        android:textSize="@dimen/feedback_title" />
 
     <EditText
         android:layout_width="match_parent"

@@ -3,6 +3,7 @@ package com.example.android.grabble_v4;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,11 @@ import java.util.List;
 public class HighScoreAdapter extends RecyclerView.Adapter<HighScoreAdapter.ScoreViewHolder>{
 
     List<HighScore> highScoreList;
-    public HighScoreAdapter(List<HighScore> list){
-        highScoreList=list;
+    Context mContext;
 
+    public HighScoreAdapter(List<HighScore> list, Context context){
+        highScoreList=list;
+        mContext=context;
     }
 
     @Override
@@ -50,8 +53,8 @@ public class HighScoreAdapter extends RecyclerView.Adapter<HighScoreAdapter.Scor
         holder.mDateTime.setText(dateTime);
         holder.mScore.setText(String.valueOf(score));
         holder.itemView.setBackgroundColor(Color.TRANSPARENT);
-        holder.mDateTime.setTextSize(20);
-        holder.mScore.setTextSize(20);
+        holder.mDateTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float)mContext.getResources().getInteger(R.integer.dialog_text_size));
+        holder.mScore.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float)mContext.getResources().getInteger(R.integer.dialog_text_size));
 
     }
 

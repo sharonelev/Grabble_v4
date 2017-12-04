@@ -76,8 +76,10 @@
     android:gravity="bottom">
     <Button
         android:id="@+id/button_classic_game"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/button_padding"
+        android:paddingBottom="@dimen/button_padding"
         android:layout_gravity="center"
         android:background="@drawable/button_border"
         android:clickable="true"
@@ -91,11 +93,13 @@
 
     <Button
         android:id="@+id/button_speedy_game"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/button_width"
         android:textSize="@dimen/button_text_size"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@drawable/button_border"
+        android:paddingTop="@dimen/button_padding"
+        android:paddingBottom="@dimen/button_padding"
         android:clickable="true"
         android:onClick="onClick"
         android:text="@string/speedy_game"
@@ -105,9 +109,11 @@
 
     <Button
         android:id="@+id/button_moderate_game"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:paddingTop="@dimen/button_padding"
+        android:paddingBottom="@dimen/button_padding"
         android:background="@drawable/button_border"
         android:clickable="true"
         android:onClick="onClick"

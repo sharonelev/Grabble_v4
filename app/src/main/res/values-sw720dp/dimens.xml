@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--setting text in code
+    <dimen name="bubble_text_size">16sp</dimen>
+    <dimen name="good_luck_bubble_text_size">50sp</dimen>
+    <dimen name="dialog_text_size">14sp</dimen>
+    <dimen name="dialog_buttons_text_size">10sp</dimen>
+    <dimen name="dialog_title_text_size">14sp</dimen>
+    <dimen name="letter_points">14sp</dimen>
+    <dimen name="letter_name">25sp</dimen>
+    <dimen name="toast_text_size">16sp</dimen>
+    <dimen name="timer_text_size">60sp</dimen>
+    -->
+    <!--setting text in xml-->
+    <dimen name="button_padding">35dp</dimen>
+    <dimen name="button_width">600dp</dimen>
+    <dimen name="menu_text_size">25sp</dimen>
+    <dimen name="high_score_title">50sp</dimen>
+    <dimen name="table_headers">40sp</dimen>
+    <dimen name="instructions_text_size">25sp</dimen>
+    <dimen name="button_text_size">25sp</dimen>
+    <dimen name="lets_play_text_size">80sp</dimen>
+    <dimen name="by_sha_text_size">30sp</dimen>
+    <dimen name="your_words_text_size">30sp</dimen>
+    <dimen name="feedback_title">35sp</dimen>
+    <dimen name="edit_text">25sp</dimen>
+    <dimen name="my_words_list_height">100dp</dimen>
+    <dimen name="builder_height">110dp</dimen>
+
+</resources>

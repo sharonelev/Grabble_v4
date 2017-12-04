@@ -86,7 +86,7 @@ public class checkWordFromAPI {
                 Log.d("valid", "did not get valid result");
             }
 
-            //  valid="1"; //TODO REMVOE AFTER TESTING
+            //  valid="1";
             {
 
                 if (valid.equals("0")) {

@@ -8,11 +8,15 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -75,10 +79,20 @@ public class rateDialog implements DialogInterface.OnClickListener
         AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         LayoutInflater inflater = LayoutInflater.from(this.context);
         this.dialogView = inflater.inflate(angtrim.com.fivestarslibrary.R.layout.stars, (ViewGroup)null);
+
         String titleToAdd = this.title == null?"Rate this app":this.title;
+        TextView titleTextView =  new TextView(context);
+        titleTextView.setText(titleToAdd);
+        titleTextView.setPadding(0,30,0,30);
+        titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            titleTextView.setBackgroundColor(context.getColor(R.color.colorPrimary));
+        }
+        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) context.getResources().getInteger(R.integer.dialog_title_text_size));
         String textToAdd = this.rateText == null?"How much do you love our app?":this.rateText;
         this.contentTextView = (TextView)this.dialogView.findViewById(angtrim.com.fivestarslibrary.R.id.text_content);
         this.contentTextView.setText(textToAdd);
+        this.contentTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) context.getResources().getInteger(R.integer.dialog_text_size));
         this.ratingBar = (RatingBar)this.dialogView.findViewById(angtrim.com.fivestarslibrary.R.id.ratingBar);
         this.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
@@ -98,7 +112,7 @@ public class rateDialog implements DialogInterface.OnClickListener
             stars.getDrawable(2).setColorFilter(starColor, PorterDuff.Mode.SRC_ATOP);
                    }
 
-        this.alertDialog = builder.setTitle(titleToAdd).setView(this.dialogView).setNegativeButton("Not Now", this).setPositiveButton("Ok", this).setNeutralButton("Never", this).setOnCancelListener(new DialogInterface.OnCancelListener() {
+        this.alertDialog = builder.setCustomTitle(titleTextView).setView(this.dialogView).setNegativeButton("Not Now", this).setPositiveButton("Ok", this).setNeutralButton("Never", this).setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 Log.i("on_cancel","star dialog");
@@ -137,13 +151,20 @@ public class rateDialog implements DialogInterface.OnClickListener
 
     private void show() {
         boolean disabled = this.sharedPrefs.getBoolean("disabled", false);
-     //  if(!disabled) //TODO RETURN THIS AFTER TESTING!
+      if(!disabled) //TODO RETURN THIS AFTER TESTING!
         {
             this.whileDialogShows.onShowDialog();
             this.build();
             this.alertDialog.show();
-            TextView textView = (TextView) this.alertDialog.findViewById(android.R.id.message);
-            textView.setTextSize(context.getResources().getDimension(R.dimen.dialog_text_size));
+            Button button1 = (Button) this.alertDialog.findViewById(android.R.id.button1);
+            Button button2 = (Button) this.alertDialog.findViewById(android.R.id.button2);
+            Button button3 = (Button) this.alertDialog.findViewById(android.R.id.button3);
+
+            button1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) context.getResources().getInteger(R.integer.dialog_buttons_text_size));
+            button2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) context.getResources().getInteger(R.integer.dialog_buttons_text_size));
+            button3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) context.getResources().getInteger(R.integer.dialog_buttons_text_size));
+
+
         }
 
     }

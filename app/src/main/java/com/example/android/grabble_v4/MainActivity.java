@@ -22,6 +22,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.DialogTitle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,10 +31,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -121,12 +125,13 @@ public class MainActivity extends AppCompatActivity implements
     public SQLiteDatabase dictionaryDb;
     DictionaryDbHelper dbHelper;
     Toast toast;
-
+    boolean noTilesOnBoard;
     //preferences
     public boolean showCorrectPopUp;
     public boolean showWrongPopUp;
     public boolean shakeToGetLetter;
     public boolean animatePoints;
+    public static final String LIMIT_POPUP = "limit_pop_up";
     //UI elements
     ProgressBar pBar;
     TextView mScore;
@@ -459,7 +464,8 @@ public class MainActivity extends AppCompatActivity implements
                 else if (lettersLeft == 0) { //means he tapped end game
                     getLetter.setEnabled(false);
                     int reduceScore = reduceScoreEndGame(); //calculate value of letters left on board
-                    dialogEndGameSure(reduceScore); //could be 0
+                    if(board.size()>0)
+                        dialogEndGameSure(reduceScore); //can't be 0
 
                     break;
                 }
@@ -709,7 +715,9 @@ public class MainActivity extends AppCompatActivity implements
             noLettersInBag();
         }
         if (board.isEmpty() && builder.isEmpty()) {
+            setEnableAll(false);
             setFinalPoints(0);
+
         }
         setEnableAll(true);
        return;
@@ -748,7 +756,7 @@ public class MainActivity extends AppCompatActivity implements
 
        final Animation anim = AnimationUtils.loadAnimation(this, R.anim.animation_shrink);
         //anim.setDuration(200);
-        toastManager("You have reached the tile limit on board. Letters will be replaced randomly.");
+        passedWordLimit();
         final Handler myHandler= new Handler();
         Random rand = new Random();
         final SingleLetter letterToReplace;
@@ -842,33 +850,32 @@ public class MainActivity extends AppCompatActivity implements
                         setEnableAll(true);
                     }
                 }).show();
-        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
-        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
+        setDialogTextSize(dialog);
 
     }
 
     public void dialogEndGameSure(final int boardPoints) {
         getLetter.setEnabled(true);
-       AlertDialog dialog= new AlertDialog.Builder(this).setTitle("End Game")
-                .setMessage("Are you sure you want to end game? You will lose " + boardPoints + " for tiles left in the board")
+       AlertDialog dialog= new AlertDialog.Builder(this).setTitle(getString(R.string.end_game))
+                .setMessage("Are you sure you want to end game? You will lose " + boardPoints + " points for tiles left on the board")
                 .setPositiveButton("I am sure", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         setFinalPoints(boardPoints);
                     }
                 }).setNegativeButton("I'll keep trying", null).show();
-        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
-        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
+        setDialogTextSize(dialog);
+
     }
 
     public void dialogEndGame(final int res) {
 
-if(highScoreScreenSlideDialog!=null) {
-    if (highScoreScreenSlideDialog.isVisible()) {
-        //   Log.i("end game dialog", "high score visible");
-        highScoreScreenSlideDialog.dismiss();  //close high score dialog if end game dialog
-    }
-}
+        if(highScoreScreenSlideDialog!=null) {
+            if (highScoreScreenSlideDialog.isVisible()) {
+                //   Log.i("end game dialog", "high score visible");
+                highScoreScreenSlideDialog.dismiss();  //close high score dialog if end game dialog
+            }
+        }
         String msg = "";
 
         if (res == 1) {
@@ -878,7 +885,7 @@ if(highScoreScreenSlideDialog!=null) {
             msg = "Well done!";
         }
 
-     AlertDialog dialog =  new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
+        AlertDialog dialog =  new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.end_game))
                 .setMessage("Your Score: " + playerScore + "\n" + msg)
                 .setNegativeButton(R.string.new_game, new DialogInterface.OnClickListener() {
                     @Override
@@ -904,8 +911,7 @@ if(highScoreScreenSlideDialog!=null) {
                         getLetterButtonToNewGame();
                     }
                 }).show();
-        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
-        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
+        setDialogTextSize(dialog);
     }
 
     public void getLetterButtonToNewGame(){
@@ -926,7 +932,7 @@ if(highScoreScreenSlideDialog!=null) {
         }
         int wordLength = word.length();
         if (wordLength >= 7) {
-            longScore = "\n" + "Woohoo! " + wordLength + " extra points for a " + wordLength + " letter word!";
+            longScore = "\n" + "Woohoo! " + wordLength + " extra points for your " + wordLength + " letter word!";
         }
         else
             wordLength=0;
@@ -946,9 +952,27 @@ if(highScoreScreenSlideDialog!=null) {
                         afterDialogSuccess(score);
                     }
                 }).show();
-        TextView textView = (TextView) dialog.findViewById(android.R.id.message);
-        textView.setTextSize(getResources().getDimension(R.dimen.dialog_text_size));
+        setDialogTextSize(dialog);
 
+    }
+
+    public void passedWordLimit(){
+        if(!Hawk.contains(LIMIT_POPUP)) {
+            AlertDialog dialog = new AlertDialog.Builder(this).setMessage("You have reached the tile limit on the board, " +
+                    "a random tile was replaced")
+                    .setNeutralButton("Got it", null)
+                    .setPositiveButton("Don't show this again", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Hawk.put(LIMIT_POPUP, true);
+                                }
+                            }
+                    )
+                    .show();
+            setDialogTextSize(dialog);
+        }
+        else
+            toastManager("You have reached the tile limit on board. Letters will be replaced randomly.");
     }
 
     public void addWordToMyWords(int tempScore) {
@@ -966,6 +990,7 @@ if(highScoreScreenSlideDialog!=null) {
         }
 
         startPointAnimation(tempScore,"+");
+
         for (int i = 0; i < builder_size; i++) { //add to word array
             newWord.add(i, builder.get(i));
             theWord= theWord + builder.get(i).getLetter_name();
@@ -984,6 +1009,7 @@ if(highScoreScreenSlideDialog!=null) {
             board.remove(toRemove);//remove place holders
         }
 
+
         //remove blank letters from mywords - start removing from end
         Collections.sort(tempMyWordsLetters);
         Set uniqueValues = new HashSet(tempMyWordsLetters); //now unique
@@ -992,7 +1018,7 @@ if(highScoreScreenSlideDialog!=null) {
             //none broken letter check was done earlier
             int toRemove = tempMyWordsLettersUnique.get(i);
             myWords.remove(toRemove);
-            wordList.remove(toRemove); //TODO Test this
+            wordList.remove(toRemove);
             mWordsAdapter.notifyDataSetChanged();
         }
 
@@ -1070,12 +1096,31 @@ if(highScoreScreenSlideDialog!=null) {
     }
 
     //CORE ASSISTING METHODS
+    public void setDialogTextSize(AlertDialog dialog){
+
+        TextView contentTextView = (TextView) dialog.findViewById(android.R.id.message);
+        Button button1 = (Button) dialog.findViewById(android.R.id.button1);
+        Button button2 = (Button) dialog.findViewById(android.R.id.button2);
+        Button button3 = (Button) dialog.findViewById(android.R.id.button3);
+
+        button1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.dialog_buttons_text_size));
+        button2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.dialog_buttons_text_size));
+        button3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.dialog_buttons_text_size));
+        contentTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.dialog_text_size));
+
+
+    }
+
     public void toastManager(String txt){
 
         if (toast != null) {
             toast.cancel();
         }
         toast = Toast.makeText(this, txt, Toast.LENGTH_SHORT);
+
+        ViewGroup group = (ViewGroup) toast.getView();
+        TextView messageTextView = (TextView) group.getChildAt(0);
+        messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.toast_text_size));
         toast.show();
     }
 
@@ -1112,10 +1157,13 @@ if(highScoreScreenSlideDialog!=null) {
                 addLetterToBoard(CLASSIC_GET_LETTER);
 
             startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss), "-");
-          if(!replaceFlag) {
+          if(!replaceFlag) { //if replace flag is false!
               mBoardAdapter.notifyDataSetChanged(); //if replace flag notify occurs in runnable
-              replaceFlag = false;
+
           }
+          else
+              replaceFlag = false; //for next time
+
             playerScore--; //reduce a point for each tile the user adds
             mScore.setText(String.valueOf(playerScore));
 
@@ -1339,6 +1387,7 @@ if(highScoreScreenSlideDialog!=null) {
                 if (countDownInd!=0) {
                     if (lettersLeft > 0) {
                         addLetterToBoard(TIME_UP);
+                        mBoardAdapter.notifyDataSetChanged();
                         startPointAnimation(getResources().getInteger(R.integer.get_letter_points_loss),"-");
                         playerScore = playerScore - 1;
                         mScore.setText(String.valueOf(playerScore));
@@ -1372,7 +1421,9 @@ if(highScoreScreenSlideDialog!=null) {
 
    //////ANIMATION
     public void startPointAnimation(int score, String plusOrMinus){
+
         if(animatePoints) {
+
             pointsAnimation.setText(plusOrMinus + String.valueOf(score));
             final Animation animation = AnimationUtils.loadAnimation(this, R.anim.animation);
             animation.reset();
@@ -1380,8 +1431,12 @@ if(highScoreScreenSlideDialog!=null) {
             pointsAnimation.startAnimation(animation);
             pointsAnimation.setVisibility(View.INVISIBLE);
             pointsAnimation.bringToFront();
-        }
+
+
+
     }
+
+}
 
     //////SHAKER
     public void shakeDetectorInit(){
@@ -1433,7 +1488,7 @@ if(highScoreScreenSlideDialog!=null) {
         bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
         bubbleText = (TextView) findViewById(R.id.instruction_bubble);
         bubbleText.setText(bubble1);
-        bubbleText.setTextSize(getResources().getDimension(R.dimen.bubble_text_size));
+        bubbleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.bubble_text_size));
         bubbleText.setPadding(5,5,5,5);
         bubbleLayout.setForegroundGravity(Gravity.NO_GRAVITY);
 
@@ -1442,7 +1497,7 @@ if(highScoreScreenSlideDialog!=null) {
         if(boardTileWidth>0)
             bubbleLayout.setX(boardTileWidth*5);
         else
-            bubbleLayout.setX(dpToPx(this, deviceWidth)/2);
+            bubbleLayout.setX(dpToPx(this, deviceWidth)/3);
 
         bubbleLayout.setY(0+15);
         bubbleLayout.bringToFront();
@@ -1503,10 +1558,11 @@ if(highScoreScreenSlideDialog!=null) {
                     bubbleLayout.setArrowDirection(ArrowDirection.LEFT);
                     //bubbleLayout.setX();
                     bubbleLayout.setY(dpToPx(getBaseContext(),deviceHeight/2));
-                    bubbleText.setTextSize(getResources().getDimension(R.dimen.good_luck_bubble_text_size));
+                    bubbleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.good_luck_bubble_text_size));
                     bubbleLayout.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
                     bubbleText.setText(bubble5);
                     bubbleGoToInstructions.setVisibility(View.VISIBLE);
+                    bubbleGoToInstructions.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.bubble_text_size));
                     bubbleText.setPadding(5,5,5,0);
                     bubbleGoToInstructions.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -1688,13 +1744,13 @@ if(highScoreScreenSlideDialog!=null) {
     public void setDeviceDimensions(){
 
 //TODO REMOVE AFTER TESTING:
-       Hawk.delete(DEVICE_HEIGHT);
+   /*   Hawk.delete(DEVICE_HEIGHT);
         Hawk.delete(DEVICE_WIDTH);
         Hawk.delete(MYWORDS_HEIGHT);
         Hawk.delete(SAW_BUBBLE_TOUR);
         Hawk.delete(TILE_WIDTH);
         Hawk.delete(TILE_HEIGHT);
-
+*/
 ////////////////TODO did you remove this???
 
 
@@ -1753,9 +1809,9 @@ if(highScoreScreenSlideDialog!=null) {
 
     private void setTimerSize(){
         if(deviceHeight<550)
-            countDownView.setTextSize(getResources().getDimension(R.dimen.timer_below_550));
+            countDownView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.timer_below_550));
         else if (deviceHeight<600)
-            countDownView.setTextSize(getResources().getDimension(R.dimen.timer_below_600));
+            countDownView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.timer_below_600));
         else return;
     }
 

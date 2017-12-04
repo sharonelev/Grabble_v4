@@ -55,9 +55,15 @@ public static HighScoreScreenSlideDialog createInstance(int gameType){
     { //set size
         super.onResume();
         int screenHeightDP = Hawk.get(MainActivity.DEVICE_HEIGHT); //
+        int screenWidthDP = Hawk.get(MainActivity.DEVICE_WIDTH); //
         int screenHeightPX = MainActivity.dpToPx(getContext(),screenHeightDP); //
+        int screenWidthPX = MainActivity.dpToPx(getContext(),screenWidthDP); //
         Window window = getDialog().getWindow();
-        window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT, (int) (screenHeightPX/1.5));
+        if(screenWidthDP<600)
+            window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT, (int) (screenHeightPX/1.5));
+        else
+            window.setLayout( (int) (screenWidthPX/1.5), (int) (screenHeightPX/1.5));
+
     }
 
     @Nullable

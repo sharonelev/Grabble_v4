@@ -35,7 +35,6 @@
         android:fontFamily="monospace"
         android:paddingLeft="3dp"
         android:paddingBottom="1dp"
-        android:textSize="28sp"
         tools:text="T" />
 
 
@@ -46,7 +45,6 @@
         android:layout_gravity="bottom|right"
 android:textScaleX="0.75"
         android:fontFamily="monospace"
-        android:textSize="10sp"
         android:paddingRight="3dp"
         android:paddingBottom="3dp"
         tools:text="2" />

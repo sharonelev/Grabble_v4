@@ -5,9 +5,9 @@
         <string name="welcome">Let"'"s play</string>
 
         <!--High Scores-->
-        <string name="classic_high_score">My Classic Mode High Scores</string>
-        <string name="speedy_high_score">My Speedy Mode High Scores</string>
-        <string name="moderate_high_score">My Moderate Mode High Scores</string>
+        <string name="classic_high_score">My Classic Mode\nHigh Scores</string>
+        <string name="speedy_high_score">My Speedy Mode\nHigh Scores</string>
+        <string name="moderate_high_score">My Moderate Mode\nHigh Scores</string>
         <string name="no_high_score">No High Scores</string>
 
 

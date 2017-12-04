@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="tiles_on_board">8</integer>
-    <integer name="tiles_on_board_no_timer">10</integer>
+    <integer name="tiles_on_board">10</integer>
+    <integer name="tiles_on_board_no_timer">12</integer>
     <integer name="reduce_text_size_letter">3</integer>
     <integer name="reduce_text_size_points">2</integer>
-    <integer name="num_of_tiles_to_reduce_from">11</integer>
+    <integer name="num_of_tiles_to_reduce_from">12</integer>
     <integer name="reduce_text_size_10_points">8</integer>
     <!--setting text size programatically-->
     <integer name="bubble_text_size">25</integer>
@@ -14,7 +14,7 @@
     <integer name="dialog_buttons_text_size">22</integer>
     <integer name="letter_points">25</integer>
     <integer name="toast_text_size">25</integer>
-    <integer name="letter_name">45</integer>
+    <integer name="letter_name">50</integer>
     <integer name="timer_below_550">35</integer>
     <integer name="timer_below_600">35</integer>
 </resources>

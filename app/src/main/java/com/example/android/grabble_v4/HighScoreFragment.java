@@ -85,7 +85,7 @@ public class HighScoreFragment extends Fragment implements View.OnClickListener 
                 break;
         }
 
-        scoreAdapter = new HighScoreAdapter(PreferenceUtilities.getTopFive(getActivity().getBaseContext(), gameType)); //0= classic mode
+        scoreAdapter = new HighScoreAdapter(PreferenceUtilities.getTopFive(getActivity().getBaseContext(), gameType), getActivity().getBaseContext()); //0= classic mode
         LinearLayoutManager scoreLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         scoreLayoutManager.setAutoMeasureEnabled(true);
         scoresRecyclerView.setLayoutManager(scoreLayoutManager);
