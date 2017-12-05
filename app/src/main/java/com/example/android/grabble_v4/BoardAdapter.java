@@ -68,6 +68,8 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         boolean shouldAttachToParentImmediately = false;
         final View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         LetterViewHolder viewHolder = new LetterViewHolder(view);
+
+
         if(tileDimensions!=null)
             if(!Hawk.contains(MainActivity.TILE_HEIGHT) || !Hawk.contains(MainActivity.TILE_WIDTH))
                     getTileDimensionsInit(view);

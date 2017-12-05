@@ -87,63 +87,79 @@
         android:layout_height="match_parent"
         android:layout_marginTop="3dp">
 
-        <TextView
-            android:id="@+id/linearTimer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="2dp"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/scrabble_letter_list"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:background="@drawable/timer_border"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text=""
-            android:textColor="#fcb851"
-            android:textSize="@dimen/timer_text_size"
-            android:textStyle="bold"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/scrabble_letter_list"
+            android:overScrollMode="never"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+
+            android:scrollbars="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/get_letter"
+
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scrabble_letter_list"
+            android:id="@+id/get_letter_frame"
+            >
+            <TextView
+                android:id="@+id/linearTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:layout_gravity="right"
+                android:padding="10dp"
+                android:text=""
+                android:textSize="@dimen/timer_text_size"
+                android:textStyle="bold"
+                android:visibility="gone"
+                />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stateListAnimator="@null"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"
             android:background="@drawable/button_border"
             android:gravity="center"
             android:onClick="onClick"
             android:text="@string/get_letter"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scrabble_letter_list" />
+            android:id="@+id/get_letter"
+        />
+
+
+    </FrameLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/word_builder_list"
             android:layout_width="0dp"
             android:layout_height="55dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginStart="0dp"
             android:overScrollMode="never"
             android:paddingBottom="3dp"
             android:paddingTop="3dp"
             android:scrollbars="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="@+id/get_letter"
-            app:layout_constraintTop_toBottomOf="@+id/get_letter"
+            app:layout_constraintRight_toRightOf="@+id/get_letter_frame"
+            app:layout_constraintTop_toBottomOf="@+id/get_letter_frame"
             tools:listitem="@layout/letter_on_board_view" />
 
         <LinearLayout
             android:id="@+id/buttons"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginStart="0dp"
             android:orientation="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="@+id/get_letter"
+            app:layout_constraintRight_toRightOf="@+id/get_letter_frame"
             app:layout_constraintTop_toBottomOf="@+id/word_builder_list">
 
             <Button
@@ -170,16 +186,16 @@
 
         <TextView
             android:id="@+id/my_words_title"
-            android:layout_width="395dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:layout_marginStart="1dp"
-            android:layout_marginTop="-1dp"
-            android:gravity="center"
             android:text="Your words:"
             android:textSize="18dp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttons" />
 
         <RelativeLayout
@@ -241,8 +257,6 @@
             android:id="@+id/myWordsRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginStart="0dp"
             android:overScrollMode="never"
             android:paddingBottom="3dp"
             android:scrollbars="vertical"
@@ -253,22 +267,6 @@
             app:layout_constraintTop_toBottomOf="@+id/my_words_title"
             app:layout_constraintVertical_bias="0.0" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/scrabble_letter_list"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="0dp"
-            android:foregroundGravity="center_vertical|center_horizontal"
-            android:overScrollMode="never"
-            android:paddingBottom="1dp"
-            android:scrollbars="vertical"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/linearTimer"
-            app:layout_constraintTop_toTopOf="parent" />
 
 
     </android.support.constraint.ConstraintLayout>

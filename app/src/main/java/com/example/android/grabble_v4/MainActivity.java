@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
@@ -89,8 +90,7 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         BoardAdapter.LetterClickListener,
         myWordsAdapter.ListWordClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener,
-        BoardAdapter.TileDimensions
+        SharedPreferences.OnSharedPreferenceChangeListener
 {
 
     //RecyclerView elements
@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements
     RecyclerView mBuilderRecView;
     RecyclerView mMyWordsRecView;
     GridLayoutManager gridLayoutManager;
+    LinearLayoutManager boardLinearLayout;
     LinearLayoutManager BuilderLayoutManager;
     StaggeredGridLayoutManager myWordsStaggeredManager;
     HighScoreScreenSlideDialog highScoreScreenSlideDialog;
@@ -147,11 +148,11 @@ public class MainActivity extends AppCompatActivity implements
     private Sensor mAccelerometer;
     private ShakeDetector mShakeDetector;
     //Device specs
-    public static final String DEVICE_HEIGHT = "Device_Height_px";
-    public static final String DEVICE_WIDTH = "Device_Width_px";
-    public static final String MYWORDS_HEIGHT = "my_words_height_px";
-    public static final String TILE_HEIGHT = "tile_height";
-    public static final String TILE_WIDTH = "tile_width";
+    public static final String DEVICE_HEIGHT = "Device_Height_dp";
+    public static final String DEVICE_WIDTH = "Device_Width_dp";
+    public static final String MYWORDS_HEIGHT = "my_words_height_px_new";
+    public static final String TILE_HEIGHT = "tile_height_px";
+    public static final String TILE_WIDTH = "tile_width_px";
     public static int deviceHeight;
     public static int deviceWidth;
     public float myWordsHeight;
@@ -189,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent homeScreen = getIntent();
         shakeDetectorInit();
         attachDB();
+
 
 
         gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
@@ -326,12 +328,14 @@ public class MainActivity extends AppCompatActivity implements
         replaceFlag=false;
         setEnableAll(true);
 
+        gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
+        boardLinearLayout = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         if(countDownInd==0) {
-                gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
+               // gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board_no_timer));
                 enableCountDown(false);
         }
        else {
-            gridLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.tiles_on_board));
+
 
             if(countDownInd==1){
                 createTimer(getResources().getInteger(R.integer.timer_initial_moderate));
@@ -351,7 +355,8 @@ public class MainActivity extends AppCompatActivity implements
         BuilderLayoutManager.setAutoMeasureEnabled(true);
         mBuilderRecView.setLayoutManager(BuilderLayoutManager);
 
-        mBoardRecView.setLayoutManager(gridLayoutManager);
+        //mBoardRecView.setLayoutManager(gridLayoutManager);
+        mBoardRecView.setLayoutManager(boardLinearLayout);
         mBoardRecView.getLayoutParams().height = boardHeight;
 
         myWordsStaggeredManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL); //4 as default
@@ -387,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements
         mScore.setText(String.valueOf(playerScore));
 
         //Create and set adapters
-        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list,this);
+        mBoardAdapter = new BoardAdapter(this, board, this, R.id.scrabble_letter_list,null);
         mBoardRecView.setAdapter(mBoardAdapter);
 
         mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,null);
@@ -432,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements
                         break;
                     case 2:
                         createTimer(getResources().getInteger(R.integer.timer_initial_speedy));
-
+                        break;
                 }
                 initalizeTimers=false;
             }
@@ -1354,9 +1359,10 @@ public class MainActivity extends AppCompatActivity implements
 
         if (enable) {
             countDownView.setVisibility(View.VISIBLE);
+            countDownView.bringToFront();
+
             if(countDownInd==2)
             {getLetter.setEnabled(false);}
-            //if(Hawk.get()) -- better off having func in bubble method
             countDownTimer.start();
 
         } else {
@@ -1496,8 +1502,8 @@ public class MainActivity extends AppCompatActivity implements
 
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleX = (TextView)findViewById(R.id.bubble_quit);
-        if(boardTileWidth>0)
-            bubbleLayout.setX(boardTileWidth*5);
+        if(Hawk.contains(TILE_WIDTH))
+            bubbleLayout.setX((int)Hawk.get(TILE_WIDTH)*4);
         else
             bubbleLayout.setX(dpToPx(this, deviceWidth)/3);
 
@@ -1674,6 +1680,7 @@ public class MainActivity extends AppCompatActivity implements
         else
             divider.setDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.line_divider_l));
         mBuilderRecView.addItemDecoration(divider);
+        mBoardRecView.addItemDecoration(divider);
     }
 
     public static DisplayMetrics getDeviceMetrics(Context context){
@@ -1703,12 +1710,12 @@ public class MainActivity extends AppCompatActivity implements
         return (int) (spValue * fontScale + 0.5f);
     }
 
-    @Override
-    public void getTileDimensions(int tileWidth, int tileHeight) {
+    /* @Override
+   public void getTileDimensions(int tileWidth, int tileHeight) {
         boardTileHeight=tileHeight;
         boardTileWidth=tileWidth;
         setSpanForStaggered(); //after getting tile dimensions
-    }
+    }*/
 
     private void getMyWordsHeight() {
 
@@ -1746,13 +1753,13 @@ public class MainActivity extends AppCompatActivity implements
     public void setDeviceDimensions(){
 
 //TODO REMOVE AFTER TESTING:
-   /*   Hawk.delete(DEVICE_HEIGHT);
+   /*  Hawk.delete(DEVICE_HEIGHT);
         Hawk.delete(DEVICE_WIDTH);
         Hawk.delete(MYWORDS_HEIGHT);
         Hawk.delete(SAW_BUBBLE_TOUR);
         Hawk.delete(TILE_WIDTH);
-        Hawk.delete(TILE_HEIGHT);
-*/
+        Hawk.delete(TILE_HEIGHT);*/
+
 ////////////////TODO did you remove this???
 
 
@@ -1769,21 +1776,21 @@ public class MainActivity extends AppCompatActivity implements
             deviceHeight = Hawk.get(DEVICE_HEIGHT);
             deviceWidth  = Hawk.get(DEVICE_WIDTH);
         }
-        setHeightForRV();
-        getMyWordsHeight();
-    }
-
-    private void setSpanForStaggered() {
 
         if(Hawk.contains(MainActivity.TILE_HEIGHT) && Hawk.contains(MainActivity.TILE_WIDTH))
         {
             boardTileHeight = Hawk.get(TILE_HEIGHT);
             boardTileWidth = Hawk.get(TILE_WIDTH);
         }
+        //setHeightForRV();
+        getMyWordsHeight();
+    }
+
+    private void setSpanForStaggered() {
 
         if(myWordsHeight>0 && boardTileHeight>0) {
         //    int j = dpToPx(getBaseContext(),myWordsHeight);
-            int tileHeightDp = pxToDp(this,boardTileHeight);
+            int tileHeightDp =  pxToDp(this,boardTileHeight)+(int) (boardTileHeight*0.02);
             int spans = (int) Math.floor(myWordsHeight / tileHeightDp);
             myWordsStaggeredManager.setSpanCount(spans);
 
@@ -1810,6 +1817,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setTimerSize(){
+
+        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/digital-7-mono.ttf");
+        countDownView.setTypeface(tf);
+        countDownView.bringToFront();
+
         if(deviceHeight<550)
             countDownView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.timer_below_550));
         else if (deviceHeight<600)

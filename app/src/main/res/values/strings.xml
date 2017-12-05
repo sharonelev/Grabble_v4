@@ -16,7 +16,7 @@
         <string name="instructions">Make words with 3 or more letters by using letters from the top of the board and from words you already created. Shake or tap "'"GET LETTER"'" to get another tile.</string>
         <string name="rules_title">Game rules:</string>
         <string name="rules">+ New words must contain at least one letter from the board\n+ When reusing a word from your list you must use all of its letters\n+ You may use several words from your list to make a new one\n+ Just adding the letter "'"S"'" to the end a word is not allowed\n+ You can have up to 8 tiles open at the top of the board, after that pressing GET LETTER will exchange one of the tiles randomly</string>
-        <string name="score_instructions">After playing a word you will receive points according to the letter values in your word. If you reuse an existing word, you get to keep the points you got for the original word. 7 letter words or more will grant you with bonus points, 1 per letter! Requesting a tile from the bag or if your time runs up (on the speedy and moderate modes) will reduce a point from your score. At the end of the game you will lose points for the tiles left on the board according to their value.\n   </string>
+        <string name="score_instructions">+ After playing a word you will receive points according to the letter values in your word\n+ If you reuse an existing word, you get to keep the points you got for the original word\n+ 7 letter words or more will grant you with bonus points, 1 per letter!\n+ Requesting a tile from the bag or if your time runs up (on the speedy and moderate modes) will reduce a point from your score\n+ At the end of the game you will lose points for the tiles left on the board according to their value\n   </string>
         <string name="bubble_on_board">Create words with 3\nor more letters from\ntiles on the board</string>
         <string name="bubble_on_myWords">or reuse the words\nyou already made</string>
         <string name="classic_moderate_bubble_on_GetLetter">Can"'"t make a word?\nTap or *SHAKE* to get a\nletter and lose a point</string>
@@ -27,7 +27,7 @@
         <string name="show_bbl_instructions"><u>Show bubble\ninstructions</u></string>
         <string name="go_to_instructions">For detailed instructions <u>click here</u></string>
         <!--buttons-->
-        <string name="get_letter">Get Letter</string>
+        <string name="get_letter">GET LETTER</string>
         <string name="end_game">END GAME</string>
         <string name="share_move">SHARE</string>
         <string name="new_game">NEW GAME</string>

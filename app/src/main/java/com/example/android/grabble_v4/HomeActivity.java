@@ -15,7 +15,7 @@ import com.example.android.grabble_v4.data.SingleLetter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, BoardAdapter.TileDimensions{
 
     private static  int LETTER_TIME_OUT=1000;
     private List<SingleLetter> mList = new ArrayList<>();
@@ -89,7 +89,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager WelcomeLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(WelcomeLayoutManager);
         mList.add(letterI);
-        mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView, null);
+        mWelcomeAdapter = new BoardAdapter(this, mList, null, R.id.welcomeRecyclerView, this);
         recyclerView.setAdapter(mWelcomeAdapter);
         recyclerView.setEnabled(false);
         myHandler.postDelayed(addI,LETTER_TIME_OUT);
@@ -126,4 +126,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         finish();
     }
 
+    @Override
+    public void getTileDimensions(int tileWidth, int tileHeight) {
+        Log.i("height", String.valueOf(MainActivity.pxToDp(this,tileHeight)));
+        Log.i("width", String.valueOf(MainActivity.pxToDp(this,tileWidth)));
+    }
 }

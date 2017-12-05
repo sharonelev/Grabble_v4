@@ -70,7 +70,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         int screenWidthDP=Hawk.get(MainActivity.DEVICE_WIDTH);
         int screenWidthPX = MainActivity.dpToPx(mContext,screenWidthDP);
         int tileSize;
-        //tile size incluudes spaces
+        //tile size includes spaces
         if(screenWidthDP<400)
             tileSize=(int) screenWidthPX/10;
         else if(screenWidthDP<600)
@@ -133,9 +133,6 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
            //int deviceWidthPX = MainActivity.dpToPx(mContext,deviceWidthDP);
             DividerItemDecoration divider;
             divider= new DividerItemDecoration(eachWordRecView.getContext(),DividerItemDecoration.HORIZONTAL);
-           /* if(deviceWidthDP<400)
-                divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_s));
-            else */
                 if(deviceWidthDP<400)
                 divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_s));
             else
