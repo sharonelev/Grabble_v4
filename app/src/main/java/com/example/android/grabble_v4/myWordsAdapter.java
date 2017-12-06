@@ -2,15 +2,23 @@ package com.example.android.grabble_v4;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.Image;
+import android.support.transition.Visibility;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuAdapter;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.orhanobut.hawk.Hawk;
@@ -55,7 +63,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     }
 
     @Override
-    public void onBindViewHolder(WordViewHolder holder, int position)
+    public void onBindViewHolder(final WordViewHolder holder, int position)
 
     {
         if(myWords.get(position)==null){
@@ -80,6 +88,42 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         //holder.itemView.setBackgroundColor(Color.RED); //For testing only
         holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
 
+
+        holder.wordMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //creating a popup menu
+                PopupMenu popup = new PopupMenu(mContext, holder.wordMenu, Gravity.NO_GRAVITY, R.attr.actionOverflowMenuStyle, 0);
+                //inflating menu from xml resource
+                popup.inflate(R.menu.word_menu);
+                //adding click listener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.word_history:
+                                //handle menu1 click
+                                break;
+                            case R.id.word_dictionary:
+                                //handle menu2 click
+                                break;
+                            case R.id.word_share:
+                                //handle menu3 click
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                //displaying the popup
+                //popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), holder.itemView);
+                menuHelper.setForceShowIcon(true);
+                //menuHelper.setGravity(Gravity.END);
+                menuHelper.show();
+            }
+        });
+
+
     }
 
     @Override
@@ -93,6 +137,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         BoardAdapter mBoardAdapter;
         List<SingleLetter> mList = new ArrayList<>();
         boolean isEnabled= true;
+        ImageButton wordMenu;
 
 
         public void mySetEnabled(boolean state){
@@ -105,11 +150,13 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             super(itemView);
 
             eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
+            wordMenu = (ImageButton) itemView.findViewById(R.id.word_options);
             setDivider();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             eachWordRecView.setLayoutManager(wordLayoutManager);
             mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView,null);
             eachWordRecView.setAdapter(mBoardAdapter);
+            wordMenu.setVisibility(View.VISIBLE);
 
         }
 
@@ -117,6 +164,8 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         @Override
         public void onLetterClick(int view_id, int clickedItemIndex) { // a letter in a myWords was clicked
             if(isEnabled) {
+                if(wordMenu.getVisibility()!= View.GONE)
+                    {wordMenu.setVisibility(View.GONE);}
                 Log.i("MyWordsAdapter", "onLetterClick " + clickedItemIndex);
                 int position = getAdapterPosition();
                 mList.remove(clickedItemIndex);

@@ -77,7 +77,7 @@
             android:text="X"
             android:paddingLeft="5dp"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="@dimen/x_bubble"
             android:id="@+id/bubble_quit"/>
         </LinearLayout>
     </com.daasuu.bl.BubbleLayout>
@@ -90,13 +90,12 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/scrabble_letter_list"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/builder_height"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:overScrollMode="never"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-
             android:scrollbars="vertical"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -116,10 +115,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:gravity="center"
+                android:gravity="center_horizontal"
                 android:layout_gravity="right"
                 android:padding="10dp"
                 android:text=""
+                android:layout_marginRight="10dp"
                 android:textSize="@dimen/timer_text_size"
                 android:textStyle="bold"
                 android:visibility="gone"
@@ -131,6 +131,8 @@
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"
             android:background="@drawable/button_border"
+            android:textSize="@dimen/button_text_size"
+            android:padding="@dimen/button_padding"
             android:gravity="center"
             android:onClick="onClick"
             android:text="@string/get_letter"
@@ -143,7 +145,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/word_builder_list"
             android:layout_width="0dp"
-            android:layout_height="55dp"
+            android:layout_height="@dimen/builder_height"
             android:overScrollMode="never"
             android:paddingBottom="3dp"
             android:paddingTop="3dp"
@@ -168,6 +170,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/button_border"
+                android:textSize="@dimen/button_text_size"
+                android:padding="@dimen/button_padding"
                 android:gravity="center"
                 android:onClick="onClick"
                 android:text="Play word" />
@@ -175,7 +179,9 @@
             <Button
                 android:id="@+id/clear_word"
                 android:layout_width="0dp"
+                android:padding="@dimen/button_padding"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/button_text_size"
                 android:layout_toRightOf="@id/send_word"
                 android:layout_weight="1"
                 android:background="@drawable/button_border"
@@ -192,7 +198,7 @@
             android:layout_marginRight="1dp"
             android:layout_marginStart="1dp"
             android:text="Your words:"
-            android:textSize="18dp"
+            android:textSize="@dimen/your_words_text_size"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -216,7 +222,7 @@
                 android:paddingLeft="5dp"
                 android:text="Your Score:"
                 android:textColor="#000000"
-                android:textSize="20sp"
+                android:textSize="@dimen/game_sum"
                 android:textStyle="bold" />
 
             <TextView
@@ -229,7 +235,7 @@
                 android:paddingLeft="10dp"
                 android:text="0"
                 android:textColor="#000000"
-                android:textSize="20sp" />
+                android:textSize="@dimen/game_sum" />
 
             <TextView
                 android:id="@+id/tiles_title"
@@ -239,7 +245,7 @@
                 android:paddingLeft="5dp"
                 android:text="Tiles Left:"
                 android:textColor="#000000"
-                android:textSize="20sp"
+                android:textSize="@dimen/game_sum"
                 android:textStyle="bold" />
 
             <TextView
@@ -250,7 +256,7 @@
                 android:layout_toRightOf="@id/tiles_title"
                 android:paddingLeft="10dp"
                 android:textColor="#000000"
-                android:textSize="20sp" />
+                android:textSize="@dimen/game_sum" />
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView

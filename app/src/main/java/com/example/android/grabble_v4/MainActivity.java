@@ -23,8 +23,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.DialogTitle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -58,10 +56,8 @@ import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
 import com.example.android.grabble_v4.Utilities.Interfaces.WhileDialogShows;
 import com.example.android.grabble_v4.Utilities.rateDialog;
-import com.example.android.grabble_v4.data.DictionaryDbHelper;
-import com.example.android.grabble_v4.data.Instructions;
+import com.example.android.grabble_v4.Utilities.DictionaryDbHelper;
 import com.example.android.grabble_v4.data.LetterBag;
-import com.example.android.grabble_v4.data.SendFeedback;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
 import com.orhanobut.hawk.Hawk;
@@ -191,8 +187,6 @@ public class MainActivity extends AppCompatActivity implements
         shakeDetectorInit();
         attachDB();
 
-
-
         gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
         initalizeTimers=false;
 
@@ -207,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements
                 countDownInd = 2;
                 break;
         }
-
-
 
 
         //UI elements initialization
@@ -229,17 +221,12 @@ public class MainActivity extends AppCompatActivity implements
         //UI size adjustments
         Hawk.init(this).build();
         setDeviceDimensions();
-
-
         setDivider(); //dividers to builder RV
-
 
         //Shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         setupSharedPreferences();
-
-
 
         //game initialization
         newGame();
@@ -251,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements
         //bubble tour
         boolean saw_bubbles=Hawk.get(SAW_BUBBLE_TOUR,false);
         if(!saw_bubbles)
-            showBubbles();
+            showBubbles(false);
 
         //HockeyApp
         checkForUpdates();
@@ -592,6 +579,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onWordItemClick(int clickedWord, int clickedLetter) {
+
         Log.i("Main Activity", "onWordItemClick -letter" + clickedLetter);
         Log.i("Main Activity", "onWordItemClick -word" + clickedWord);
         Log.i("getSpanCount",String.valueOf(myWordsStaggeredManager.getSpanCount()));
@@ -638,6 +626,7 @@ public class MainActivity extends AppCompatActivity implements
                         myWords.get(wordIndex).remove(letterIndex);
                         myWords.get(wordIndex).add(letterIndex, builder.get(clickedItemIndex));
                         mWordsAdapter.notifyItemChanged(wordIndex); //
+                        checkWordComplete(wordIndex);
                         break;
                 }  //in any case:
 
@@ -719,11 +708,15 @@ public class MainActivity extends AppCompatActivity implements
         if (lettersLeft == 0) {
             noLettersInBag();
         }
-        if (board.isEmpty() && builder.isEmpty()) {
+        if (board.isEmpty() && builder.isEmpty()) { //finished up all the tiles
+
             setEnableAll(false);
+            board.add(new SingleLetter(""));
+            mBoardAdapter.notifyDataSetChanged();
             setFinalPoints(0);
 
         }
+
         setEnableAll(true);
        return;
     }
@@ -746,6 +739,7 @@ public class MainActivity extends AppCompatActivity implements
                     } //per caution. shouldn't get here
                     myWords.get(wordIndex).remove(letterIndex); //remove space holder
                     myWords.get(wordIndex).add(letterIndex, builder.get(i));
+                    checkWordComplete(wordIndex);
                     break;
             }
 
@@ -755,6 +749,18 @@ public class MainActivity extends AppCompatActivity implements
         mBoardAdapter.notifyDataSetChanged();
         mBuilderAdapter.notifyDataSetChanged();
         mWordsAdapter.notifyDataSetChanged();
+    }
+
+    private void checkWordComplete(int wordToCheck) {
+        for(SingleLetter letter:myWords.get(wordToCheck)){
+            if(letter.getLetter_name()=="")
+                return;
+        } //all letters aren't blank
+        myWordsAdapter.WordViewHolder wordView = (myWordsAdapter.WordViewHolder)mMyWordsRecView.findViewHolderForLayoutPosition(wordToCheck);
+        if(wordView!=null)
+            wordView.wordMenu.setVisibility(View.VISIBLE);
+
+
     }
 
     public void replaceTile(){
@@ -998,15 +1004,19 @@ public class MainActivity extends AppCompatActivity implements
 
         for (int i = 0; i < builder_size; i++) { //add to word array
             newWord.add(i, builder.get(i));
-            theWord= theWord + builder.get(i).getLetter_name();
-            if (builderLetterTypes.get(i)[0] == 0) {
+            theWord= theWord + builder.get(i).getLetter_name(); //string format
+            if (builderLetterTypes.get(i)[0] == 0) { //from board
                 tempBoardLetters.add(builderLetterTypes.get(i)[2]);
 
             }
-            if (builderLetterTypes.get(i)[0] == 1) {
+            if (builderLetterTypes.get(i)[0] == 1) { //from word
                 tempMyWordsLetters.add(builderLetterTypes.get(i)[1]); //save word indexes
             }
         }
+
+        Word addWord = new Word( theWord);
+        wordList.add(addWord);
+
      //SORT templettertypes and remove from board accordingly - start removing from end
         Collections.sort(tempBoardLetters);
         for (int i = tempBoardLetters.size() - 1; i >= 0; i--) {
@@ -1016,6 +1026,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
         //remove blank letters from mywords - start removing from end
+        //handles removal of multiple words that combine a new word
         Collections.sort(tempMyWordsLetters);
         Set uniqueValues = new HashSet(tempMyWordsLetters); //now unique
         List<Integer> tempMyWordsLettersUnique = new ArrayList<>(uniqueValues);
@@ -1027,17 +1038,21 @@ public class MainActivity extends AppCompatActivity implements
             mWordsAdapter.notifyDataSetChanged();
         }
 
+
+
         builder.clear();
         builderLetterTypes.clear();
         mBuilderAdapter.notifyDataSetChanged();
         mBoardAdapter.notifyDataSetChanged();
         myWords.add(newWord); //always added to end
         mWordsAdapter.notifyDataSetChanged();
+        //new word will always be last
+        int lastWordIndex = myWords.size()-1;
+        checkWordComplete(lastWordIndex);
+
         myWordsStaggeredManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
 
-       // int getIndex= myWords.indexOf(newWord);
-        Word addWord = new Word( theWord);
-        wordList.add(addWord);
+
         playerScore = playerScore + tempScore;
         mScore.setText(String.valueOf(playerScore));
     }
@@ -1313,7 +1328,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         if (requestCode == RESULT_CODE_INSTRUCTIONS && resultCode == RESULT_CODE_INSTRUCTIONS) {
             if(data.getIntExtra(BUTTON_TAPPED, 0)==(R.string.show_bbl_instructions)) {
-                showBubbles();
+                showBubbles(true);
 
             }
         }
@@ -1474,13 +1489,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     ///// INSTRUCTION BUBBLES
-    public void showBubbles(){
+    public void showBubbles(final boolean fromInstructionsPage){
 
         showingBubblesFlag = true;
+
         Log.i("method","show bubbles");
-        if(countDownInd!=0){
-            countDownTimer.cancel();
-        }
+        if (countDownInd != 0) {
+                countDownTimer.cancel();
+            }
+
         setEnableAll(false);
 
         final String bubble1= getString(R.string.bubble_on_board);
@@ -1540,7 +1557,7 @@ public class MainActivity extends AppCompatActivity implements
                         bubbleText.setText(bubble3_1);
                         bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
                         bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
-                        bubbleLayout.setY(mBoardRecView.getY()+10);
+                        bubbleLayout.setY(countDownView.getY()+bubbleLayout.getHeight());
 
                     }
 
@@ -1550,7 +1567,8 @@ public class MainActivity extends AppCompatActivity implements
                     bubbleText.setText(bubble3_2);
                     bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
                     bubbleLayout.setX(countDownView.getX()-countDownView.getWidth()-bubbleLayout.getWidth());
-                    bubbleLayout.setY(mBoardRecView.getY()+10);
+                    bubbleLayout.setY(countDownView.getY()+bubbleLayout.getHeight());
+
                 }
 
 
@@ -1591,7 +1609,7 @@ public class MainActivity extends AppCompatActivity implements
                     Hawk.put(SAW_BUBBLE_TOUR,true);
                     bubbleLayout.setVisibility(GONE);
                     if(countDownInd!=0) {
-                        countDownTimer.start();
+                            countDownTimer.start();
                     }
                     showingBubblesFlag=false;
                     setEnableAll(true);
@@ -1822,11 +1840,12 @@ public class MainActivity extends AppCompatActivity implements
         countDownView.setTypeface(tf);
         countDownView.bringToFront();
 
-        if(deviceHeight<550)
+/*        if(deviceHeight<550)
             countDownView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.timer_below_550));
         else if (deviceHeight<600)
             countDownView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) getResources().getInteger(R.integer.timer_below_600));
-        else return;
+        else return;*/
+
     }
 
     //RATE US

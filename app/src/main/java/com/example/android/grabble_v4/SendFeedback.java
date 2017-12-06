@@ -1,4 +1,4 @@
-package com.example.android.grabble_v4.data;
+package com.example.android.grabble_v4;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,9 +10,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
-
-import com.example.android.grabble_v4.MainActivity;
-import com.example.android.grabble_v4.R;
 
 /**
  * Created by user on 14/10/2017.

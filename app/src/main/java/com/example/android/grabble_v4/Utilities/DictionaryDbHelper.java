@@ -1,4 +1,4 @@
-package com.example.android.grabble_v4.data;
+package com.example.android.grabble_v4.Utilities;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -26,7 +26,7 @@ public class DictionaryDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     Context mContext;
     private SQLiteDatabase dictionaryDB;
-    public final static String DATABASE_PATH ="/data/data/com.sha.android.grabble/databases/";
+    public final static String DATABASE_PATH ="/data/data/com.sha.android.tiles/databases/";
 
     // Constructor
     public DictionaryDbHelper(Context context) {

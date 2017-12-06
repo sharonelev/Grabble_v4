@@ -12,7 +12,7 @@
     <dimen name="timer_text_size">60sp</dimen>
     -->
     <!--setting text in xml-->
-    <dimen name="timer_text_size">50sp</dimen>
+    <dimen name="timer_text_size">85sp</dimen>
     <dimen name="button_padding">35dp</dimen>
     <dimen name="button_width">600dp</dimen>
     <dimen name="menu_text_size">25sp</dimen>
@@ -26,6 +26,6 @@
     <dimen name="feedback_title">35sp</dimen>
     <dimen name="edit_text">25sp</dimen>
     <dimen name="my_words_list_height">100dp</dimen>
-    <dimen name="builder_height">110dp</dimen>
+    <dimen name="builder_height">90dp</dimen>
 
 </resources>

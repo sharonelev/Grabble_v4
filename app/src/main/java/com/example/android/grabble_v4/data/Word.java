@@ -1,5 +1,7 @@
 package com.example.android.grabble_v4.data;
 
+import java.util.List;
+
 /**
  * Created by user on 07/11/2017.
  */
@@ -7,10 +9,17 @@ package com.example.android.grabble_v4.data;
 public class Word {
     int order_num;
     String theWord;
+    List<Word> wordHistory;
 
-    public Word(int i, String w){
-        order_num=i;
+    public Word(String w, List<Word> prevWord){
         theWord=w;
+        if (prevWord!=null)
+        {
+            for(Word word:prevWord)
+            wordHistory.add(word);
+        }
+
+
     }
     public Word(String w){
 
@@ -34,5 +43,9 @@ public class Word {
     public void setTheWord(String theWord) {
 
         this.theWord = theWord;
+    }
+
+    public List<Word> getWordHistory() {
+        return wordHistory;
     }
 }

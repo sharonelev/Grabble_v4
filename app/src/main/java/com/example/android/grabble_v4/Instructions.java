@@ -1,18 +1,12 @@
-package com.example.android.grabble_v4.data;
+package com.example.android.grabble_v4;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.example.android.grabble_v4.MainActivity;
-import com.example.android.grabble_v4.R;
-import com.orhanobut.hawk.Hawk;
 
 /**
  * Created by user on 03/10/2017.

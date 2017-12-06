@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
+    xmlns:tools="http://schemas.android.com/tools"
     >
     <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/my_words_list_height"
         android:id="@+id/each_word"
         android:padding="1dp"
         android:scrollbars="horizontal"
         android:overScrollMode="never"
+        tools:listitem = "@layout/letter_on_board_view"
+
 
         ></android.support.v7.widget.RecyclerView>
 
-
-</FrameLayout>
+    <ImageButton
+        android:id="@+id/word_options"
+        android:layout_width="20dp"
+        android:src="@drawable/menu_icon"
+        android:layout_height="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/each_word"
+        android:background="@color/transparent"
+        android:paddingLeft="2dp"
+        android:scaleType="fitXY"
+        />
+</RelativeLayout>

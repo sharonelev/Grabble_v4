@@ -12,7 +12,7 @@
     <dimen name="button_padding">2dp</dimen>
     <dimen name="button_width">300dp</dimen>
     <dimen name="menu_text_size">18sp</dimen>
-
+    <dimen name="x_bubble">16sp</dimen>
     <dimen name="timer_text_size">35sp</dimen>
     <dimen name="high_score_title">25sp</dimen>
     <dimen name="table_headers">20sp</dimen>
@@ -23,5 +23,8 @@
     <dimen name="feedback_title">25sp</dimen>
     <dimen name="edit_text">20sp</dimen>
     <dimen name="my_words_list_height">70dp</dimen>
+    <dimen name="builder_height">55dp</dimen>
+    <dimen name="your_words_text_size">18sp</dimen>
+    <dimen name="game_sum">20sp</dimen>
 
 </resources>
