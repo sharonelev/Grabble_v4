@@ -386,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements
         mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,null);
         mBuilderRecView.setAdapter(mBuilderAdapter);
 
-        mWordsAdapter = new myWordsAdapter(this, myWords, this, wordList);
+        mWordsAdapter = new myWordsAdapter(this, myWords, this, wordList, false);
         mMyWordsRecView.setAdapter(mWordsAdapter);
 
     }

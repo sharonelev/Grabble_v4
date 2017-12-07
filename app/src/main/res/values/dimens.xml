@@ -27,5 +27,6 @@
     <dimen name="your_words_text_size">18sp</dimen>
     <dimen name="game_sum">20sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="points_in_history">20sp</dimen>
 
 </resources>

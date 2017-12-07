@@ -28,4 +28,15 @@
         android:scaleType="fitXY"
         android:visibility="gone"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_toRightOf="@id/each_word"
+        android:layout_gravity="right"
+        android:text="+29"
+        android:textStyle="bold"
+        android:textSize="@dimen/points_in_history"
+        android:layout_height="wrap_content"
+        android:id="@+id/points_earned"
+        android:visibility="gone"
+        />
 </RelativeLayout>

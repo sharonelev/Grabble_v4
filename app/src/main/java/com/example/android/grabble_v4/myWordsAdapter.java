@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
@@ -38,6 +39,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     List<List<SingleLetter>> myWords;
     ListWordClickListener mOnClickListener;
     List<Word> mWordList;
+    boolean mHistory;
 
 
    public interface ListWordClickListener {
@@ -46,11 +48,12 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
 
 
-    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener, List<Word> wordList){
+    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener, List<Word> wordList, boolean history){
         mContext=context;
         myWords=aWords;
         mOnClickListener=listener;
         mWordList = wordList;
+        mHistory = history;
 
     }
     @Override
@@ -59,7 +62,6 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         int layoutIdForListItem = R.layout.my_words_list;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
-
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         myWordsAdapter.WordViewHolder viewHolder = new myWordsAdapter.WordViewHolder(view);
 
@@ -79,21 +81,9 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
        holder.mList.addAll(myWords.get(position));
         holder.mBoardAdapter.notifyDataSetChanged();
         holder.isEnabled=true;
-        int screenWidthDP=Hawk.get(MainActivity.DEVICE_WIDTH);
-        int screenWidthPX = MainActivity.dpToPx(mContext,screenWidthDP);
-        int tileSize;
-        //tile size includes spaces
-        if(screenWidthDP<400)
-            tileSize=(int) screenWidthPX/10;
-        else if(screenWidthDP<600)
-            tileSize=(int) screenWidthPX/11;
-        else
-            tileSize=(int) screenWidthPX/12;
-        int menuWidth = MainActivity.dpToPx(mContext,20);
-        //holder.itemView.setBackgroundColor(Color.RED); //For testing only
-        holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize+ menuWidth;
 
 
+    //POP UP MENU FOR WORD
         holder.wordMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,7 +121,36 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             }
         });
 
-        checkWordComplete(position,holder); //int should be word position, not tile
+        //WORD SIZE
+        int screenWidthDP=Hawk.get(MainActivity.DEVICE_WIDTH);
+        int screenWidthPX = MainActivity.dpToPx(mContext,screenWidthDP);
+        int tileSize;
+        //tile size includes spaces
+        if(screenWidthDP<400)
+            tileSize=(int) screenWidthPX/10;
+        else if(screenWidthDP<600)
+            tileSize=(int) screenWidthPX/11;
+        else
+            tileSize=(int) screenWidthPX/12;
+        int menuWidth = MainActivity.dpToPx(mContext,20);
+        holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize+ menuWidth;
+
+        if(mHistory)
+        {
+            int wordPoints=0;
+            holder.wordMenu.setVisibility(View.GONE);
+            for(SingleLetter letter:holder.mList){
+                wordPoints=letter.getLetter_value()+wordPoints;
+            }
+            if(holder.mList.size()>=7)
+                wordPoints=holder.mList.size()+wordPoints;
+            holder.pointsFromWord.setText("+"+String.valueOf(wordPoints));
+            holder.pointsFromWord.setVisibility(View.VISIBLE);
+            holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize*2;  //+MainActivity.spToPx(mContext,mContext.getResources().getDimension(R.dimen.points_in_history));
+
+        } else  // in myWords
+        checkWordComplete(position,holder); //word position
+
 
     }
 
@@ -147,6 +166,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         List<SingleLetter> mList = new ArrayList<>();
         boolean isEnabled= true;
         ImageButton wordMenu;
+        TextView pointsFromWord;
 
 
         public void mySetEnabled(boolean state){
@@ -160,6 +180,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
             eachWordRecView = (RecyclerView) itemView.findViewById(R.id.each_word);
             wordMenu = (ImageButton) itemView.findViewById(R.id.word_options);
+            pointsFromWord= (TextView) itemView.findViewById(R.id.points_earned);
             setDivider();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             eachWordRecView.setLayoutManager(wordLayoutManager);
