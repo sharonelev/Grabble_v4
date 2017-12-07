@@ -29,6 +29,7 @@ dependencies {
     dependencies {
         compile 'com.google.code.gson:gson:2.8.2'
     }
+
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'net.hockeyapp.android:HockeySDK:5.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
@@ -37,10 +38,9 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:preference-v7:25.3.1'
     compile 'com.github.krtkush:LinearTimer:v2.1.1'
-    testCompile 'junit:junit:4.12'
     compile 'com.pacioianu.david:ink-page-indicator:1.2.0'
     compile 'com.orhanobut:hawk:2.0.1'
     compile 'com.daasuu:BubbleLayout:1.1.1'
     compile 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
-
+    testCompile 'junit:junit:4.12'
 }

@@ -1,8 +1,10 @@
 package com.example.android.grabble_v4;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
+import android.os.Parcelable;
 import android.support.transition.Visibility;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuAdapter;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.example.android.grabble_v4.data.SingleLetter;
+import com.example.android.grabble_v4.data.Word;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.ArrayList;
@@ -34,7 +37,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     Context mContext;
     List<List<SingleLetter>> myWords;
     ListWordClickListener mOnClickListener;
-
+    List<Word> mWordList;
 
 
    public interface ListWordClickListener {
@@ -43,10 +46,11 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
 
 
-    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener){
+    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener, List<Word> wordList){
         mContext=context;
         myWords=aWords;
         mOnClickListener=listener;
+        mWordList = wordList;
 
     }
     @Override
@@ -63,7 +67,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     }
 
     @Override
-    public void onBindViewHolder(final WordViewHolder holder, int position)
+    public void onBindViewHolder(final WordViewHolder holder, final int position)
 
     {
         if(myWords.get(position)==null){
@@ -85,8 +89,9 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             tileSize=(int) screenWidthPX/11;
         else
             tileSize=(int) screenWidthPX/12;
+        int menuWidth = MainActivity.dpToPx(mContext,20);
         //holder.itemView.setBackgroundColor(Color.RED); //For testing only
-        holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize;
+        holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize+ menuWidth;
 
 
         holder.wordMenu.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +108,9 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
                         switch (item.getItemId()) {
                             case R.id.word_history:
                                 //handle menu1 click
+                                Intent intent =  new Intent(mContext, HistoryOfWord.class);
+                                Hawk.put(MainActivity.WORD, mWordList.get(position));
+                                mContext.startActivity(intent);
                                 break;
                             case R.id.word_dictionary:
                                 //handle menu2 click
@@ -123,6 +131,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             }
         });
 
+        checkWordComplete(position,holder); //int should be word position, not tile
 
     }
 
@@ -156,7 +165,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             eachWordRecView.setLayoutManager(wordLayoutManager);
             mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView,null);
             eachWordRecView.setAdapter(mBoardAdapter);
-            wordMenu.setVisibility(View.VISIBLE);
+           // wordMenu.setVisibility(View.VISIBLE);
 
         }
 
@@ -190,6 +199,15 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
     }
 
+
+    }
+
+    private void checkWordComplete(int wordToCheck, final WordViewHolder holder) {
+        for(SingleLetter letter:myWords.get(wordToCheck)){
+            if(letter.getLetter_name()=="")
+                return;
+        } //all letters aren't blank
+        holder.wordMenu.setVisibility(View.VISIBLE);
 
     }
 }

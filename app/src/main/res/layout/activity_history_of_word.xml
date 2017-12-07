@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context="com.example.android.grabble_v4.HistoryOfWord">
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/word_history_full_rv">
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+    android:layout_width="wrap_content"
+    android:layout_toRightOf="@id/word_history_full_rv"
+    android:layout_gravity="right"
+    android:text="+29"
+    android:textStyle="bold"
+    android:textSize="@dimen/button_text_size"
+    android:layout_height="wrap_content"
+    android:id="@+id/points_earned"
+    />
+
+</LinearLayout>

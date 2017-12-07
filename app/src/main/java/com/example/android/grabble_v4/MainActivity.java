@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements
     List<SingleLetter> builder = new ArrayList<>();
     List<int[]> builderLetterTypes = new ArrayList<>();// 0=from board 1=from myWords
     List<List<SingleLetter>> myWords = new ArrayList<>();
-    List<Word> wordList = new ArrayList<>();
+    public List<Word> wordList = new ArrayList<>();
     private BoardAdapter mBoardAdapter;
     private BoardAdapter mBuilderAdapter;
     private myWordsAdapter mWordsAdapter;
@@ -161,10 +161,11 @@ public class MainActivity extends AppCompatActivity implements
     public static final String TIME_UP = "time_up";
     public static final String CLASSIC_GET_LETTER = "get_letter";
     public static final String AFTER_PLAYED_WORD = "after_played_word";
-    //results from other activities
+    //parameters for between activities
     public final static int RESULT_CODE_HIGH_SCORE_FRAGMENT = 123;
     public final static int RESULT_CODE_INSTRUCTIONS = 456;
     public final static String BUTTON_TAPPED = "Button_tapped";
+    public final static String WORD = "word_to_return_history";
     //first time bubble instructions
     public BubbleLayout bubbleLayout;
     public TextView bubbleText;
@@ -385,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements
         mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,null);
         mBuilderRecView.setAdapter(mBuilderAdapter);
 
-        mWordsAdapter = new myWordsAdapter(this, myWords, this);
+        mWordsAdapter = new myWordsAdapter(this, myWords, this, wordList);
         mMyWordsRecView.setAdapter(mWordsAdapter);
 
     }
@@ -677,7 +678,7 @@ public class MainActivity extends AppCompatActivity implements
             pBar.setVisibility(View.INVISIBLE);
 
 
-         //  valid="1"; //TODO REMVOE AFTER TESTING
+           valid=true; //TODO REMVOE AFTER TESTING
 
 
                 if (!valid) {
@@ -752,14 +753,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void checkWordComplete(int wordToCheck) {
+/*
         for(SingleLetter letter:myWords.get(wordToCheck)){
             if(letter.getLetter_name()=="")
                 return;
         } //all letters aren't blank
         myWordsAdapter.WordViewHolder wordView = (myWordsAdapter.WordViewHolder)mMyWordsRecView.findViewHolderForLayoutPosition(wordToCheck);
-        if(wordView!=null)
+        if(wordView!=null) {
             wordView.wordMenu.setVisibility(View.VISIBLE);
-
+            mWordsAdapter.notifyDataSetChanged();
+        }
+*/
 
     }
 
@@ -1014,8 +1018,8 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        Word addWord = new Word( theWord);
-        wordList.add(addWord);
+
+        List<Word> prevWords = new ArrayList<>();
 
      //SORT templettertypes and remove from board accordingly - start removing from end
         Collections.sort(tempBoardLetters);
@@ -1034,11 +1038,13 @@ public class MainActivity extends AppCompatActivity implements
             //none broken letter check was done earlier
             int toRemove = tempMyWordsLettersUnique.get(i);
             myWords.remove(toRemove);
+            prevWords.add(wordList.get(toRemove));
             wordList.remove(toRemove);
             mWordsAdapter.notifyDataSetChanged();
         }
 
-
+        Word addWord = new Word(theWord,prevWords);
+        wordList.add(addWord);
 
         builder.clear();
         builderLetterTypes.clear();

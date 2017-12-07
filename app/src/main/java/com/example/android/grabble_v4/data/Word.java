@@ -1,43 +1,50 @@
 package com.example.android.grabble_v4.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by user on 07/11/2017.
  */
 
-public class Word {
-    int order_num;
+public class Word{
+    int nodeLevel = 0;
     String theWord;
     List<Word> wordHistory;
 
-    public Word(String w, List<Word> prevWord){
-        theWord=w;
-        if (prevWord!=null)
-        {
-            for(Word word:prevWord)
-            wordHistory.add(word);
-        }
+    public Word(String w, List<Word> prevWord) {
+        theWord = w;
+        wordHistory = new ArrayList<>();
+        if (prevWord != null) {
+            for (Word wordInList : prevWord) {
+                wordHistory.add(wordInList);
+                nodeLevel = Math.max(nodeLevel, wordInList.getNodeLevel() + 1);
+            }
+        } else nodeLevel = 0;
 
 
     }
-    public Word(String w){
 
-        theWord=w;
+    public Word(String w) {
+
+        theWord = w;
     }
 
-    public int getOrder_num() {
+    public int getNodeLevel() {
 
-        return order_num;
+        return nodeLevel;
     }
 
     public String getTheWord() {
         return theWord;
     }
 
-    public void setOrder_num(int order_num) {
+    public void setNodeLevel(int order_num) {
 
-        this.order_num = order_num;
+        this.nodeLevel = order_num;
     }
 
     public void setTheWord(String theWord) {

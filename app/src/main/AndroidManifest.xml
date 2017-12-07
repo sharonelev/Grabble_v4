@@ -4,7 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/icon_t"
@@ -12,45 +16,53 @@
         android:roundIcon="@mipmap/icon_t"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:launchMode="singleTop"/>
-        <activity android:name=".Instructions"
-            android:parentActivityName=".MainActivity"
-            >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
-        <activity android:name=".SendFeedback"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Instructions"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-
-        <activity android:name=".SettingsActivity"
+        <activity
+            android:name=".SendFeedback"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
             android:label="Settings"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
         <meta-data
             android:name="net.hockeyapp.android.appIdentifier"
             android:value="${HOCKEYAPP_APP_ID}" />
+
+        <activity
+            android:name=".HistoryOfWord"
+            android:label="@string/title_activity_history_of_word"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".HistoryOfWord"
+            android:label="@string/title_activity_history_of_word"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
