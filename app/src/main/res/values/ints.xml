@@ -12,6 +12,7 @@
     <integer name="reduce_text_size_points">2</integer>
     <integer name="reduce_text_size_10_points">3</integer>
     <integer name="num_of_tiles_to_reduce_from">10</integer>
+    <integer name="extra_history_num_of_tiles_to_reduce_from">3</integer>
     <!--setting text size programatically-->
     <integer name="bubble_text_size">18</integer>
     <integer name="good_luck_bubble_text_size">50</integer>
@@ -21,6 +22,7 @@
     <integer name="letter_points">12</integer>
     <integer name="toast_text_size">16</integer>
     <integer name="letter_name">28</integer>
+    <integer name="points_in_history">22</integer>
     <integer name="timer_below_550">26</integer>
     <integer name="timer_below_600">30</integer>
 

@@ -16,7 +16,7 @@
     <dimen name="button_width">500dp</dimen>
     <dimen name="menu_text_size">22sp</dimen>
     <dimen name="timer_text_size">60sp</dimen>
-    <dimen name="high_score_title">35sp</dimen>
+    <dimen name="fragment_title">35sp</dimen>
     <dimen name="table_headers">30sp</dimen>
     <dimen name="instructions_text_size">22sp</dimen>
     <dimen name="button_text_size">25sp</dimen>

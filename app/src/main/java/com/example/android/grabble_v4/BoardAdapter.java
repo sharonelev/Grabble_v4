@@ -126,9 +126,11 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         int reduce_text_size_points= mContext.getResources().getInteger(R.integer.reduce_text_size_points);
         int reduce_text_size_10points= mContext.getResources().getInteger(R.integer.reduce_text_size_10_points);
         int num_of_tiles_threshold =mContext.getResources().getInteger(R.integer.num_of_tiles_to_reduce_from);
-
+        if(recyclerViewId==R.id.word_in_level_rv) {
+            num_of_tiles_threshold = num_of_tiles_threshold - mContext.getResources().getInteger(R.integer.extra_history_num_of_tiles_to_reduce_from);
+        }
         //shrink tiles for long words
-        if(!((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) && numOfTiles>num_of_tiles_threshold)) {
+        if(!((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView || recyclerViewId==R.id.word_in_level_rv) && numOfTiles>num_of_tiles_threshold)) {
 
             holder.mLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP,(float) mContext.getResources().getInteger(R.integer.letter_name));
             holder.mLetterValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) mContext.getResources().getInteger(R.integer.letter_points));
@@ -139,12 +141,13 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
 
         }
-             else if ((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView) && numOfTiles > num_of_tiles_threshold) {
+             else if ((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView || recyclerViewId==R.id.word_in_level_rv) && numOfTiles > num_of_tiles_threshold) {
               //  int defaultSizeForName= (int) mContext.getResources().getDimension(R.dimen.letter_name);
-            int defaultSizeForName=  mContext.getResources().getInteger(R.integer.letter_name);
+                int defaultSizeForName=  mContext.getResources().getInteger(R.integer.letter_name);
                 int defaultSizeForValue =  mContext.getResources().getInteger(R.integer.letter_points);
                 holder.mLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) defaultSizeForName-(numOfTiles-num_of_tiles_threshold)*reduce_text_size_letter);
                 holder.mLetterValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) defaultSizeForValue-(numOfTiles-num_of_tiles_threshold)*reduce_text_size_points);
+
                 if(Integer.parseInt(holder.mLetterValue.getText().toString())>=10)
                 {
                     holder.mLetterValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float)defaultSizeForValue-(numOfTiles-num_of_tiles_threshold)*reduce_text_size_points-reduce_text_size_letter);
@@ -207,7 +210,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         @Override
         public void onClick(View view) {
             {
-                if(recyclerViewId==R.id.welcomeRecyclerView){
+                if(recyclerViewId==R.id.welcomeRecyclerView || recyclerViewId==R.id.word_in_level_rv){
                     return;
                 }
 

@@ -8,12 +8,12 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/my_words_list_height"
         android:id="@+id/each_word"
-        android:padding="1dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:paddingLeft="1dp"
         android:scrollbars="horizontal"
         android:overScrollMode="never"
         tools:listitem = "@layout/letter_on_board_view"
-
-
         ></android.support.v7.widget.RecyclerView>
 
     <ImageButton
@@ -24,15 +24,16 @@
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/each_word"
         android:background="@color/transparent"
-        android:paddingLeft="0dp"
+        android:paddingLeft="1dp"
         android:scaleType="fitXY"
         android:visibility="gone"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_toRightOf="@id/each_word"
-        android:layout_gravity="right"
         android:text="+29"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="-2dp"
         android:textStyle="bold"
         android:textSize="@dimen/points_in_history"
         android:layout_height="wrap_content"

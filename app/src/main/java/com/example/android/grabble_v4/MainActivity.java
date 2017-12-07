@@ -166,6 +166,9 @@ public class MainActivity extends AppCompatActivity implements
     public final static int RESULT_CODE_INSTRUCTIONS = 456;
     public final static String BUTTON_TAPPED = "Button_tapped";
     public final static String WORD = "word_to_return_history";
+    public final static String HISTORY_WIDTH = "history_fragment_width";
+    public final static String HISTORY_LONGEST_WORD = "history_longest_word";
+
     //first time bubble instructions
     public BubbleLayout bubbleLayout;
     public TextView bubbleText;

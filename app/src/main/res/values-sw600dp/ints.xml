@@ -15,6 +15,7 @@
     <integer name="letter_points">25</integer>
     <integer name="toast_text_size">25</integer>
     <integer name="letter_name">45</integer>
+    <integer name="points_in_history">30</integer>
     <integer name="timer_below_550">35</integer>
     <integer name="timer_below_600">35</integer>
 </resources>

@@ -1,11 +1,15 @@
 package com.example.android.grabble_v4;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.support.transition.Visibility;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuAdapter;
 import android.support.v7.view.menu.MenuBuilder;
@@ -15,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
@@ -40,6 +46,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     ListWordClickListener mOnClickListener;
     List<Word> mWordList;
     boolean mHistory;
+    Toast toast;
 
 
    public interface ListWordClickListener {
@@ -97,13 +104,29 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.word_history:
-                                //handle menu1 click
-                                Intent intent =  new Intent(mContext, HistoryOfWord.class);
                                 Hawk.put(MainActivity.WORD, mWordList.get(position));
-                                mContext.startActivity(intent);
+                                HistoryOfWord historyOfWord =new HistoryOfWord();
+                                historyOfWord.show(((FragmentActivity)mContext).getSupportFragmentManager(),"Dialog Fragment");
                                 break;
                             case R.id.word_dictionary:
-                                //handle menu2 click
+                                if(!isOnline())
+                                {
+                                    toastManager("no internet connectivity");
+
+                                    break;
+                                } else {
+                                    try {
+                                        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                                        String term = "DEFINE: " + mWordList.get(position).getTheWord();
+                                        intent.putExtra(SearchManager.QUERY, term);
+                                        mContext.startActivity(intent);
+
+                                    } catch (Exception e) {
+                                        // TODO: handle exception
+                                        toastManager("something went wrong");
+
+                                    }
+                                }
                                 break;
                             case R.id.word_share:
                                 //handle menu3 click
@@ -137,16 +160,32 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
         if(mHistory)
         {
+            int num_of_tiles_threshold=mContext.getResources().getInteger(R.integer.num_of_tiles_to_reduce_from)-mContext.getResources().getInteger(R.integer.extra_history_num_of_tiles_to_reduce_from)+1;
             int wordPoints=0;
+            int wordLength= holder.mList.size();
+            int reduce_text_size_letter= mContext.getResources().getInteger(R.integer.reduce_text_size_letter);
+
             holder.wordMenu.setVisibility(View.GONE);
             for(SingleLetter letter:holder.mList){
                 wordPoints=letter.getLetter_value()+wordPoints;
             }
-            if(holder.mList.size()>=7)
+
+            //Extra points for long words
+            if(wordLength>=7)
                 wordPoints=holder.mList.size()+wordPoints;
+
+            //Points text size
+            int defaultSizeForPoints = mContext.getResources().getInteger(R.integer.points_in_history);
+            holder.pointsFromWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, defaultSizeForPoints);
+            if(wordLength>(num_of_tiles_threshold)) {
+               holder.pointsFromWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) defaultSizeForPoints - (wordLength - num_of_tiles_threshold) * reduce_text_size_letter);
+            }
             holder.pointsFromWord.setText("+"+String.valueOf(wordPoints));
             holder.pointsFromWord.setVisibility(View.VISIBLE);
-            holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize*2;  //+MainActivity.spToPx(mContext,mContext.getResources().getDimension(R.dimen.points_in_history));
+            holder.pointsFromWord.setRotation(+90);
+            holder.itemView.getLayoutParams().width=holder.itemView.getLayoutParams().WRAP_CONTENT; //+MainActivity.spToPx(mContext,mContext.getResources().getDimension(R.dimen.points_in_history));
+            holder.itemView.getLayoutParams().height= (int) ((int)Hawk.get(MainActivity.TILE_HEIGHT)*1.2);
+            //holder.itemView.getLayoutParams().width= (int) ((holder.mList.size())*(tileSize)+Math.floor(tileSize*1.5)); //+MainActivity.spToPx(mContext,mContext.getResources().getDimension(R.dimen.points_in_history));
 
         } else  // in myWords
         checkWordComplete(position,holder); //word position
@@ -184,7 +223,11 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             setDivider();
             LinearLayoutManager wordLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             eachWordRecView.setLayoutManager(wordLayoutManager);
-            mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView,null);
+            if(!mHistory){
+                mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.myWordsRecyclerView,null);
+            }
+            else
+                mBoardAdapter = new BoardAdapter(mContext, mList, this, R.id.word_in_level_rv,null);
             eachWordRecView.setAdapter(mBoardAdapter);
            // wordMenu.setVisibility(View.VISIBLE);
 
@@ -193,6 +236,8 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
         @Override
         public void onLetterClick(int view_id, int clickedItemIndex) { // a letter in a myWords was clicked
+            if(mHistory)
+                {return;}
             if(isEnabled) {
                 if(wordMenu.getVisibility()!= View.GONE)
                     {wordMenu.setVisibility(View.GONE);}
@@ -231,4 +276,25 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
         holder.wordMenu.setVisibility(View.VISIBLE);
 
     }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        boolean returnOnline = (netInfo != null && netInfo.isConnected());
+        return returnOnline;
+
+    }
+    public void toastManager(String txt){
+
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(mContext, txt, Toast.LENGTH_SHORT);
+
+        ViewGroup group = (ViewGroup) toast.getView();
+        TextView messageTextView = (TextView) group.getChildAt(0);
+        messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) mContext.getResources().getInteger(R.integer.toast_text_size));
+        toast.show();
+    }
+
 }

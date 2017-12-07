@@ -2,6 +2,8 @@ package com.example.android.grabble_v4;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
+import com.orhanobut.hawk.Hawk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +61,8 @@ public class HistoryWordAdapter  extends RecyclerView.Adapter<HistoryWordAdapter
 
         breakWordToSingleLetters(holder, position);
         holder.wordsAdapter.notifyDataSetChanged();
-        holder.wordInLevel.setBackgroundColor(Color.RED);
+        holder.setDivider();
+
     }
 
 
@@ -109,14 +113,22 @@ public class HistoryWordAdapter  extends RecyclerView.Adapter<HistoryWordAdapter
             mLetterWordList= new ArrayList<>();
             wordInLevel = (RecyclerView) itemView.findViewById(R.id.word_in_level_rv);
             wordsAdapter = new myWordsAdapter(mContext, mLetterWordList, null, null, true);
-            linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, true);
+            linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             wordInLevel.setAdapter(wordsAdapter);
             wordInLevel.setLayoutManager(linearLayoutManager);
 
         }
 
 
+        public void setDivider(){
 
+            //int deviceWidthPX = MainActivity.dpToPx(mContext,deviceWidthDP);
+            DividerItemDecoration divider;
+            divider= new DividerItemDecoration(wordInLevel.getContext(),DividerItemDecoration.VERTICAL);
+                 divider.setDrawable(ContextCompat.getDrawable(mContext, R.drawable.line_divider_s));
+            wordInLevel.addItemDecoration(divider);
+
+        }
 
     }
 

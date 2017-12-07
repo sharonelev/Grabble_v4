@@ -28,7 +28,7 @@
             android:background="@color/colorPrimary"
             android:textStyle="bold"
             android:fontFamily="sans-serif-condensed"
-            android:textSize="@dimen/high_score_title"
+            android:textSize="@dimen/fragment_title"
 
             app:layout_constraintRight_toRightOf="parent" />
 
