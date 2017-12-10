@@ -1,5 +1,6 @@
 package com.example.android.grabble_v4;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.grabble_v4.Utilities.Share;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
 import com.orhanobut.hawk.Hawk;
@@ -47,6 +49,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
     List<Word> mWordList;
     boolean mHistory;
     Toast toast;
+    Activity mActivity;
 
 
    public interface ListWordClickListener {
@@ -55,12 +58,13 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
 
 
-    public  myWordsAdapter(Context context,  List<List<SingleLetter>> aWords, ListWordClickListener listener, List<Word> wordList, boolean history){
+    public  myWordsAdapter(Context context, Activity activity, List<List<SingleLetter>> aWords, ListWordClickListener listener, List<Word> wordList, boolean history){
         mContext=context;
         myWords=aWords;
         mOnClickListener=listener;
         mWordList = wordList;
         mHistory = history;
+        mActivity=activity;
 
     }
     @Override
@@ -108,6 +112,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
                                 HistoryOfWord historyOfWord =new HistoryOfWord();
                                 historyOfWord.show(((FragmentActivity)mContext).getSupportFragmentManager(),"Dialog Fragment");
                                 break;
+
                             case R.id.word_dictionary:
                                 if(!isOnline())
                                 {
@@ -130,6 +135,25 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
                                 break;
                             case R.id.word_share:
                                 //handle menu3 click
+
+                               /* int points=0;
+                                for(SingleLetter letter:holder.mList){
+                                    points=letter.getLetter_value()+points;
+                                }
+                                if(holder.mList.size()>=7)
+                                {
+                                    points=points+holder.mList.size();
+                                }*/
+
+                               // new Share("I just made the word "+mWordList.get(position).getTheWord()+ " on TILES and got "+String.valueOf(points)+" points!\n",mContext,mActivity);
+                                Hawk.put(MainActivity.WORD, mWordList.get(position));
+                                //Hawk.put(MainActivity.WORD_POINTS, points);
+                                //holder.pointsFromWord.setVisibility(View.GONE);
+                                ShareSingleWord shareSingleWord =new ShareSingleWord();
+                                shareSingleWord.show(((FragmentActivity)mContext).getSupportFragmentManager(),"Dialog Fragment");
+
+
+
                                 break;
                         }
                         return false;
@@ -160,7 +184,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
         if(mHistory)
         {
-            int num_of_tiles_threshold=mContext.getResources().getInteger(R.integer.num_of_tiles_to_reduce_from)-mContext.getResources().getInteger(R.integer.extra_history_num_of_tiles_to_reduce_from)+1;
+            int num_of_tiles_threshold=HistoryOfWord.FRAGMENT_TILE_FIT-1;
             int wordPoints=0;
             int wordLength= holder.mList.size();
             int reduce_text_size_letter= mContext.getResources().getInteger(R.integer.reduce_text_size_letter);
@@ -178,7 +202,11 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             int defaultSizeForPoints = mContext.getResources().getInteger(R.integer.points_in_history);
             holder.pointsFromWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, defaultSizeForPoints);
             if(wordLength>(num_of_tiles_threshold)) {
-               holder.pointsFromWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) defaultSizeForPoints - (wordLength - num_of_tiles_threshold) * reduce_text_size_letter);
+                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) holder.pointsFromWord.getLayoutParams();
+                int marginPx = MainActivity.dpToPx(mContext,5);
+                mlp.setMargins((-2)*marginPx,marginPx, 0, 0);
+                holder.pointsFromWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) defaultSizeForPoints - (wordLength - num_of_tiles_threshold) * reduce_text_size_letter);
+
             }
             holder.pointsFromWord.setText("+"+String.valueOf(wordPoints));
             holder.pointsFromWord.setVisibility(View.VISIBLE);

@@ -58,7 +58,7 @@ public class SendFeedback extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         Intent email = new Intent(Intent.ACTION_SEND);
         String to="apps.by.sha@gmail.com";
-        String subject="Feedback from Grabble_v4 app";
+        String subject="Feedback from TILES app";
         String message=feedback.getText().toString();
         email.putExtra(Intent.EXTRA_EMAIL, new String[]{ to});
         email.putExtra(Intent.EXTRA_SUBJECT, subject);

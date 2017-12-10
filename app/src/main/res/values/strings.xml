@@ -37,9 +37,13 @@
 
 
     <!--share-->
-    <string name="share_score_title">"TILES"</string>
-    <string name="share_score_1">"Check out my new High Score! I just made "</string>
-    <string name="share_score_2">" points on TILES!"</string>
+    <string name="share_score_title">TILES</string>
+    <string name="share_score_1">Check out my new score! I just made </string>
+    <string name="share_score_2"> points on TILES! </string>
+    <string name="share_word_1">I just got </string>
+    <string name="share_word_2"> points for </string>
+    <string name="share_word_3"> on TILES!</string>
+
 
     <!-- preferences-->
     <string name="animate_key">animate_key</string>

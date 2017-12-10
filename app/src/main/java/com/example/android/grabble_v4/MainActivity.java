@@ -1,10 +1,12 @@
 package com.example.android.grabble_v4;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -19,7 +21,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +60,7 @@ import com.example.android.grabble_v4.Utilities.Interfaces.NotNowReviewListener;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
 import com.example.android.grabble_v4.Utilities.Interfaces.WhileDialogShows;
+import com.example.android.grabble_v4.Utilities.Share;
 import com.example.android.grabble_v4.Utilities.rateDialog;
 import com.example.android.grabble_v4.Utilities.DictionaryDbHelper;
 import com.example.android.grabble_v4.data.LetterBag;
@@ -166,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements
     public final static int RESULT_CODE_INSTRUCTIONS = 456;
     public final static String BUTTON_TAPPED = "Button_tapped";
     public final static String WORD = "word_to_return_history";
+    public final static String WORD_POINTS = "word_points";
     public final static String HISTORY_WIDTH = "history_fragment_width";
     public final static String HISTORY_LONGEST_WORD = "history_longest_word";
 
@@ -180,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     // LIFE CYCLE EVENTS
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -234,7 +242,6 @@ public class MainActivity extends AppCompatActivity implements
 
         //game initialization
         newGame();
-
 
         //other features:
         //rate dialog
@@ -389,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements
         mBuilderAdapter = new BoardAdapter(this, builder, this, R.id.word_builder_list,null);
         mBuilderRecView.setAdapter(mBuilderAdapter);
 
-        mWordsAdapter = new myWordsAdapter(this, myWords, this, wordList, false);
+        mWordsAdapter = new myWordsAdapter(this, this, myWords, this, wordList, false);
         mMyWordsRecView.setAdapter(mWordsAdapter);
 
     }
@@ -401,7 +408,8 @@ public class MainActivity extends AppCompatActivity implements
 
         if(board.size()==getResources().getInteger(R.integer.tiles_start_replace))
         {
-            replaceTile();
+            passedWordLimit();
+
                }
         else {
             RandomSelector randomSelector = new RandomSelector(bag);
@@ -681,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements
             pBar.setVisibility(View.INVISIBLE);
 
 
-           valid=true; //TODO REMVOE AFTER TESTING
+         //  valid=true; //TODO REMVOE AFTER TESTING
 
 
                 if (!valid) {
@@ -774,7 +782,6 @@ public class MainActivity extends AppCompatActivity implements
 
        final Animation anim = AnimationUtils.loadAnimation(this, R.anim.animation_shrink);
         //anim.setDuration(200);
-        passedWordLimit();
         final Handler myHandler= new Handler();
         Random rand = new Random();
         final SingleLetter letterToReplace;
@@ -910,9 +917,10 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i) {
                         newGame();
                     }
-                }).setNeutralButton("BACK", new DialogInterface.OnClickListener() {
+                }).setNeutralButton("SHARE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                shareScore(playerScore);
                 getLetterButtonToNewGame();
             }
         })
@@ -977,20 +985,33 @@ public class MainActivity extends AppCompatActivity implements
     public void passedWordLimit(){
         if(!Hawk.contains(LIMIT_POPUP)) {
             AlertDialog dialog = new AlertDialog.Builder(this).setMessage("You have reached the tile limit on the board, " +
-                    "a random tile was replaced")
-                    .setNeutralButton("Got it", null)
+                    "a random tile will be replaced")
+                    .setNeutralButton("Got it", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            replaceTile();
+                        }
+                    })
                     .setPositiveButton("Don't show this again", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                             replaceTile();
                                     Hawk.put(LIMIT_POPUP, true);
                                 }
                             }
-                    )
+                    ).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            replaceTile();
+                        }
+                    })
                     .show();
             setDialogTextSize(dialog);
         }
         else
-            toastManager("You have reached the tile limit on board. Letters will be replaced randomly.");
+        {
+            replaceTile();
+            toastManager("You have reached the tile limit on board. Letters will be replaced randomly.");}
     }
 
     public void addWordToMyWords(int tempScore) {
@@ -1438,17 +1459,8 @@ public class MainActivity extends AppCompatActivity implements
     //FEATURES
     //////SHARE
     public void shareScore(int score){
-        String mimeType ="text/plain";
-        String title = getString(R.string.share_score_title);
-        String textToShare = getString(R.string.share_score_1) + score + getString(R.string.share_score_2);
-        //// ADD LINK TO PLAY STORE when available
-        ShareCompat.IntentBuilder
-                /* The from method specifies the Context from which this share is coming from */
-                .from(this)
-                .setType(mimeType)
-                .setChooserTitle(title)
-                .setText(textToShare)
-                .startChooser();
+        new Share( getString(R.string.share_score_1)+score+getString(R.string.share_score_2),this,this);
+
     }
 
    //////ANIMATION
@@ -1817,7 +1829,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if(myWordsHeight>0 && boardTileHeight>0) {
         //    int j = dpToPx(getBaseContext(),myWordsHeight);
-            int tileHeightDp =  pxToDp(this,boardTileHeight)+(int) (boardTileHeight*0.02);
+            int tileHeightDp = (int) (pxToDp(this,boardTileHeight)*1.1); //TODO is 1.1 not too much?
             int spans = (int) Math.floor(myWordsHeight / tileHeightDp);
             myWordsStaggeredManager.setSpanCount(spans);
 
@@ -1871,6 +1883,16 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+/*    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }*/
 
 
 }

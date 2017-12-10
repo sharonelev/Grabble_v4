@@ -117,9 +117,10 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         holder.mLetter.setText(name);
         holder.mLetterValue.setText(String.valueOf(value));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        //SHADOW
+/*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.itemView.setElevation((float) 25);
-        }
+        }*/
         int numOfTiles = mBoard.size();
 
         int reduce_text_size_letter= mContext.getResources().getInteger(R.integer.reduce_text_size_letter);
@@ -127,8 +128,13 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
         int reduce_text_size_10points= mContext.getResources().getInteger(R.integer.reduce_text_size_10_points);
         int num_of_tiles_threshold =mContext.getResources().getInteger(R.integer.num_of_tiles_to_reduce_from);
         if(recyclerViewId==R.id.word_in_level_rv) {
-            num_of_tiles_threshold = num_of_tiles_threshold - mContext.getResources().getInteger(R.integer.extra_history_num_of_tiles_to_reduce_from);
+            num_of_tiles_threshold = HistoryOfWord.FRAGMENT_TILE_FIT-1;
+            Log.i("BoardAdapter",String.valueOf(num_of_tiles_threshold));
         }
+        else if(recyclerViewId==R.id.myWordsRecyclerView)
+            {
+                num_of_tiles_threshold=num_of_tiles_threshold-1; //make room for menu
+            }
         //shrink tiles for long words
         if(!((recyclerViewId==R.id.word_builder_list || recyclerViewId==R.id.myWordsRecyclerView || recyclerViewId==R.id.word_in_level_rv) && numOfTiles>num_of_tiles_threshold)) {
 

@@ -1,5 +1,6 @@
 package com.example.android.grabble_v4;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
@@ -27,12 +28,14 @@ public class HistoryWordAdapter  extends RecyclerView.Adapter<HistoryWordAdapter
 
     List<List<Word>> mWordList;
     Context mContext;
-    List<SingleLetter> letterBag= new ArrayList<SingleLetter>();;
+    List<SingleLetter> letterBag= new ArrayList<SingleLetter>();
+    Activity mActivity;
 
-    public HistoryWordAdapter(Context context, List<List<Word>> wordList) {
+    public HistoryWordAdapter(Context context, Activity activity,List<List<Word>> wordList) {
 
         mWordList = wordList;
         mContext = context;
+        mActivity=activity;
 
 
     }
@@ -112,7 +115,7 @@ public class HistoryWordAdapter  extends RecyclerView.Adapter<HistoryWordAdapter
             super(itemView);
             mLetterWordList= new ArrayList<>();
             wordInLevel = (RecyclerView) itemView.findViewById(R.id.word_in_level_rv);
-            wordsAdapter = new myWordsAdapter(mContext, mLetterWordList, null, null, true);
+            wordsAdapter = new myWordsAdapter(mContext,mActivity, mLetterWordList, null, null, true);
             linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             wordInLevel.setAdapter(wordsAdapter);
             wordInLevel.setLayoutManager(linearLayoutManager);

@@ -33,7 +33,7 @@
         android:layout_toRightOf="@id/each_word"
         android:text="+29"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="-2dp"
+        android:layout_marginLeft="-3dp"
         android:textStyle="bold"
         android:textSize="@dimen/points_in_history"
         android:layout_height="wrap_content"

@@ -15,48 +15,39 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/fragment_title"
         android:textColor="@color/gray_title"
-        android:id="@+id/fragment_title"
+        android:id="@+id/fragment_title_single_word"
         android:background="@color/colorPrimary"
         android:textStyle="bold"
         android:gravity="center_horizontal|top"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:fontFamily="sans-serif-condensed"
-        android:text="Word History"/>
+        android:text="I just made the word "/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_below="@id/fragment_title"
+        android:layout_below="@id/fragment_title_single_word"
         android:overScrollMode="never"
         android:layout_height="wrap_content"
-        android:id="@+id/word_history_full_rv">
+        android:id="@+id/word_single_rv">
     </android.support.v7.widget.RecyclerView>
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:layout_gravity="bottom"
+        android:gravity="center"
+        android:text="@string/share_word_3"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:textSize="@dimen/fragment_title"
+        android:textColor="@color/gray_title"
+        android:textStyle="bold">
 
-        <ImageView
-            android:layout_width="0dp"
-            android:clickable="true"
-            android:layout_weight="1"
-            android:id="@+id/history_camera"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_photo_camera_black_24dp"/>
 
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:id="@+id/history_share"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_share_black_24dp"/>
-    </LinearLayout>
+    </TextView>
 
 
 </RelativeLayout>
