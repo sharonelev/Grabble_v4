@@ -25,6 +25,10 @@
     <integer name="points_in_history">22</integer>
     <integer name="timer_below_550">26</integer>
     <integer name="timer_below_600">30</integer>
+    <integer name="fragment_height">4</integer>
+    <integer name="fragment_width">3</integer>
+
+
 
 
 </resources>

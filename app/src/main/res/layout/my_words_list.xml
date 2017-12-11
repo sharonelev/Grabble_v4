@@ -18,9 +18,9 @@
 
     <ImageButton
         android:id="@+id/word_options"
-        android:layout_width="20dp"
+        android:layout_width="@dimen/word_menu_icon"
         android:src="@drawable/menu_icon"
-        android:layout_height="20dp"
+        android:layout_height="@dimen/word_menu_icon"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/each_word"
         android:background="@color/transparent"

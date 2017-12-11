@@ -204,7 +204,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             if(wordLength>(num_of_tiles_threshold)) {
                 ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) holder.pointsFromWord.getLayoutParams();
                 int marginPx = MainActivity.dpToPx(mContext,5);
-                mlp.setMargins((-2)*marginPx,marginPx, 0, 0);
+                mlp.setMargins((-1)*marginPx,marginPx, 0, 0);
                 holder.pointsFromWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) defaultSizeForPoints - (wordLength - num_of_tiles_threshold) * reduce_text_size_letter);
 
             }

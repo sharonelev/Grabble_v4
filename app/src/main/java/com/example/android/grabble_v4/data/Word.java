@@ -14,9 +14,11 @@ public class Word{
     int nodeLevel = 0;
     String theWord;
     List<Word> wordHistory;
+    int points;
 
-    public Word(String w, List<Word> prevWord) {
+    public Word(String w, List<Word> prevWord, int score) {
         theWord = w;
+        points=score;
         wordHistory = new ArrayList<>();
         if (prevWord != null) {
             for (Word wordInList : prevWord) {
@@ -51,6 +53,7 @@ public class Word{
 
         this.theWord = theWord;
     }
+    public int getPoints(){return points;}
 
     public List<Word> getWordHistory() {
         return wordHistory;

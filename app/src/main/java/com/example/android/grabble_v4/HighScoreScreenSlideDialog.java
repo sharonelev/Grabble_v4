@@ -70,6 +70,7 @@ public static HighScoreScreenSlideDialog createInstance(int gameType){
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.high_score_view_pager,container,true);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         InkPageIndicator inkPageIndicator = (InkPageIndicator) rootview.findViewById(R.id.ink_indicator);
         mPager = (ViewPager) rootview.findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());

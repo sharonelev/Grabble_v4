@@ -7,14 +7,14 @@
     <integer name="num_of_tiles_to_reduce_from">12</integer>
     <integer name="reduce_text_size_10_points">8</integer>
     <!--setting text size programatically-->
-    <integer name="bubble_text_size">35</integer>
+    <integer name="bubble_text_size">25</integer>
     <integer name="good_luck_bubble_text_size">60</integer>
     <integer name="dialog_text_size">25</integer>
     <integer name="dialog_title_text_size">30</integer>
     <integer name="dialog_buttons_text_size">22</integer>
-    <integer name="letter_points">25</integer>
+    <integer name="letter_points">20</integer>
     <integer name="toast_text_size">25</integer>
-    <integer name="letter_name">50</integer>
+    <integer name="letter_name">35</integer>
     <integer name="timer_below_550">35</integer>
     <integer name="timer_below_600">35</integer>
 </resources>

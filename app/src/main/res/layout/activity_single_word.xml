@@ -7,30 +7,32 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg12"
+    android:background="@drawable/fragment_horizontal"
 >
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/fragment_title"
+        android:textSize="@dimen/fragment_subtitle"
         android:textColor="@color/gray_title"
         android:id="@+id/fragment_title_single_word"
         android:background="@color/colorPrimary"
-        android:textStyle="bold"
         android:gravity="center_horizontal|top"
         android:paddingTop="10dp"
+        android:textStyle="bold"
         android:paddingBottom="10dp"
         android:fontFamily="sans-serif-condensed"
         android:text="I just made the word "/>
 
     <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_below="@id/fragment_title_single_word"
-        android:overScrollMode="never"
+        android:id="@+id/word_single_rv"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/word_single_rv">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/fragment_title_single_word"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="10dp"
+        android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
 
     <TextView
         android:layout_width="match_parent"
@@ -42,7 +44,7 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_alignParentBottom="true"
-        android:textSize="@dimen/fragment_title"
+        android:textSize="@dimen/fragment_subtitle"
         android:textColor="@color/gray_title"
         android:textStyle="bold">
 

@@ -12,20 +12,22 @@
     <dimen name="timer_text_size">50sp</dimen>-->
     <!--setting text in xml-->
     <dimen name="x_bubble">20sp</dimen>
-    <dimen name="button_padding">20dp</dimen>
+    <dimen name="button_padding">10dp</dimen>
     <dimen name="button_width">500dp</dimen>
     <dimen name="menu_text_size">22sp</dimen>
-    <dimen name="timer_text_size">60sp</dimen>
-    <dimen name="fragment_title">35sp</dimen>
-    <dimen name="table_headers">30sp</dimen>
+    <dimen name="timer_text_size">40sp</dimen>
+    <dimen name="fragment_title">30sp</dimen>
+    <dimen name="fragment_subtitle">25sp</dimen>
+    <dimen name="table_headers">25sp</dimen>
     <dimen name="instructions_text_size">22sp</dimen>
-    <dimen name="button_text_size">25sp</dimen>
-    <dimen name="lets_play_text_size">60sp</dimen>
-    <dimen name="by_sha_text_size">30sp</dimen>
-    <dimen name="your_words_text_size">30sp</dimen>
+    <dimen name="button_text_size">20sp</dimen>
+    <dimen name="lets_play_text_size">45sp</dimen>
+    <dimen name="by_sha_text_size">20sp</dimen>
+    <dimen name="your_words_text_size">25sp</dimen>
     <dimen name="feedback_title">25sp</dimen>
     <dimen name="edit_text">20sp</dimen>
     <dimen name="my_words_list_height">100dp</dimen>
     <dimen name="builder_height">80dp</dimen>
-    <dimen name="game_sum">30sp</dimen>
+    <dimen name="game_sum">25sp</dimen>
+    <dimen name="word_menu_icon">25dp</dimen>
 </resources>

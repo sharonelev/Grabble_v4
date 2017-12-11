@@ -59,6 +59,7 @@ public class ShareSingleWord extends DialogFragment{
         mWordsLevel = (RecyclerView) rootview.findViewById(R.id.word_single_rv);
         mList = new ArrayList<>();
         title =(TextView)rootview.findViewById(R.id.fragment_title_single_word);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         wordAdapter= new HistoryWordAdapter(getContext(), getActivity(),mList);
         mWordsLevel.setAdapter(wordAdapter);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -66,11 +67,11 @@ public class ShareSingleWord extends DialogFragment{
 
         if (Hawk.contains(MainActivity.WORD)) {
             finalWord = Hawk.get(MainActivity.WORD);
-            String points= " "+String.valueOf(Hawk.get(MainActivity.WORD_POINTS))+" ";
             List<Word> tempList= new ArrayList<>();
             tempList.add(finalWord);
             mList.add(tempList);
             wordAdapter.notifyDataSetChanged();
+            title.setText("I just got "+finalWord.getPoints()+" points for the word:");
         //    title.setText(getString(R.string.share_word_1)+points+ getString(R.string.share_word_2));
             rootview.getViewTreeObserver().addOnGlobalLayoutListener(
                     new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -92,6 +93,8 @@ public class ShareSingleWord extends DialogFragment{
                                 @Override
                                 public void run() {
                                     dismiss();
+
+
                                 }
                             }, 1000);*/
 
@@ -109,7 +112,7 @@ public class ShareSingleWord extends DialogFragment{
         super.onResume();
         int tileHeight = Hawk.get(MainActivity.TILE_HEIGHT);
         Window window = getDialog().getWindow();
-        window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT,(int)(tileHeight * (4.5)));
+        window.setLayout(ViewPager.LayoutParams.WRAP_CONTENT,(int)(tileHeight * (getResources().getInteger(R.integer.fragment_height)+0.5)));
 
     }
 

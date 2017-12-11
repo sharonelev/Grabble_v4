@@ -406,15 +406,71 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
+
         if(board.size()==getResources().getInteger(R.integer.tiles_start_replace))
         {
             passedWordLimit();
 
                }
         else {
+
             RandomSelector randomSelector = new RandomSelector(bag);
             SingleLetter selectedLetter;
             selectedLetter = randomSelector.getRandom();
+
+            ///////if two consonants, add a vowel (a,i,o,e)//////////
+            int constantsLimit=2;
+            if(board.size()>constantsLimit) {
+                List<String> vowels = new ArrayList<String>();
+                vowels.add("A");
+                vowels.add("E");
+                vowels.add("I");
+                vowels.add("O");
+                vowels.add("U");
+                boolean noVowel = true;
+
+                //any vowels left at all?
+                int vowels_left=0;
+                int j=0;
+                while (vowels_left == 0 && j < bag.size()) {
+
+                               if (bag.get(j).getLetter_name().equals("A")||
+                                   bag.get(j).getLetter_name().equals("E")||
+                                   bag.get(j).getLetter_name().equals("I")||
+                                   bag.get(j).getLetter_name().equals("O")||
+                                   bag.get(j).getLetter_name().equals("U")) {
+
+                                vowels_left = vowels_left + bag.get(j).getLetter_probability();
+                        }
+                        j++;
+               }
+
+                if(vowels_left==0)
+                {
+                    noVowel=false;
+                }
+
+                int b = 0;
+                while (noVowel && b < board.size()) {
+                    for (String vowel : vowels) {
+                        if (board.get(b).getLetter_name().equals(vowel)) {
+                            noVowel = false;
+                            break;
+                        }
+                    }
+                        b++;
+                }
+
+                while (noVowel) {
+                    for (String vowel : vowels)
+                        if (selectedLetter.getLetter_name().equals(vowel)) {
+                            noVowel = false;
+                            break;
+                        }
+                    if (noVowel)
+                        selectedLetter = randomSelector.getRandom();
+                }
+            }
             //reduce from bag
             for (int j = 0; j < bag.size(); j++) { //find letter to reduce probability from bag
                 if (bag.get(j).letter_name.equals(selectedLetter.letter_name)) {
@@ -689,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements
             pBar.setVisibility(View.INVISIBLE);
 
 
-         //  valid=true; //TODO REMVOE AFTER TESTING
+          // valid=true; //TODO REMVOE AFTER TESTING
 
 
                 if (!valid) {
@@ -1067,7 +1123,7 @@ public class MainActivity extends AppCompatActivity implements
             mWordsAdapter.notifyDataSetChanged();
         }
 
-        Word addWord = new Word(theWord,prevWords);
+        Word addWord = new Word(theWord,prevWords,tempScore);
         wordList.add(addWord);
 
         builder.clear();
@@ -1792,13 +1848,13 @@ public class MainActivity extends AppCompatActivity implements
     public void setDeviceDimensions(){
 
 //TODO REMOVE AFTER TESTING:
-   /*  Hawk.delete(DEVICE_HEIGHT);
+    /* Hawk.delete(DEVICE_HEIGHT);
         Hawk.delete(DEVICE_WIDTH);
         Hawk.delete(MYWORDS_HEIGHT);
         Hawk.delete(SAW_BUBBLE_TOUR);
         Hawk.delete(TILE_WIDTH);
-        Hawk.delete(TILE_HEIGHT);*/
-
+        Hawk.delete(TILE_HEIGHT);
+*/
 ////////////////TODO did you remove this???
 
 

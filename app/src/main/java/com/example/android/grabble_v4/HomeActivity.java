@@ -63,9 +63,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             mList.set(0,letterL);
             mList.set(1,letterI);
-            mList.set(2,letterT);
             mList.add(3,letterS);
-
+            mList.set(2,letterT);
             mWelcomeAdapter.notifyDataSetChanged();
         }
     };
