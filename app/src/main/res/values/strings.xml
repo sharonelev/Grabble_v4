@@ -38,11 +38,14 @@
 
     <!--share-->
     <string name="share_score_title">TILES</string>
-    <string name="share_score_1">Check out my new score! I just made </string>
-    <string name="share_score_2"> points on TILES! </string>
-    <string name="share_word_1">I just got </string>
-    <string name="share_word_2"> points for </string>
+    <string name="share_score_1">"Check out my new score! I just made "</string>
+    <string name="share_score_2">" points on TILES " </string>
+    <string name="share_word_1">"I just got "</string>
+    <string name="share_word_2">" points for "</string>
     <string name="share_word_3"> on TILES</string>
+    <string name="share_classic">"classic mode! "</string>
+    <string name="share_moderate">"moderate mode! "</string>
+    <string name="share_speedy">"speedy mode! "</string>
 
 
     <!-- preferences-->
@@ -67,5 +70,6 @@
     <string name="rate_txt">Rate us on the app store</string>
     <string name="title_activity_history_of_word">HistoryOfWord</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_details">DetailsActivity</string>
 
 </resources>

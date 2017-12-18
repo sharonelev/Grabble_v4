@@ -1,5 +1,6 @@
 package com.example.android.grabble_v4;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -71,6 +72,7 @@ public static HighScoreScreenSlideDialog createInstance(int gameType){
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.high_score_view_pager,container,true);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         InkPageIndicator inkPageIndicator = (InkPageIndicator) rootview.findViewById(R.id.ink_indicator);
         mPager = (ViewPager) rootview.findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
@@ -83,6 +85,9 @@ public static HighScoreScreenSlideDialog createInstance(int gameType){
         newGameButton = (Button) rootview.findViewById(R.id.new_game_in_high_score);
         backButton.setOnClickListener(this);
         newGameButton.setOnClickListener(this);
+        Activity thisActivity = getActivity();
+        if(thisActivity instanceof HomeActivity)
+        {newGameButton.setVisibility(View.GONE);}
         return rootview;
     }
 

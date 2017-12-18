@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements
     public SQLiteDatabase dictionaryDb;
     DictionaryDbHelper dbHelper;
     Toast toast;
+    static SingleLetter placer = new SingleLetter(" ",0,0);
     boolean noTilesOnBoard;
     //preferences
     public boolean showCorrectPopUp;
@@ -172,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements
     public final static int RESULT_CODE_INSTRUCTIONS = 456;
     public final static String BUTTON_TAPPED = "Button_tapped";
     public final static String WORD = "word_to_return_history";
+    public final static String GAME_TYPE = "game_type";
+    public final static String PREV_ACTIVITY = "prev_activity";
     public final static String WORD_POINTS = "word_points";
     public final static String HISTORY_WIDTH = "history_fragment_width";
     public final static String HISTORY_LONGEST_WORD = "history_longest_word";
@@ -182,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements
     public TextView bubbleX;
     public TextView bubbleGoToInstructions;
     public final static String SAW_BUBBLE_TOUR = "saw_bubble_tour";
+    public boolean showBubblesFromInstructionsFromHome =false;
     public boolean showingBubblesFlag=false;
 
 
@@ -199,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements
         shakeDetectorInit();
         attachDB();
 
-        gameType = homeScreen.getIntExtra("game_type", R.id.button_classic_game);
+        gameType = homeScreen.getIntExtra(GAME_TYPE, R.id.button_classic_game);
         initalizeTimers=false;
 
         switch (gameType) {
@@ -211,6 +215,10 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.button_speedy_game:
                 countDownInd = 2;
+                break;
+            case R.id.bubble_layout_instructions:
+                countDownInd = 0;
+                showBubblesFromInstructionsFromHome=true;
                 break;
         }
 
@@ -248,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements
         rateApp();
         //bubble tour
         boolean saw_bubbles=Hawk.get(SAW_BUBBLE_TOUR,false);
-        if(!saw_bubbles)
+        if(!saw_bubbles || showBubblesFromInstructionsFromHome)
             showBubbles(false);
 
         //HockeyApp
@@ -561,7 +569,8 @@ public class MainActivity extends AppCompatActivity implements
                 for (int i = 0; i < myWords.size(); i++) { //loop per word
                     int blankCounter = 0;
                     for (int j = 0; j < myWords.get(i).size(); j++) { //loop per letter in word
-                        if (myWords.get(i).get(j).getLetter_name().equals("")) {
+                        //if (myWords.get(i).get(j).getLetter_name().equals(" ")) {
+                        if (myWords.get(i).get(j).equals(placer)) {
                             blankCounter++;
                         }
                     }
@@ -655,7 +664,7 @@ public class MainActivity extends AppCompatActivity implements
         mBuilderAdapter.notifyDataSetChanged();
         builderLetterTypes.add(placer(1, clickedWord, clickedLetter)); //keeps track of new word in builder origin
         myWords.get(clickedWord).remove(clickedLetter);
-        myWords.get(clickedWord).add(clickedLetter, new SingleLetter("", 0, 0)); //notify occurs in myWordsAdapter
+        myWords.get(clickedWord).add(clickedLetter, placer); //notify occurs in myWordsAdapter
     }
 
     @Override
@@ -670,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.scrabble_letter_list: //board
                 builder.add(board.get(clickedItemIndex));
                 board.remove(clickedItemIndex);
-                board.add(clickedItemIndex, new SingleLetter("", 0, 0));
+                board.add(clickedItemIndex, placer);
                 builderLetterTypes.add(placer(0, -1, clickedItemIndex));
                 mBoardAdapter.notifyDataSetChanged();
                 mBuilderAdapter.notifyDataSetChanged();
@@ -779,7 +788,7 @@ public class MainActivity extends AppCompatActivity implements
         if (board.isEmpty() && builder.isEmpty()) { //finished up all the tiles
 
             setEnableAll(false);
-            board.add(new SingleLetter(""));
+            board.add(placer);
             mBoardAdapter.notifyDataSetChanged();
             setFinalPoints(0);
 
@@ -848,7 +857,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.i("letter_remove",String.valueOf(toRemove));
         setEnableAll(false);
 
-        if(board.get(toRemove).getLetter_name().equals("")) {
+        if(board.get(toRemove).equals(placer)) {
             int i;
             for (i = 0; i < builderLetterTypes.size(); i++) //find the tile on the builder
             {
@@ -951,6 +960,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public void dialogEndGame(final int res) {
 
+        getLetterButtonToNewGame();
+
         if(highScoreScreenSlideDialog!=null) {
             if (highScoreScreenSlideDialog.isVisible()) {
                 //   Log.i("end game dialog", "high score visible");
@@ -977,20 +988,20 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 shareScore(playerScore);
-                getLetterButtonToNewGame();
+                //getLetterButtonToNewGame();
             }
         })
                 .setPositiveButton("HIGH SCORES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                getLetterButtonToNewGame();
+                //getLetterButtonToNewGame();
                openHighScoreDialog();
             }
         })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialogInterface) {
-                        getLetterButtonToNewGame();
+                  //      getLetterButtonToNewGame();
                     }
                 }).show();
         setDialogTextSize(dialog);
@@ -1366,6 +1377,7 @@ public class MainActivity extends AppCompatActivity implements
             case  R.id.instructions_menu:
                 destinationActivity = Instructions.class;
                 intent = new Intent(context, destinationActivity);
+                intent.putExtra(PREV_ACTIVITY,"main");
                 startActivityForResult(intent,RESULT_CODE_INSTRUCTIONS);
                 return true;
             case R.id.high_score_in_menu:
@@ -1515,7 +1527,19 @@ public class MainActivity extends AppCompatActivity implements
     //FEATURES
     //////SHARE
     public void shareScore(int score){
-        new Share( getString(R.string.share_score_1)+score+getString(R.string.share_score_2),this,this);
+        String modeString="";
+        switch (countDownInd){
+            case 0:
+                modeString=getString(R.string.share_classic);
+                break;
+            case 1:
+                modeString=getString(R.string.share_moderate);
+                break;
+            case 2:
+                modeString=getString(R.string.share_speedy);
+                break;
+        }
+        new Share( getString(R.string.share_score_1)+score+getString(R.string.share_score_2)+modeString,this,this);
 
     }
 
@@ -1568,6 +1592,7 @@ public class MainActivity extends AppCompatActivity implements
     ///// INSTRUCTION BUBBLES
     public void showBubbles(final boolean fromInstructionsPage){
 
+        showBubblesFromInstructionsFromHome=false;
         showingBubblesFlag = true;
 
         Log.i("method","show bubbles");

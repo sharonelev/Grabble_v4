@@ -16,6 +16,7 @@ public class Instructions extends AppCompatActivity implements View.OnClickListe
     /* Field to store our TextView */
     TextView bbl;
     ScrollView instruction_scrollview;
+    String prevActivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +24,7 @@ public class Instructions extends AppCompatActivity implements View.OnClickListe
         instruction_scrollview= (ScrollView)findViewById(R.id.inst_scroll);
         bbl= (TextView) findViewById(R.id.get_bbl_instructions);
         bbl.setText(R.string.show_bbl_instructions);
+        prevActivity=getIntent().getStringExtra(MainActivity.PREV_ACTIVITY);
 
 
         /* Typical usage of findViewById... */
@@ -41,9 +43,17 @@ public class Instructions extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         if(view.getId()==R.id.bubble_layout_instructions){
             Intent homeIntent = new Intent(Instructions.this, MainActivity.class);
-            homeIntent.putExtra(MainActivity.BUTTON_TAPPED, R.string.show_bbl_instructions);
-            setResult(MainActivity.RESULT_CODE_INSTRUCTIONS, homeIntent);
-            finish();
+            if(prevActivity.equals("main")) {
+                homeIntent.putExtra(MainActivity.BUTTON_TAPPED, R.string.show_bbl_instructions);
+                setResult(MainActivity.RESULT_CODE_INSTRUCTIONS, homeIntent);
+                finish();
+            }
+            else
+            {
+                homeIntent.putExtra(MainActivity.GAME_TYPE,view.getId());
+                startActivity(homeIntent);
+                finish();
+            }
 
         }
     }

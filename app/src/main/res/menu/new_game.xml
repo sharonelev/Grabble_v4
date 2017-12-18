@@ -14,7 +14,6 @@
         <item
             android:id="@+id/instructions_menu"
             android:orderInCategory="3"
-
             android:title="Instructions" />
         <item
             android:id="@+id/high_score_in_menu"

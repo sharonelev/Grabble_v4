@@ -272,7 +272,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
                 Log.i("MyWordsAdapter", "onLetterClick " + clickedItemIndex);
                 int position = getAdapterPosition();
                 mList.remove(clickedItemIndex);
-                mList.add(clickedItemIndex, new SingleLetter("", 0, 0));
+                mList.add(clickedItemIndex, MainActivity.placer);
                 mBoardAdapter.notifyItemRemoved(clickedItemIndex);
                 mBoardAdapter.notifyItemInserted(clickedItemIndex);
                 mOnClickListener.onWordItemClick(position, clickedItemIndex);
@@ -298,7 +298,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
     private void checkWordComplete(int wordToCheck, final WordViewHolder holder) {
         for(SingleLetter letter:myWords.get(wordToCheck)){
-            if(letter.getLetter_name()=="")
+            if(letter.equals(MainActivity.placer))
                 return;
         } //all letters aren't blank
         holder.wordMenu.setVisibility(View.VISIBLE);

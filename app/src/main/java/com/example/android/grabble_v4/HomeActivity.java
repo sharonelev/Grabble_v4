@@ -1,5 +1,6 @@
 package com.example.android.grabble_v4;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,9 +10,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import com.example.android.grabble_v4.data.SingleLetter;
-
+import com.example.android.grabble_v4.Utilities.LocaleHelper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +87,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        LocaleHelper.setLocale(this,"en");
         recyclerView =(RecyclerView) findViewById(R.id.welcomeRecyclerView);
         LinearLayoutManager WelcomeLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(WelcomeLayoutManager);
@@ -120,7 +124,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void endActivity(int gameType) {
         Intent homeIntent = new Intent(HomeActivity.this, MainActivity.class);
-        homeIntent.putExtra("game_type",gameType);
+        homeIntent.putExtra(MainActivity.GAME_TYPE,gameType);
         startActivity(homeIntent);
         finish();
     }
@@ -129,5 +133,49 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void getTileDimensions(int tileWidth, int tileHeight) {
         Log.i("height", String.valueOf(MainActivity.pxToDp(this,tileHeight)));
         Log.i("width", String.valueOf(MainActivity.pxToDp(this,tileWidth)));
+    }
+
+
+    //MENU METHODS
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.new_game, menu);
+        menu.getItem(0).setVisible(false);
+        menu.getItem(1).setVisible(false);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Context context = HomeActivity.this;
+        Class destinationActivity;
+        Intent intent;
+        switch (item.getItemId()) {
+
+            case  R.id.instructions_menu:
+                destinationActivity = Instructions.class;
+                intent = new Intent(context, destinationActivity);
+                intent.putExtra(MainActivity.PREV_ACTIVITY,"home");
+                startActivity(intent);
+                return true;
+            case R.id.high_score_in_menu:
+                openHighScoreDialog();
+                return true;
+            case R.id.send_feedback:
+                destinationActivity = SendFeedback.class;
+                intent = new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+            case R.id.settings:
+                destinationActivity = SettingsActivity.class;
+                intent= new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+        } //switch
+        return super.onOptionsItemSelected(item); //if not action_search
+    }
+    public void openHighScoreDialog(){
+
+        HighScoreScreenSlideDialog.createInstance(0).show(getSupportFragmentManager(),"Dialog Fragment");
     }
 }

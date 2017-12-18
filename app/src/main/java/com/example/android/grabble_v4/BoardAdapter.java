@@ -170,7 +170,7 @@ public class BoardAdapter  extends RecyclerView.Adapter<BoardAdapter.LetterViewH
 
 
         //handle blank placers
-            if(name.equals("") ){
+            if(name.equals(" ") ){
                 holder.mLetterValue.setVisibility(View.INVISIBLE);
                 holder.clickable(holder.itemView,0);
                 holder.itemView.setBackgroundColor(Color.TRANSPARENT);
