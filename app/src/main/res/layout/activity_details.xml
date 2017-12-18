@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,25 +8,71 @@
     tools:context="com.example.android.grabble_v4.DetailsActivity">
 
     <TextView
+        android:padding="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/details_title"
+        android:text="TILE DISTRIBUTION"
+        android:layout_marginRight="8dp"
+        android:textSize="@dimen/table_headers"
+        android:textStyle="bold"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout_details"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/details_title"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/table_headers"
         android:text="Letter"
         android:padding="5dp"/>
+
     <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
+        android:textSize="@dimen/table_headers"
         android:layout_height="wrap_content"
-        android:text="Value"
         android:padding="5dp"
-        />
+        android:text="Points" />
+
     <TextView
         android:layout_width="wrap_content"
+        android:textSize="@dimen/table_headers"
         android:layout_height="wrap_content"
         android:text="Frequency"
         android:padding="5dp"/>
+</LinearLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/details_recyclerview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        ></android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/linearLayout_details"
+        app:layout_constraintRight_toRightOf="@+id/linearLayout_details"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout_details"
+        tools:listitem="@layout/letter_details_view"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:paddingBottom="@dimen/details_margin_bottom"
+        >
 
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.v7.widget.RecyclerView>
+
+</android.support.constraint.ConstraintLayout>

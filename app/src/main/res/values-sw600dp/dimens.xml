@@ -30,4 +30,5 @@
     <dimen name="builder_height">80dp</dimen>
     <dimen name="game_sum">25sp</dimen>
     <dimen name="word_menu_icon">25dp</dimen>
+    <dimen name="details_margin">85dp</dimen>
 </resources>

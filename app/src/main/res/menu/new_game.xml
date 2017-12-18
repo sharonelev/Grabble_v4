@@ -28,6 +28,10 @@
             android:id="@+id/settings"
             android:orderInCategory="6"
             android:title="Settings"></item>
+        <item
+            android:id="@+id/tile_freq"
+            android:orderInCategory="7"
+            android:title="Tile Distribution"></item>
 
     </group>
 </menu>

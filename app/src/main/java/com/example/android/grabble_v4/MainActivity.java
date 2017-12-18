@@ -1393,6 +1393,11 @@ public class MainActivity extends AppCompatActivity implements
                 intent= new Intent(context, destinationActivity);
                 startActivity(intent);
                 return true;
+            case R.id.tile_freq:
+                destinationActivity = DetailsActivity.class;
+                intent= new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
         } //switch
         return super.onOptionsItemSelected(item); //if not action_search
     }

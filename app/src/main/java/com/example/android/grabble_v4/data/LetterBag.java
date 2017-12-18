@@ -11,7 +11,6 @@ import java.util.List;
 public class LetterBag {
 
 
-
     public static List<SingleLetter> createScrabbleSet(List<SingleLetter> list) {
 
 
