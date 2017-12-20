@@ -176,10 +176,13 @@ public class HistoryOfWord extends DialogFragment implements View.OnClickListene
 
 
     private Bitmap takeScreenshot(View view) {
+
         View screenView = view.getRootView();
         screenView.setDrawingCacheEnabled(true);
         Bitmap bitmap = Bitmap.createBitmap(screenView.getDrawingCache());
         screenView.setDrawingCacheEnabled(false);
+        shareButton.setVisibility(View.VISIBLE);
+        camera.setVisibility(View.VISIBLE);
         return bitmap;
     }
 
@@ -197,7 +200,7 @@ public class HistoryOfWord extends DialogFragment implements View.OnClickListene
             bm.compress(Bitmap.CompressFormat.PNG, 85, fOut);
             fOut.flush();
             fOut.close();
-            Toast.makeText(getContext(), "Photo saved in Tiles folder", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Photo saved in you phone gallery", Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -227,11 +230,14 @@ public class HistoryOfWord extends DialogFragment implements View.OnClickListene
 
         String fileName;
         fileName = finalWord.getTheWord() + "_History.png";
+        shareButton.setVisibility(View.INVISIBLE);
+        camera.setVisibility(View.INVISIBLE);
         switch (view.getId()) {
 
             case R.id.history_camera:
                 if (checkPermission()) {
                     store(takeScreenshot(rootview), fileName);
+
                 }
                 break;
             case R.id.history_share:
@@ -261,9 +267,11 @@ public class HistoryOfWord extends DialogFragment implements View.OnClickListene
         if (requestCode == REQUEST_CODE){
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
-                store(takeScreenshot(rootview), finalWord.getTheWord() + "_History");
+                store(takeScreenshot(rootview), finalWord.getTheWord() + "_History.png");
+
             }else {
                 Toast.makeText(getContext(), "Permission required to store history", Toast.LENGTH_SHORT).show();
+
             }
         }
     }

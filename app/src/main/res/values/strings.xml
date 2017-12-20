@@ -28,6 +28,7 @@
     <string name="go_to_instructions">For detailed instructions <u>click here</u></string>
     <!--buttons-->
     <string name="get_letter">GET LETTER</string>
+    <string name="best_move">BEST MOVE</string>
     <string name="end_game">END GAME</string>
     <string name="share_move">SHARE</string>
     <string name="new_game">NEW GAME</string>

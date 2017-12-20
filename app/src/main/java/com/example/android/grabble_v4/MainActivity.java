@@ -53,10 +53,12 @@ import android.widget.Toast;
 
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
+import com.example.android.grabble_v4.Utilities.BestWord;
 import com.example.android.grabble_v4.Utilities.Interfaces.CancelReviewListener;
 import com.example.android.grabble_v4.Utilities.Interfaces.NeverReviewListener;
 import com.example.android.grabble_v4.Utilities.Interfaces.NoStartReviewListener;
 import com.example.android.grabble_v4.Utilities.Interfaces.NotNowReviewListener;
+import com.example.android.grabble_v4.Utilities.LocaleHelper;
 import com.example.android.grabble_v4.Utilities.PreferenceUtilities;
 import com.example.android.grabble_v4.Utilities.ShakeDetector;
 import com.example.android.grabble_v4.Utilities.Interfaces.WhileDialogShows;
@@ -202,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent homeScreen = getIntent();
         shakeDetectorInit();
         attachDB();
-
+        LocaleHelper.setLocale(this,"en");
         gameType = homeScreen.getIntExtra(GAME_TYPE, R.id.button_classic_game);
         initalizeTimers=false;
 
@@ -268,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onResume() {
         Log.i("lifecycleEvent","onResume");
         super.onResume();
+        LocaleHelper.setLocale(this,"en");
         long prevTimer= getIntent().getLongExtra("timer",0); //in case a game with timer was stopped and resumed
         if(prevTimer>0 && countDownInd!=0 && getLetter.getText()!=getString(R.string.new_game)) {
             initalizeTimers=true;
@@ -541,6 +544,11 @@ public class MainActivity extends AppCompatActivity implements
                 onGetLetter();
 
                 break;
+
+/*            case R.id.best_word:
+
+                new bestMoveFinder().execute();
+                break;*/
 
             case R.id.send_word:
                 Log.i("send word", "send word");
@@ -1567,6 +1575,34 @@ public class MainActivity extends AppCompatActivity implements
 
 }
 
+    /////BEST MOVE
+    private class bestMoveFinder extends AsyncTask<Void,Void,String>
+    {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            setEnableAll(false);
+            pBar.setVisibility(View.VISIBLE); //progress bar
+        }
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            Log.i("on_click", "best word");
+            String theBestWord="";
+            BestWord bestWord = new BestWord(getBaseContext(),board,myWords, wordList,theBestWord);
+            return theBestWord; //TODO implement to return 1 best word
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            setEnableAll(true);
+            pBar.setVisibility(View.INVISIBLE);
+            Log.i("onpost","done searching best move");
+        }
+    }
+
+
     //////SHAKER
     public void shakeDetectorInit(){
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -1915,7 +1951,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if(myWordsHeight>0 && boardTileHeight>0) {
         //    int j = dpToPx(getBaseContext(),myWordsHeight);
-            int tileHeightDp = (int) (pxToDp(this,boardTileHeight)*1.1); //TODO is 1.1 not too much?
+            int tileHeightDp = (int) (pxToDp(this,boardTileHeight)*1.1);
             int spans = (int) Math.floor(myWordsHeight / tileHeightDp);
             myWordsStaggeredManager.setSpanCount(spans);
 
