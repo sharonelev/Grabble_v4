@@ -57,7 +57,7 @@ public class rateDialog implements DialogInterface.OnClickListener
         private String rateText = null;
         private AlertDialog alertDialog;
         private View dialogView;
-        private int upperBound = 10;
+        private int upperBound = 3;
         private int starColor;
 
         //interfaces

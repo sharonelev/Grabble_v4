@@ -68,6 +68,7 @@ import com.example.android.grabble_v4.Utilities.DictionaryDbHelper;
 import com.example.android.grabble_v4.data.LetterBag;
 import com.example.android.grabble_v4.data.SingleLetter;
 import com.example.android.grabble_v4.data.Word;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.orhanobut.hawk.Hawk;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -166,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements
     public static  int boardTileHeight;
     //add letter to board sources
     public static final String NEW_GAME = "new_game";
+    public static final String END_GAME = "end_game";
     public static final String MODERATE_GET_LETTER = "moderate_mid_timer";
     public static final String TIME_UP = "time_up";
     public static final String CLASSIC_GET_LETTER = "get_letter";
@@ -191,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements
     public boolean showingBubblesFlag=false;
 
 
+    //Firebase Analytics
+    private FirebaseAnalytics mFirebaseAnalytics;;
 
     // LIFE CYCLE EVENTS
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -207,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements
         LocaleHelper.setLocale(this,"en");
         gameType = homeScreen.getIntExtra(GAME_TYPE, R.id.button_classic_game);
         initalizeTimers=false;
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
 
         switch (gameType) {
             case R.id.button_classic_game:
@@ -331,6 +337,12 @@ public class MainActivity extends AppCompatActivity implements
 
     // CORE GAME METHODS
     public void newGame() {
+
+        Bundle params = new Bundle();
+        params.putString("event", NEW_GAME);
+        params.putString("full_text", "user started new game");
+        mFirebaseAnalytics.logEvent(NEW_GAME, params);
+
         //create bag
         game_limit = getResources().getInteger(R.integer.tiles_in_game);
         lettersLeft = game_limit;
@@ -967,6 +979,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void dialogEndGame(final int res) {
+
+        Bundle params = new Bundle();
+        params.putString("event",END_GAME );
+        params.putString("full_text", "game ended");
+        mFirebaseAnalytics.logEvent(END_GAME, params);
 
         getLetterButtonToNewGame();
 
@@ -1773,7 +1790,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 .setTitle("Your custom title")
                 .setForceMode(false)
-                .setUpperBound(10) // Market opened if a rating >= 9 is selected
+                .setUpperBound(3) // Market opened if a rating >= 3 is selected
                 .setRateText(getString(R.string.rate_txt))
                 .setTitle(getString(R.string.rate_title))
                 .setNoStarsListener(new NoStartReviewListener() {
@@ -1824,7 +1841,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         })        .setColor(Color.rgb(255,215,0))
                 //   .setReviewListener((ReviewListener) this) // Used to listen for reviews (if you want to track them )
-                .showAfter(3);
+                .showAfter(10);
     }
 
 
