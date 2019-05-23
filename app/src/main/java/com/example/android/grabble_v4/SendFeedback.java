@@ -76,8 +76,9 @@ public class SendFeedback extends AppCompatActivity implements View.OnClickListe
                    public void onCancel(DialogInterface dialogInterface) {
                        Context context = SendFeedback.this;
                        Class destinationActivity = MainActivity.class;
-                       Intent main_intent= new Intent(context,destinationActivity);
-                       startActivity(main_intent);
+                     //  Intent main_intent= new Intent(context,destinationActivity);
+                       //startActivity(main_intent);
+                       finish();
                    }
                })
                 .setNeutralButton("Back to Game", new DialogInterface.OnClickListener() {
@@ -85,8 +86,9 @@ public class SendFeedback extends AppCompatActivity implements View.OnClickListe
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Context context = SendFeedback.this;
                         Class destinationActivity = MainActivity.class;
-                        Intent main_intent= new Intent(context,destinationActivity);
-                        startActivity(main_intent);
+                        //Intent main_intent= new Intent(context,destinationActivity);
+                        //startActivity(main_intent);
+                        finish();
                     }
                 }).create().show();
 

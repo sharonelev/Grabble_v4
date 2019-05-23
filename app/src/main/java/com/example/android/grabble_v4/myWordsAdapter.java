@@ -1,5 +1,6 @@
 package com.example.android.grabble_v4;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -96,6 +97,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
 
     //POP UP MENU FOR WORD
         holder.wordMenu.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View view) {
                 //creating a popup menu
@@ -161,7 +163,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
                 });
                 //displaying the popup
                 //popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), holder.itemView);
+                @SuppressLint("RestrictedApi") MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), holder.itemView);
                 menuHelper.setForceShowIcon(true);
                 //menuHelper.setGravity(Gravity.END);
                 menuHelper.show();
@@ -181,6 +183,7 @@ public class myWordsAdapter extends RecyclerView.Adapter<myWordsAdapter.WordView
             tileSize=(int) screenWidthPX/12;
         int menuWidth = MainActivity.dpToPx(mContext,20);
         holder.itemView.getLayoutParams().width=(holder.mList.size())*(tileSize)+tileSize+ menuWidth;
+//      holder.itemView.getLayoutParams().height=(int) ((int)Hawk.get(MainActivity.TILE_HEIGHT)*1.2);;
 
         if(mHistory)
         {

@@ -15,13 +15,12 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
+
         android:text="@string/welcome"
         android:textColor="@color/gray_title"
         android:textSize="@dimen/lets_play_text_size"
         android:textStyle="bold"
-        app:layout_constraintLeft_toLeftOf="@id/rootView"
-        android:layout_marginRight="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="100dp" />

@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.sha.android.tiles"
         manifestPlaceholders = [HOCKEYAPP_APP_ID: "9d075afcb26c4b0ab6a7dbc54826b63f"]
         minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 8
-        versionName "1.5"
+        targetSdkVersion 28
+        versionCode 10
+        versionName "1.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -21,30 +21,30 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
 
     })
     dependencies {
-        compile 'com.google.code.gson:gson:2.8.2'
+        implementation 'com.google.code.gson:gson:2.8.2'
     }
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'net.hockeyapp.android:HockeySDK:5.0.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:preference-v7:25.3.1'
-    compile 'com.github.krtkush:LinearTimer:v2.1.1'
-    compile 'com.pacioianu.david:ink-page-indicator:1.2.0'
-    compile 'com.orhanobut:hawk:2.0.1'
-    compile 'com.daasuu:BubbleLayout:1.1.1'
-    compile 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
-    compile 'com.google.firebase:firebase-core:11.8.0'
-    compile 'com.google.firebase:firebase-crash:11.8.0'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'net.hockeyapp.android:HockeySDK:5.0.1'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.0-beta1'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'com.github.krtkush:LinearTimer:v2.1.1'
+    implementation 'com.pacioianu.david:ink-page-indicator:1.2.0'
+    implementation 'com.orhanobut:hawk:2.0.1'
+    implementation 'com.daasuu:BubbleLayout:1.1.1'
+    implementation 'com.github.Angtrim:Android-Five-Stars-Library:v3.1'
+    implementation 'com.google.firebase:firebase-core:16.0.9'
+    implementation 'com.google.firebase:firebase-crash:16.2.1'
+    testImplementation 'junit:junit:4.12'
 
 }
 apply plugin: 'com.google.gms.google-services'

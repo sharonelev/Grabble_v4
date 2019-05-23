@@ -1,12 +1,10 @@
 package com.example.android.grabble_v4;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -21,11 +19,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -378,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //mBoardRecView.setLayoutManager(gridLayoutManager);
         mBoardRecView.setLayoutManager(boardLinearLayout);
-        mBoardRecView.getLayoutParams().height = boardHeight;
+        mBoardRecView.getLayoutParams().height = getHeightForRV();
 
         myWordsStaggeredManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL); //4 as default
                 setSpanForStaggered();
@@ -1936,8 +1930,8 @@ public class MainActivity extends AppCompatActivity implements
         Hawk.delete(MYWORDS_HEIGHT);
         Hawk.delete(SAW_BUBBLE_TOUR);
         Hawk.delete(TILE_WIDTH);
-        Hawk.delete(TILE_HEIGHT);
-*/
+        Hawk.delete(TILE_HEIGHT);*/
+
 ////////////////TODO did you remove this???
 
 
@@ -1960,7 +1954,7 @@ public class MainActivity extends AppCompatActivity implements
             boardTileHeight = Hawk.get(TILE_HEIGHT);
             boardTileWidth = Hawk.get(TILE_WIDTH);
         }
-        //setHeightForRV();
+        //getHeightForRV();
         getMyWordsHeight();
     }
 
@@ -1980,12 +1974,14 @@ public class MainActivity extends AppCompatActivity implements
         else return 5;*/
     }
 
-    private void setHeightForRV() {
-        if(deviceHeight<550) //check with nexus4
-           boardHeight= dpToPx(this,60); //enough for 1 tile
+    private int getHeightForRV() {
+     return    dpToPx(this,70);
+        /*if(deviceHeight<550) //check with nexus4
+           return dpToPx(this,60); //enough for 1 tile
         else if (deviceHeight<600)
-            boardHeight=  dpToPx(this,80); //1.5 tiles
-        else boardHeight=  dpToPx(this,100); //2 tiles
+            return   dpToPx(this,80); //1.5 tiles
+
+        else return   dpToPx(this,100); //2 tiles*/
     }
 
     private int getBoardRows() {

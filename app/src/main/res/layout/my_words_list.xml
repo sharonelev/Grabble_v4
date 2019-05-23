@@ -5,16 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
     <android.support.v7.widget.RecyclerView
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/my_words_list_height"
-        android:id="@+id/each_word"
-        android:paddingTop="1dp"
-        android:paddingBottom="1dp"
-        android:paddingLeft="1dp"
-        android:scrollbars="horizontal"
-        android:overScrollMode="never"
-        tools:listitem = "@layout/letter_on_board_view"
-        ></android.support.v7.widget.RecyclerView>
+      android:layout_width="wrap_content"
+      android:layout_height="@dimen/my_words_list_height"
+      android:id="@+id/each_word"
+      android:paddingTop="1dp"
+      android:paddingBottom="1dp"
+      android:paddingLeft="1dp"
+      android:scrollbars="horizontal"
+      android:overScrollMode="never"
+      tools:listitem="@layout/letter_on_board_view"
+      />
 
     <ImageButton
         android:id="@+id/word_options"
