@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "346565413115",
+    "firebase_url": "https://tiles-83936.firebaseio.com",
+    "project_id": "tiles-83936",
+    "storage_bucket": "tiles-83936.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346565413115:android:9de6b10206993866",
+        "android_client_info": {
+          "package_name": "com.sha.android.tiles"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "346565413115-qk6k9mt6p2vq56315aa7095v6iuadpns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA35KL-L3xgApojsrs7-1SPnp8DDctuONs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "346565413115-biqu9jmlno2gh2h0qkdi1l4op31bsvh3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

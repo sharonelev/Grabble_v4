@@ -1,9 +1,7 @@
 package com.example.android.grabble_v4;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,8 +11,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import com.example.android.grabble_v4.utilities.PrivacyPolicyActivity;
 import com.example.android.grabble_v4.data.SingleLetter;
-import com.example.android.grabble_v4.Utilities.LocaleHelper;
+import com.example.android.grabble_v4.utilities.LocaleHelper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,6 +172,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             case R.id.tile_freq:
                 destinationActivity = DetailsActivity.class;
+                intent= new Intent(context, destinationActivity);
+                startActivity(intent);
+                return true;
+            case R.id.privacy_policy:
+                destinationActivity = PrivacyPolicyActivity.class;
                 intent= new Intent(context, destinationActivity);
                 startActivity(intent);
                 return true;

@@ -18,7 +18,7 @@
         <item
             android:id="@+id/high_score_in_menu"
             android:orderInCategory="4"
-            android:title="My High Scores"></item>
+            android:title="My High Scores"/>
         <item
             android:id="@+id/send_feedback"
             android:orderInCategory="5"
@@ -27,11 +27,15 @@
         <item
             android:id="@+id/settings"
             android:orderInCategory="6"
-            android:title="Settings"></item>
+            android:title="Settings"/>
         <item
             android:id="@+id/tile_freq"
             android:orderInCategory="7"
-            android:title="Tile Distribution"></item>
+            android:title="Tile Distribution"/>
+        <item
+        android:id="@+id/privacy_policy"
+        android:orderInCategory="8"
+        android:title="Privacy Policy"/>
 
     </group>
 </menu>
